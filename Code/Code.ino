@@ -1,5 +1,5 @@
 
-// This Project and Code is created by Albert Kravcov
+// This Project is created by Albert Kravcov
 
 // TO DOS & FIXMEs:
 // • Find OSD button bug not enabaling the osd on first press
