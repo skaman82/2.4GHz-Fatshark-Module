@@ -732,6 +732,8 @@ void osd() {
 
 
 
+//MAIN LOOP ************************
+
 void loop() {
 
 #ifdef OLED
@@ -977,7 +979,9 @@ void loop() {
 }
 
 
-//simple avg of 4 value
+
+//RSSI READOUT ************************ simple avg of 4 value
+
 uint16_t _readRSSI() {
   volatile uint32_t sum = 0;
   analogRead(RSSI_pin);
@@ -993,21 +997,21 @@ uint16_t _readRSSI() {
 }
 
 
+
+//MAIN MENU ************************
+
 void menu() {
-  menuactive = 1;
+  
   int menu_position = 1;
-  osd_mode = 1;
 
   byte exit = 0;
-  while (exit == 0)
-  {
-
-
-    if (menu_position == 1) {
+  while (exit == 0) {
+    osd();
+    menuactive = 1;
+    osd_mode = 1;
+  
+  if (menu_position == 1) {
       buttoncheck();
-      control();
-      osd();
-
 
 #ifdef OSD
       TV.select_font(font4x6);
@@ -1034,8 +1038,6 @@ void menu() {
     else if (menu_position == 2) {
 
       buttoncheck();
-      control();
-      osd();
 
       //do stuff pos2
       TV.select_font(font4x6);
@@ -1068,8 +1070,6 @@ void menu() {
     else if (menu_position == 3) {
 
       buttoncheck();
-      control();
-      osd();
 
       TV.select_font(font4x6);
       TV.print(55, 0, "MENU");
@@ -1095,8 +1095,6 @@ void menu() {
     else if (menu_position == 4) {
 
       buttoncheck();
-      control();
-      osd();
 
       //do stuff pos4
       TV.select_font(font4x6);
@@ -1123,8 +1121,6 @@ void menu() {
     else if (menu_position == 5) {
 
       buttoncheck();
-      control();
-      osd();
 
       //do stuff pos5
       TV.select_font(font4x6);
@@ -1159,8 +1155,6 @@ void menu() {
     else if (menu_position == 6) {
 
       buttoncheck();
-      control();
-      osd();
 
       //do stuff pos6
       TV.select_font(font4x6);
@@ -1175,6 +1169,7 @@ void menu() {
 #endif
         menu_position = 0;
         menuactive = 0;
+        osd_mode = 0;
         exit = 1;
       }
 
@@ -1190,18 +1185,18 @@ void menu() {
 
 
 
+//CALIBRATION MENU ************************
+
 
 void calibration() {     // Calibration wizzard
 
-  menuactive = 1;
+  byte exit = 0;
+  while (exit == 0) {
 
   int calstep = 1;
-  osd_mode = 1;
-
+ 
   while (calstep == 1) {
     buttoncheck();
-    control();
-    osd();
     channeltable();
 
 #ifdef OSD
@@ -1252,7 +1247,6 @@ void calibration() {     // Calibration wizzard
 
   while (calstep == 2) {
     buttoncheck();
-    control();
 
     TV.print(30, 0, "RSSI CALIBRATION");
     TV.select_font(font6x8);
@@ -1280,7 +1274,6 @@ void calibration() {     // Calibration wizzard
   }
   while (calstep == 3) {
     buttoncheck();
-    control();
 
     TV.print(30, 0, "RSSI CALIBRATION");
     TV.select_font(font6x8);
@@ -1308,7 +1301,6 @@ void calibration() {     // Calibration wizzard
   }
   while (calstep == 4) {
     buttoncheck();
-    control();
 
     TV.print(30, 0, "RSSI CALIBRATION");
     TV.select_font(font6x8);
@@ -1334,35 +1326,28 @@ void calibration() {     // Calibration wizzard
       TV.clear_screen();
 #endif
       calstep = 0;
-      menuactive = 0;
-      osd_mode = 0;
-      //softReset();
-
       max = RSSImaxEEP;
       min = RSSIminEEP;
 
-      return;
+      exit = 1;
     }
   }
-
+ }
 
 }
 
+//BANDSCAN MENU ************************
 
 void bandscan() {
 
-  osd_mode = 1;
-  menuactive = 1;
+  byte exit = 0;
+  while (exit == 0) {
 
-  while (menuactive == 1) {
     buttoncheck();
-    control();
-    osd();
     channeltable();
 
     TV.select_font(font4x6);
     TV.print(35, 0, "BAND SCANNER ");
-
 
     ACT_channel = 1;
 
@@ -1376,83 +1361,77 @@ void bandscan() {
       percentage = 0;
     }
 
-
-    float rssibar1 = percentage * 0.81; //scalin the bar a bit down
+    float rssibar1 = percentage * 0.81; //scaling the bar a bit down
     TV.print(0, 90, "CH1");
     TV.draw_rect(0, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(0, (85 - rssi_value), 10, rssi_value, WHITE, WHITE);
+    TV.draw_rect(0, (85 - rssibar1), 10, rssibar1, WHITE, WHITE);
 
     ACT_channel = 2;
     TV.delay(10);
     rssi_value = _readRSSI();
-    float rssibar2 = percentage * 0.81; //scalin the bar a bit down
+    float rssibar2 = percentage * 0.81; //scaling the bar a bit down
     TV.print(16, 90, "CH2");
     TV.draw_rect(16, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(16, (85 - rssi_value), 10, rssi_value, WHITE, WHITE);
+    TV.draw_rect(16, (85 - rssibar2), 10, rssibar2, WHITE, WHITE);
 
     ACT_channel = 3;
     TV.delay(10);
     rssi_value = _readRSSI();
-    float rssibar3 = percentage * 0.81; //scalin the bar a bit down
+    float rssibar3 = percentage * 0.81; //scaling the bar a bit down
     TV.print(32, 90, "CH3");
     TV.draw_rect(32, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(32, (85 - rssi_value), 10, rssi_value, WHITE, WHITE);
+    TV.draw_rect(32, (85 - rssibar3), 10, rssibar3, WHITE, WHITE);
 
     ACT_channel = 4;
     TV.delay(10);
     rssi_value = _readRSSI();
-    float rssibar4 = percentage * 0.81; //scalin the bar a bit down
+    float rssibar4 = percentage * 0.81; //scaling the bar a bit down
     TV.print(48, 90, "CH4");
     TV.draw_rect(48, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(48, (85 - rssi_value), 10, rssi_value, WHITE, WHITE);
+    TV.draw_rect(48, (85 - rssibar4), 10, rssibar4, WHITE, WHITE);
 
     ACT_channel = 5;
     TV.delay(10);
     rssi_value = _readRSSI();
-    float rssibar5 = percentage * 0.81; //scalin the bar a bit down
+    float rssibar5 = percentage * 0.81; //scaling the bar a bit down
     TV.print(64, 90, "CH5");
     TV.draw_rect(64, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(64, (85 - rssi_value), 10, rssi_value, WHITE, WHITE);
+    TV.draw_rect(64, (85 - rssibar5), 10, rssibar5, WHITE, WHITE);
 
     ACT_channel = 6;
     TV.delay(10);
     rssi_value = _readRSSI();
-    float rssibar6 = percentage * 0.81; //scalin the bar a bit down
+    float rssibar6 = percentage * 0.81; //scaling the bar a bit down
     TV.print(80, 90, "CH6");
     TV.draw_rect(80, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(80, (85 - rssi_value), 10, rssi_value, WHITE, WHITE);
+    TV.draw_rect(80, (85 - rssibar6), 10, rssibar6, WHITE, WHITE);
 
 
     ACT_channel = 7;
     TV.delay(10);
     rssi_value = _readRSSI();
-    float rssibar7 = percentage * 0.81; //scalin the bar a bit down
+    float rssibar7 = percentage * 0.81; //scaling the bar a bit down
     TV.print(96, 90, "CH7");
     TV.draw_rect(96, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(96, (85 - rssi_value), 10, rssi_value, WHITE, WHITE);
+    TV.draw_rect(96, (85 - rssibar7), 10, rssibar7, WHITE, WHITE);
 
     ACT_channel = 8;
     TV.delay(10);
     rssi_value = _readRSSI();
-    float rssibar8 = percentage * 0.81; //scalin the bar a bit down
+    float rssibar8 = percentage * 0.81; //scaling the bar a bit down
     TV.print(112, 90, "CH8");
     TV.draw_rect(112, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(112, (85 - rssi_value), 10, rssi_value, WHITE, WHITE);
+    TV.draw_rect(112, (85 - rssibar8), 10, rssibar8, WHITE, WHITE);
 
-    TV.print(0, 0, rssi_value);
+    TV.print(0, 0, rssi_value); //debug
 
 
     if (pressedbut == 1) {
 #ifdef OSD
       TV.clear_screen();
 #endif
-      menuactive = 0;
-      osd_mode = 0;
-      exit;
-
-
+      exit = 1;
     }
-
-  }
+   }
 
 }
