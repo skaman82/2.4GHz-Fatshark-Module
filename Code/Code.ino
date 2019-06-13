@@ -3,7 +3,7 @@
 
 // TO DOS & FIXMEs:
 // • Find OSD button bug not enabaling the osd on first press
-// X Main Menu structure 
+// X Main Menu structure
 // • Finder Screen
 // • Lock Mode
 // X Calibrate menu
@@ -139,7 +139,6 @@ void setup() {
   min = RSSIminEEP;
 
 
-
   if (channelvalueEEP <= 8)
   {
     SAVED_channel = channelvalueEEP;
@@ -148,7 +147,6 @@ void setup() {
   {
     SAVED_channel = 1;
   }
-
 
 
 #ifdef OLED
@@ -209,9 +207,7 @@ void setup() {
 
   osd_mode = 1;
 
-
   //bandscan(); //for debugging only
-
 }
 
 
@@ -444,8 +440,6 @@ void control() {
         callOSD();
       }
     }
-
-
   }
 
   if (pressedbut == 3) {
@@ -493,11 +487,6 @@ void control() {
       calibration();
     }
     else if (menuactive == 1) {
-      //TV.fill(BLACK);
-      //TV.delay(10);
-      //menuactive = 0;
-      //return;
-
     }
 
     else {
@@ -558,8 +547,6 @@ void rx_update() {
   else {
     ACT_channel = BT_channel; //if nothing from above applies, set tha active channel acording to module button state
   }
-
-
 
 
 }
@@ -1001,7 +988,7 @@ uint16_t _readRSSI() {
 //MAIN MENU ************************
 
 void menu() {
-  
+
   int menu_position = 1;
 
   byte exit = 0;
@@ -1009,8 +996,8 @@ void menu() {
     osd();
     menuactive = 1;
     osd_mode = 1;
-  
-  if (menu_position == 1) {
+
+    if (menu_position == 1) {
       buttoncheck();
 
 #ifdef OSD
@@ -1193,146 +1180,146 @@ void calibration() {     // Calibration wizzard
   byte exit = 0;
   while (exit == 0) {
 
-  int calstep = 1;
- 
-  while (calstep == 1) {
-    buttoncheck();
-    channeltable();
+    int calstep = 1;
+
+    while (calstep == 1) {
+      buttoncheck();
+      channeltable();
 
 #ifdef OSD
 
-    TV.select_font(font4x6);
-    TV.print(30, 0, "RSSI CALIBRATION");
-    TV.select_font(font6x8);
-    TV.print(14, 30, "1:Select channel");
-    uint32_t rssi_value = _readRSSI();
-    // TV.print(0, 55, rssi_value);
-    TV.print(21, 55, "< ");
-    TV.print(ACT_channel);
-    TV.print(":");
-    TV.print(freq);
-    TV.print(" MHz");
-    TV.print(" >");
+      TV.select_font(font4x6);
+      TV.print(30, 0, "RSSI CALIBRATION");
+      TV.select_font(font6x8);
+      TV.print(14, 30, "1:Select channel");
+      uint32_t rssi_value = _readRSSI();
+      // TV.print(0, 55, rssi_value);
+      TV.print(21, 55, "< ");
+      TV.print(ACT_channel);
+      TV.print(":");
+      TV.print(freq);
+      TV.print(" MHz");
+      TV.print(" >");
 
-    TV.draw_rect(38, 75, 48, 16, WHITE);
-    TV.select_font(font4x6);
-    TV.print(51, 81, "NEXT >");
+      TV.draw_rect(38, 75, 48, 16, WHITE);
+      TV.select_font(font4x6);
+      TV.print(51, 81, "NEXT >");
 
 #endif
 
 #ifndef V1
-    if (ACT_channel <= 7) {
-      if (pressedbut == 4) {
-        ACT_channel += 1;
+      if (ACT_channel <= 7) {
+        if (pressedbut == 4) {
+          ACT_channel += 1;
+        }
+      }
+      if (ACT_channel >= 2) {
+
+        if (pressedbut == 5) {
+          ACT_channel -= 1;
+        }
+      }
+
+#endif
+
+      if (pressedbut == 1) {
+
+#ifdef OSD
+        TV.clear_screen();
+#endif
+
+        calstep = 2;
       }
     }
-    if (ACT_channel >= 2) {
 
-      if (pressedbut == 5) {
-        ACT_channel -= 1;
+    while (calstep == 2) {
+      buttoncheck();
+
+      TV.print(30, 0, "RSSI CALIBRATION");
+      TV.select_font(font6x8);
+
+      TV.print(0, 30, "2:Remove antenna and switch off the VTX");
+      uint32_t rssi_value = _readRSSI();
+      // RSSImaxEEP = EEPROM.read(RSSImaxADDR) * 2;
+      // TV.print(50, 55, rssi_value);
+      // TV.print(50, 65, RSSImaxEEP);
+
+      TV.draw_rect(38, 75, 48, 16, WHITE);
+      TV.select_font(font4x6);
+      TV.print(51, 81, "NEXT >");
+
+      if (pressedbut == 1) {
+
+        RSSImaxEEP = rssi_value / 2;
+        EEPROM.write(RSSImaxADDR, RSSImaxEEP);
+
+#ifdef OSD
+        TV.clear_screen();
+#endif
+        calstep = 3;
       }
     }
+    while (calstep == 3) {
+      buttoncheck();
 
-#endif
+      TV.print(30, 0, "RSSI CALIBRATION");
+      TV.select_font(font6x8);
 
-    if (pressedbut == 1) {
+      TV.print(0, 30, "3:Put on the antenna and switch on the VTX");
+      uint32_t rssi_value = _readRSSI();
+      // TV.print(50, 55, rssi_value);
+      // RSSIminEEP = EEPROM.read(RSSIminADDR) * 2;
+      // TV.print(50, 65, RSSIminEEP);
 
-#ifdef OSD
-      TV.clear_screen();
-#endif
+      TV.draw_rect(38, 75, 48, 16, WHITE);
+      TV.select_font(font4x6);
+      TV.print(51, 81, "NEXT >");
 
-      calstep = 2;
-    }
-  }
+      if (pressedbut == 1) {
 
-  while (calstep == 2) {
-    buttoncheck();
-
-    TV.print(30, 0, "RSSI CALIBRATION");
-    TV.select_font(font6x8);
-
-    TV.print(0, 30, "2:Remove antenna and switch off the VTX");
-    uint32_t rssi_value = _readRSSI();
-    // RSSImaxEEP = EEPROM.read(RSSImaxADDR) * 2;
-    // TV.print(50, 55, rssi_value);
-    // TV.print(50, 65, RSSImaxEEP);
-
-    TV.draw_rect(38, 75, 48, 16, WHITE);
-    TV.select_font(font4x6);
-    TV.print(51, 81, "NEXT >");
-
-    if (pressedbut == 1) {
-
-      RSSImaxEEP = rssi_value / 2;
-      EEPROM.write(RSSImaxADDR, RSSImaxEEP);
+        RSSIminEEP = rssi_value / 2;
+        EEPROM.write(RSSIminADDR, RSSIminEEP);
 
 #ifdef OSD
-      TV.clear_screen();
+        TV.clear_screen();
 #endif
-      calstep = 3;
+        calstep = 4;
+      }
     }
-  }
-  while (calstep == 3) {
-    buttoncheck();
+    while (calstep == 4) {
+      buttoncheck();
 
-    TV.print(30, 0, "RSSI CALIBRATION");
-    TV.select_font(font6x8);
+      TV.print(30, 0, "RSSI CALIBRATION");
+      TV.select_font(font6x8);
 
-    TV.print(0, 30, "3:Put on the antenna and switch on the VTX");
-    uint32_t rssi_value = _readRSSI();
-    // TV.print(50, 55, rssi_value);
-    // RSSIminEEP = EEPROM.read(RSSIminADDR) * 2;
-    // TV.print(50, 65, RSSIminEEP);
+      TV.print(8, 30, "4:Calibration done!");
 
-    TV.draw_rect(38, 75, 48, 16, WHITE);
-    TV.select_font(font4x6);
-    TV.print(51, 81, "NEXT >");
+      RSSIminEEP = EEPROM.read(RSSIminADDR) * 2;
+      RSSImaxEEP = EEPROM.read(RSSImaxADDR) * 2;
 
-    if (pressedbut == 1) {
+      TV.print(30, 50, "Saved Max:");
+      TV.print(RSSIminEEP);
 
-      RSSIminEEP = rssi_value / 2;
-      EEPROM.write(RSSIminADDR, RSSIminEEP);
+      TV.print(30, 60, "Saved Min:");
+      TV.print(RSSImaxEEP);
+
+      TV.draw_rect(38, 75, 48, 16, WHITE);
+      TV.select_font(font4x6);
+      TV.print(51, 81, "EXIT >");
+
+      if (pressedbut == 1) {
 
 #ifdef OSD
-      TV.clear_screen();
+        TV.clear_screen();
 #endif
-      calstep = 4;
+        calstep = 0;
+        max = RSSImaxEEP;
+        min = RSSIminEEP;
+
+        exit = 1;
+      }
     }
   }
-  while (calstep == 4) {
-    buttoncheck();
-
-    TV.print(30, 0, "RSSI CALIBRATION");
-    TV.select_font(font6x8);
-
-    TV.print(8, 30, "4:Calibration done!");
-
-    RSSIminEEP = EEPROM.read(RSSIminADDR) * 2;
-    RSSImaxEEP = EEPROM.read(RSSImaxADDR) * 2;
-
-    TV.print(30, 50, "Saved Max:");
-    TV.print(RSSIminEEP);
-
-    TV.print(30, 60, "Saved Min:");
-    TV.print(RSSImaxEEP);
-
-    TV.draw_rect(38, 75, 48, 16, WHITE);
-    TV.select_font(font4x6);
-    TV.print(51, 81, "EXIT >");
-
-    if (pressedbut == 1) {
-
-#ifdef OSD
-      TV.clear_screen();
-#endif
-      calstep = 0;
-      max = RSSImaxEEP;
-      min = RSSIminEEP;
-
-      exit = 1;
-    }
-  }
- }
 
 }
 
@@ -1423,7 +1410,7 @@ void bandscan() {
     TV.draw_rect(112, 35, 10, 50, BLACK, BLACK);
     TV.draw_rect(112, (85 - rssibar8), 10, rssibar8, WHITE, WHITE);
 
-    TV.print(0, 0, rssi_value); //debug
+    TV.print(0, 0, rssi_value); //for debugging only
 
 
     if (pressedbut == 1) {
@@ -1432,6 +1419,21 @@ void bandscan() {
 #endif
       exit = 1;
     }
-   }
+  }
 
 }
+
+
+
+
+//STORING STUFF
+
+// u8g.drawBitmapP(5, 20, 7, 32, bitmap_nkizw);   //goggle
+// u8g.drawBitmapP(5, 20, 7, 32, bitmap_hd85pj);  //bandscan
+// u8g.drawBitmapP(5, 20, 7, 32, bitmap_w113l);   //lock
+// u8g.drawBitmapP(5, 20, 7, 32, bitmap_ydywrn);  //search
+// u8g.drawBitmapP(5, 20, 7, 32, bitmap_calib);   //calibrate
+// u8g.drawBitmapP(5, 20, 7, 32, bitmap_be8bbq);  //exit
+// u8g.drawBitmapP(5, 20, 7, 32, bitmap_dock);    //dockking
+// u8g.drawBitmapP(5, 20, 1, 8, bitmap_lock);     //mini lock icon
+
