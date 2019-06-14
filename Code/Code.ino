@@ -2,11 +2,14 @@
 // This Project is created by Albert Kravcov
 
 // TO DOS & FIXMEs:
-// • Find OSD button bug not enabaling the osd on first press
 // X Main Menu structure
+// X Calibrate wizzard
+// X Bandscan
+
 // • Finder Screen
 // • Lock Mode
-// X Calibrate menu
+// • OLED screens
+// • Find OSD button bug not enabaling the osd on first press
 
 
 #include <TVout.h>
@@ -36,6 +39,7 @@ U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_NO_ACK | U8G_I2C_OPT_F
 #define displayADDR              4  // EEPROM Adress
 #define RSSImaxADDR              5  // EEPROM Adress
 #define RSSIminADDR              6  // EEPROM Adress
+#define serialADDR               7  // EEPROM Adress
 
 int channelvalueEEP;
 int lockmodeEEP;    //TODO: lock mode setting (all buttons deactivated)
@@ -43,6 +47,7 @@ int fscontrollEEP;  //TODO: FS Buttons disabled
 int displayEEP;     //TODO: OLED disabled
 int RSSImaxEEP;     // RSSI calibration
 int RSSIminEEP;     // RSSI calibration
+int serialEEP;     // serial communication
 int max; //= 365; //0% RSSI
 int min; // = 338; //100% RSSI
 
@@ -62,8 +67,8 @@ word freq;
 unsigned long previousOsdMillis = 0;
 
 #ifdef V3
-unsigned long BTinterval = 6000;
-unsigned long BTinterval_FIXED = 6000;
+unsigned long BTinterval = 1000;
+unsigned long BTinterval_FIXED = 1000;
 #endif
 
 #ifndef V3
@@ -71,7 +76,11 @@ unsigned long BTinterval = 4000;
 unsigned long BTinterval_FIXED = 4000;
 #endif
 
-
+int voffset = 20;
+  
+#ifndef V3
+int voffset = 0;
+#endif
 
 #ifdef OSD
 TVout TV;
@@ -128,17 +137,18 @@ void setup() {
 
   channelvalueEEP = EEPROM.read(chanADDR);
 
-  lockmodeEEP = EEPROM.read(chanADDR);
-  fscontrollEEP = EEPROM.read(fscontrollADDR);
-  displayEEP = EEPROM.read(displayADDR);
+  lockmodeEEP = EEPROM.read(chanADDR); //TODO
+  fscontrollEEP = EEPROM.read(fscontrollADDR); //TODO
+  displayEEP = EEPROM.read(displayADDR); //TODO
+  serialEEP = EEPROM.read(serialADDR); //TODO
 
   RSSImaxEEP = EEPROM.read(RSSImaxADDR)  * 2;
   RSSIminEEP = EEPROM.read(RSSIminADDR)  * 2;
 
   //max = RSSImaxEEP;
   //min = RSSIminEEP;
-max = 410; //0% RSSI 365
-min = 385; //100% RSSI 338
+  max = 0; //0% RSSI 365
+  min = 70; //100% RSSI 338
 
   if (channelvalueEEP <= 8)
   {
@@ -158,7 +168,7 @@ min = 385; //100% RSSI 338
 #ifdef OSD
 #ifdef PAL_FORMAT
 #ifdef V3
-  TV.begin(_PAL, 128, 96); //original 128x96px, 160x120max
+  TV.begin(_PAL, 146, 120); //original 128x96px, 160x120max
 #endif
 #ifndef V3
   TV.begin(_PAL, 112, 78);
@@ -179,7 +189,7 @@ min = 385; //100% RSSI 338
 #endif
 
   TV.clear_screen();
-  TV.bitmap(2, 20, logo);
+  TV.bitmap(2, (20 + voffset), logo);
 
 #endif
 
@@ -193,9 +203,9 @@ min = 385; //100% RSSI 338
 
 #ifdef OSD
   TV.select_font(font6x8);
-  TV.print(25, 50, "2G4 MODULE");
+  TV.print(25, (50 + voffset), "2G4 MODULE");
   TV.select_font(font4x6);
-  TV.print(24, 69, "#RUININGTHEHOBBY");
+  TV.print(24, (69 + voffset), "#RUININGTHEHOBBY");
   TV.delay(3000);
   TV.tone(500, 200);
   TV.clear_screen();
@@ -368,7 +378,7 @@ void control() {
       FS_control = 0;
 
       if (osd_mode == 1) {
-        BTinterval += 1000;
+        BTinterval += 500;
 
 
         if (BT_channel <= 7) {
@@ -501,7 +511,7 @@ void control() {
 #endif
       menuactive = 1;
       //calibration();
-        bandscan(); //for debugging only
+      bandscan(); //for debugging only
 
     }
     else if (menuactive == 1) {
@@ -818,12 +828,12 @@ void loop() {
 #ifdef OSD
     //Main OSD code
     TV.select_font(font6x8);
-    TV.print(23, 27, "CH");
+    TV.print(23, (27 + voffset), "CH");
     TV.println(ACT_channel);
-    TV.draw_rect(18, 20, 26, 20, WHITE);
+    TV.draw_rect(18, (20 + voffset), 26, 20, WHITE);
 
-    TV.draw_rect(44, 20, 55, 20, WHITE);
-    TV.print(49, 27, freq);
+    TV.draw_rect(44, (20 + voffset), 55, 20, WHITE);
+    TV.print(49, (27 + voffset), freq);
     TV.println(" MHz");
 
 #endif
@@ -842,24 +852,24 @@ void loop() {
 
 #ifdef OSD
     TV.select_font(font4x6);
-    TV.print(18, 50, "RSSI ");
+    TV.print(18, (50 + voffset), "RSSI ");
     TV.println((percentage - 0), 0);
 
     if ((percentage < 100) && (percentage >= 10)) {
-      TV.draw_rect(46, 50, 4, 4, BLACK, BLACK); //cover the first RSSI number
+      TV.draw_rect(46, (50 + voffset), 4, 4, BLACK, BLACK); //cover the first RSSI number
     }
 
     else if (percentage < 10) {
-      TV.draw_rect(42, 50, 8, 4, BLACK, BLACK); //cover the second RSSI number
+      TV.draw_rect(42, (50 + voffset), 8, 4, BLACK, BLACK); //cover the second RSSI number
     }
 
-    TV.draw_rect(18, 58, rssibar, 5, WHITE, WHITE);
+    TV.draw_rect(18, (58 + voffset), rssibar, 5, WHITE, WHITE);
     if (percentage < 100) {
-      TV.draw_rect((18 + rssibar), 58, (100 - rssibar), 5, BLACK, BLACK);
+      TV.draw_rect((18 + rssibar), (58 + voffset), (100 - rssibar), 5, BLACK, BLACK);
     }
-    TV.draw_line(18, 64, 100, 64, WHITE);
+    TV.draw_line(18, (64 + voffset), 100, (64 + voffset), WHITE);
 
-    TV.print(1, 53, rssi_value);
+    TV.print(1, (53 + voffset), rssi_value); //for debugging only
 
 #endif
 
@@ -1004,10 +1014,10 @@ void menu() {
 
 #ifdef OSD
       TV.select_font(font4x6);
-      TV.print(55, 0, "MENU");
+      TV.print(55, (0 + voffset), "MENU");
       TV.select_font(font6x8);
-      TV.bitmap(35, 30, bitmap_nkizw_OSD); //goggle
-      TV.print(15, 80, "Goggle control:");
+      TV.bitmap(35, (25 + voffset), bitmap_nkizw_OSD); //goggle
+      TV.print(15, (70 + voffset), "Goggle control:");
       TV.print("ON");
 #endif
 
@@ -1030,10 +1040,10 @@ void menu() {
 
       //do stuff pos2
       TV.select_font(font4x6);
-      TV.print(55, 0, "MENU");
+      TV.print(55, (0 + voffset), "MENU");
       TV.select_font(font6x8);
-      TV.bitmap(35, 30, bitmap_hd85pj_OSD); //scan
-      TV.print(38, 80, "Bandscan");
+      TV.bitmap(35, (25 + voffset), bitmap_hd85pj_OSD); //scan
+      TV.print(38, (70 + voffset), "Bandscan");
 
       if (pressedbut == 1) {
 #ifdef OSD
@@ -1061,10 +1071,10 @@ void menu() {
       buttoncheck();
 
       TV.select_font(font4x6);
-      TV.print(55, 0, "MENU");
+      TV.print(55, (0 + voffset), "MENU");
       TV.select_font(font6x8);
-      TV.bitmap(35, 30, bitmap_w113l_OSD); //lock
-      TV.print(39, 80, "Lock:");
+      TV.bitmap(35, (25 + voffset), bitmap_w113l_OSD); //lock
+      TV.print(39, (70 + voffset), "Lock:");
       TV.print("OFF");
 
       if (pressedbut == 4) {
@@ -1087,10 +1097,10 @@ void menu() {
 
       //do stuff pos4
       TV.select_font(font4x6);
-      TV.print(55, 0, "MENU");
+      TV.print(55, (0 + voffset), "MENU");
       TV.select_font(font6x8);
-      TV.bitmap(35, 30, bitmap_ydywrn_OSD); //search
-      TV.print(35, 80, "Find mode");
+      TV.bitmap(35, (25 + voffset), bitmap_ydywrn_OSD); //search
+      TV.print(35, (70 + voffset), "Find mode");
 
       if (pressedbut == 4) {
 #ifdef OSD
@@ -1113,10 +1123,10 @@ void menu() {
 
       //do stuff pos5
       TV.select_font(font4x6);
-      TV.print(55, 0, "MENU");
+      TV.print(55, (0 + voffset), "MENU");
       TV.select_font(font6x8);
-      TV.bitmap(35, 30, bitmap_949gqh_OSD); //tools
-      TV.print(37, 80, "Calibrate");
+      TV.bitmap(35, (25 + voffset), bitmap_949gqh_OSD); //tools
+      TV.print(37, (70 + voffset), "Calibrate");
 
 
       if (pressedbut == 1) {
@@ -1147,10 +1157,10 @@ void menu() {
 
       //do stuff pos6
       TV.select_font(font4x6);
-      TV.print(55, 0, "MENU");
+      TV.print(55, (0 + voffset), "MENU");
       TV.select_font(font6x8);
-      TV.bitmap(35, 30, bitmap_be8bbq_OSD); //exit
-      TV.print(50, 80, "EXIT");
+      TV.bitmap(35, (25 + voffset), bitmap_be8bbq_OSD); //exit
+      TV.print(50, (70 + voffset), "EXIT");
 
       if (pressedbut == 1) {
 #ifdef OSD
@@ -1191,21 +1201,20 @@ void calibration() {     // Calibration wizzard
 #ifdef OSD
 
       TV.select_font(font4x6);
-      TV.print(30, 0, "RSSI CALIBRATION");
+      TV.print(30, (0 + voffset), "RSSI CALIBRATION");
       TV.select_font(font6x8);
-      TV.print(14, 30, "1:Select channel");
+      TV.print(14, (30 + voffset), "1:Select channel");
       uint32_t rssi_value = _readRSSI();
-      // TV.print(0, 55, rssi_value);
-      TV.print(21, 55, "< ");
+      TV.print(21, (50 + voffset), "< ");
       TV.print(ACT_channel);
       TV.print(":");
       TV.print(freq);
       TV.print(" MHz");
       TV.print(" >");
 
-      TV.draw_rect(38, 75, 48, 16, WHITE);
+      TV.draw_rect(38, (75 + voffset), 48, 16, WHITE);
       TV.select_font(font4x6);
-      TV.print(51, 81, "NEXT >");
+      TV.print(51, (81 + voffset), "NEXT >");
 
 #endif
 
@@ -1237,18 +1246,18 @@ void calibration() {     // Calibration wizzard
     while (calstep == 2) {
       buttoncheck();
 
-      TV.print(30, 0, "RSSI CALIBRATION");
+      TV.print(30, (0 + voffset), "RSSI CALIBRATION");
       TV.select_font(font6x8);
 
-      TV.print(0, 30, "2:Remove antenna and switch off the VTX");
+      TV.print(0, (30 + voffset), "2:Remove antenna and switch off the VTX");
       uint32_t rssi_value = _readRSSI();
       // RSSImaxEEP = EEPROM.read(RSSImaxADDR) * 2;
       // TV.print(50, 55, rssi_value);
       // TV.print(50, 65, RSSImaxEEP);
 
-      TV.draw_rect(38, 75, 48, 16, WHITE);
+      TV.draw_rect(38, (75 + voffset), 48, 16, WHITE);
       TV.select_font(font4x6);
-      TV.print(51, 81, "NEXT >");
+      TV.print(51, (81 + voffset), "NEXT >");
 
       if (pressedbut == 1) {
 
@@ -1264,18 +1273,18 @@ void calibration() {     // Calibration wizzard
     while (calstep == 3) {
       buttoncheck();
 
-      TV.print(30, 0, "RSSI CALIBRATION");
+      TV.print(30, (0 + voffset), "RSSI CALIBRATION");
       TV.select_font(font6x8);
 
-      TV.print(0, 30, "3:Put on the antenna and switch on the VTX");
+      TV.print(0, (30 + voffset), "3:Put on the antenna and switch on the VTX");
       uint32_t rssi_value = _readRSSI();
       // TV.print(50, 55, rssi_value);
       // RSSIminEEP = EEPROM.read(RSSIminADDR) * 2;
       // TV.print(50, 65, RSSIminEEP);
 
-      TV.draw_rect(38, 75, 48, 16, WHITE);
+      TV.draw_rect(38, (75 + voffset), 48, 16, WHITE);
       TV.select_font(font4x6);
-      TV.print(51, 81, "NEXT >");
+      TV.print(51, (81 + voffset), "NEXT >");
 
       if (pressedbut == 1) {
 
@@ -1291,23 +1300,23 @@ void calibration() {     // Calibration wizzard
     while (calstep == 4) {
       buttoncheck();
 
-      TV.print(30, 0, "RSSI CALIBRATION");
+      TV.print(30, (0 + voffset), "RSSI CALIBRATION");
       TV.select_font(font6x8);
 
-      TV.print(8, 30, "4:Calibration done!");
+      TV.print(8, (30 + voffset), "4:Calibration done!");
 
       RSSIminEEP = EEPROM.read(RSSIminADDR) * 2;
       RSSImaxEEP = EEPROM.read(RSSImaxADDR) * 2;
 
-      TV.print(30, 50, "Saved Max:");
+      TV.print(30, (50 + voffset), "Saved Max:");
       TV.print(RSSIminEEP);
 
-      TV.print(30, 60, "Saved Min:");
+      TV.print(30, (60 + voffset), "Saved Min:");
       TV.print(RSSImaxEEP);
 
-      TV.draw_rect(38, 75, 48, 16, WHITE);
+      TV.draw_rect(38, (75 + voffset), 48, 16, WHITE);
       TV.select_font(font4x6);
-      TV.print(51, 81, "EXIT >");
+      TV.print(51, (81 + voffset), "EXIT >");
 
       if (pressedbut == 1) {
 
@@ -1329,196 +1338,245 @@ void calibration() {     // Calibration wizzard
 
 void bandscan() {
 
+
   byte exit = 0;
   while (exit == 0) {
-  
+
     menuactive = 1; //for debugging only
     buttoncheck();
     channeltable();
 
     TV.select_font(font4x6);
-    TV.print(35, 0, "BAND SCANNER ");
-    TV.draw_line(0, 65, 112, 65, WHITE);
+    TV.print(35, (0 + voffset), "BAND SCANNER ");
+    TV.draw_line(0, (70 + voffset), 123, (70 + voffset), WHITE);
 
-   //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH1
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH1
     if (ACT_channel == 1) {
-    //TV.delay(10);
-    //TV.print(0, 0, ACT_channel); //for debugging only
 
-    uint32_t rssi_value1 = _readRSSI();
-    float percentage1 = map(rssi_value1, max, min, 0, 100);
-    if (percentage1 > 100) {
-      percentage1 = 100;
-    }
-    else if (percentage1 < 0) {
-      percentage1 = 0;
+      uint32_t rssi_value1 = _readRSSI();
+      float percentage1 = map(rssi_value1, max, min, 0, 100);
+      if (percentage1 > 100) {
+        percentage1 = 100;
+      }
+      else if (percentage1 < 0) {
+        percentage1 = 0;
+      }
+
+      TV.draw_rect(0, (13 + voffset), 14, 67, BLACK, BLACK);
+      TV.draw_rect(0, ((70 - (percentage1 * 0.5)) + voffset), 10, (percentage1 * 0.5), WHITE, WHITE);
+      TV.print(0, (75 + voffset), "CH1");
+      if ((percentage1 < 100) && (percentage1 >= 10)) {
+      TV.print(2, ((63 - (percentage1 * 0.5)) + voffset), percentage1, 0); 
+      }
+      else if (percentage1 < 10) {
+      TV.print(4, ((63 - (percentage1 * 0.5)) + voffset), percentage1, 0); 
+      }
+      else {
+        TV.print(0, ((63 - (percentage1 * 0.5)) + voffset), percentage1, 0); 
+        }
+      //TV.print("%");
+      ACT_channel = 2;
     }
 
-    TV.draw_rect(0, 8, 14, 67, BLACK, BLACK);
-    TV.draw_rect(0, (65 - (percentage1 * 0.5)), 10, (percentage1 * 0.5), WHITE, WHITE);
-    TV.print(0, 70, "CH1");
-    TV.print(2, (58 - (percentage1 * 0.5)), percentage1, 0); //for debugging only
-    //TV.print("%");
-    ACT_channel = 2;
-    }
-    
-   //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH2
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH2
     else if (ACT_channel == 2) {
-    //TV.delay(10);
-    //TV.print(0, 0, ACT_channel); //for debugging only
-    
-    uint32_t rssi_value2 = _readRSSI();
-    float percentage2 = map(rssi_value2, max, min, 0, 100);
-    if (percentage2 > 100) {
-      percentage2 = 100;
+
+      uint32_t rssi_value2 = _readRSSI();
+      float percentage2 = map(rssi_value2, max, min, 0, 100);
+      if (percentage2 > 100) {
+        percentage2 = 100;
+      }
+      else if (percentage2 < 0) {
+        percentage2 = 0;
+      }
+
+      TV.draw_rect(16, (13 + voffset), 14, 67, BLACK, BLACK);
+      TV.draw_rect(16, ((70 - (percentage2 * 0.5)) + voffset), 10, (percentage2 * 0.5), WHITE, WHITE);
+      TV.print(16, (75 + voffset), "CH2");
+      if ((percentage2 < 100) && (percentage2 >= 10)) {
+      TV.print(18, ((63 - (percentage2 * 0.5)) + voffset), percentage2, 0); 
+      }
+      else if (percentage2 < 10) {
+      TV.print(20, ((63 - (percentage2 * 0.5)) + voffset), percentage2, 0); 
+      }
+      else {
+        TV.print(16, ((63 - (percentage2 * 0.5)) + voffset), percentage2, 0); 
+        }
+      //TV.print("%");
+      ACT_channel = 3;
     }
-    else if (percentage2 < 0) {
-      percentage2 = 0;
-    }
-    
-    TV.draw_rect(16, 8, 14, 67, BLACK, BLACK);
-    TV.draw_rect(16, (65 - (percentage2 * 0.5)), 10, (percentage2 * 0.5), WHITE, WHITE);
-    TV.print(16, 70, "CH2");
-    TV.print(18, (58 - (percentage2 * 0.5)), percentage2, 0); //for debugging only
-    //TV.print("%");
-    ACT_channel = 3;
-    }
-    
+
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH3
     else if (ACT_channel == 3) {
-    //TV.delay(10);
-    //TV.print(0, 0, ACT_channel); //for debugging only
-    
-    uint32_t rssi_value3 = _readRSSI();
-    float percentage3 = map(rssi_value3, max, min, 0, 100);
-    if (percentage3 > 100) {
-      percentage3 = 100;
+
+      uint32_t rssi_value3 = _readRSSI();
+      float percentage3 = map(rssi_value3, max, min, 0, 100);
+      if (percentage3 > 100) {
+        percentage3 = 100;
+      }
+      else if (percentage3 < 0) {
+        percentage3 = 0;
+      }
+
+      TV.draw_rect(32, (13 + voffset), 14, 67, BLACK, BLACK);
+      TV.draw_rect(32, ((70 - (percentage3 * 0.5)) + voffset), 10, (percentage3 * 0.5), WHITE, WHITE);
+      TV.print(32, (75 + voffset), "CH3");
+      if ((percentage3 < 100) && (percentage3 >= 10)) {
+      TV.print(34, ((63 - (percentage3 * 0.5)) + voffset), percentage3, 0); 
+      }
+      else if (percentage3 < 10) {
+      TV.print(36, ((63 - (percentage3 * 0.5)) + voffset), percentage3, 0); 
+      }
+      else {
+        TV.print(32, ((63 - (percentage3 * 0.5)) + voffset), percentage3, 0);
+        }
+      //TV.print("%");
+      ACT_channel = 4;
     }
-    else if (percentage3 < 0) {
-      percentage3 = 0;
-    }
-    
-    TV.draw_rect(32, 8, 14, 67, BLACK, BLACK);
-    TV.draw_rect(32, (65 - (percentage3 * 0.5)), 10, (percentage3 * 0.5), WHITE, WHITE);
-    TV.print(32, 70, "CH3");
-    TV.print(34, (58 - (percentage3 * 0.5)), percentage3, 0); //for debugging only
-    //TV.print("%");
-    ACT_channel = 4;
-  }
-    
+
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH4
     else if (ACT_channel == 4) {
-    //TV.delay(10);
-    //TV.print(0, 0, ACT_channel); //for debugging only
 
-    uint32_t rssi_value4 = _readRSSI();
-    float percentage4 = map(rssi_value4, max, min, 0, 100);
-    if (percentage4 > 100) {
-      percentage4 = 100;
+      uint32_t rssi_value4 = _readRSSI();
+      float percentage4 = map(rssi_value4, max, min, 0, 100);
+      if (percentage4 > 100) {
+        percentage4 = 100;
+      }
+      else if (percentage4 < 0) {
+        percentage4 = 0;
+      }
+      TV.draw_rect(48, (13 + voffset), 14, 67, BLACK, BLACK);
+      TV.draw_rect(48, ((70 - (percentage4 * 0.5)) + voffset), 10, (percentage4 * 0.5), WHITE, WHITE);
+      TV.print(48, (75 + voffset), "CH4");
+      if ((percentage4 < 100) && (percentage4 >= 10)) {
+      TV.print(50, ((63 - (percentage4 * 0.5)) + voffset), percentage4, 0); 
+      }
+      else if (percentage4 < 10) {
+      TV.print(52, ((63 - (percentage4 * 0.5)) + voffset), percentage4, 0); 
+      }
+      else {
+        TV.print(48, ((63 - (percentage4 * 0.5)) + voffset), percentage4, 0); 
+        }
+      //TV.print("%");
+      ACT_channel = 5;
     }
-    else if (percentage4 < 0) {
-      percentage4 = 0;
-    }
-    TV.draw_rect(48, 8, 14, 67, BLACK, BLACK);
-    TV.draw_rect(48, (65 - (percentage4 * 0.5)), 10, (percentage4 * 0.5), WHITE, WHITE);
-    TV.print(48, 70, "CH4");
-    TV.print(50, (58 - (percentage4 * 0.5)), percentage4, 0); //for debugging only
-    //TV.print("%");
-    ACT_channel = 5;
-    }
-    
+
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH5
     else if (ACT_channel == 5) {
-    //TV.delay(10);
-    //TV.print(0, 0, ACT_channel); //for debugging only
-    
-    uint32_t rssi_value5 = _readRSSI();
-    float percentage5 = map(rssi_value5, max, min, 0, 100);
-    if (percentage5 > 100) {
-      percentage5 = 100;
+
+      uint32_t rssi_value5 = _readRSSI();
+      float percentage5 = map(rssi_value5, max, min, 0, 100);
+      if (percentage5 > 100) {
+        percentage5 = 100;
+      }
+      else if (percentage5 < 0) {
+        percentage5 = 0;
+      }
+
+      TV.draw_rect(64, (13 + voffset), 14, 67, BLACK, BLACK);
+      TV.draw_rect(64, ((70 - (percentage5 * 0.5)) + voffset), 10, (percentage5 * 0.5), WHITE, WHITE);
+      TV.print(64, (75 + voffset), "CH5");
+      if ((percentage5 < 100) && (percentage5 >= 10)) {
+      TV.print(66, ((63 - (percentage5 * 0.5)) + voffset), percentage5, 0); 
+      }
+      else if (percentage5 < 10) {
+      TV.print(68, ((63 - (percentage5 * 0.5)) + voffset), percentage5, 0); 
+      }
+      else {
+        TV.print(64, ((63 - (percentage5 * 0.5)) + voffset), percentage5, 0); 
+        }
+      //TV.print("%");
+      ACT_channel = 6;
     }
-    else if (percentage5 < 0) {
-      percentage5 = 0;
-    }
-    
-    TV.draw_rect(64, 8, 14, 67, BLACK, BLACK);
-    TV.draw_rect(64, (65 - (percentage5 * 0.5)), 10, (percentage5 * 0.5), WHITE, WHITE);
-    TV.print(64, 70, "CH5");
-    TV.print(66, (58 - (percentage5 * 0.5)), percentage5, 0); //for debugging only
-    //TV.print("%");
-    ACT_channel = 6;
-    }
-    
+
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH6
     else if (ACT_channel == 6) {
-    //TV.delay(10);
-    //TV.print(0, 0, ACT_channel); //for debugging only
-    
-    uint32_t rssi_value6 = _readRSSI();
-    float percentage6 = map(rssi_value6, max, min, 0, 100);
-    
-    if (percentage6 > 100) {
-      percentage6 = 100;
-    }
-    else if (percentage6 < 0) {
-      percentage6 = 0;
-    }
-    
-    TV.draw_rect(80, 8, 14, 67, BLACK, BLACK);
-    TV.draw_rect(80, (65 - (percentage6 * 0.5)), 10, (percentage6 * 0.5), WHITE, WHITE);
-    TV.print(80, 70, "CH6");
-    TV.print(82, (58 - (percentage6 * 0.5)), percentage6, 0); //for debugging only
-    //TV.print("%");
-    ACT_channel = 7;
-   }
 
-   //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH7
+      uint32_t rssi_value6 = _readRSSI();
+      float percentage6 = map(rssi_value6, max, min, 0, 100);
+
+      if (percentage6 > 100) {
+        percentage6 = 100;
+      }
+      else if (percentage6 < 0) {
+        percentage6 = 0;
+      }
+
+      TV.draw_rect(80, (13 + voffset), 14, 67, BLACK, BLACK);
+      TV.draw_rect(80, ((70 - (percentage6 * 0.5)) + voffset), 10, (percentage6 * 0.5), WHITE, WHITE);
+      TV.print(80, (75 + voffset), "CH6");
+      if ((percentage6 < 100) && (percentage6 >= 10)) {
+      TV.print(82, ((63 - (percentage6 * 0.5)) + voffset), percentage6, 0); 
+      }
+      else if (percentage6 < 10) {
+      TV.print(84, ((63 - (percentage6 * 0.5)) + voffset), percentage6, 0); 
+      }
+      else {
+        TV.print(80, ((63 - (percentage6 * 0.5)) + voffset), percentage6, 0); 
+        }
+      //TV.print("%");
+      ACT_channel = 7;
+    }
+
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH7
     else if (ACT_channel == 7) {
-    //TV.delay(10);
-    //TV.print(0, 0, ACT_channel); //for debugging only
-    
-    uint32_t rssi_value7 = _readRSSI();
-    float percentage7 = map(rssi_value7, max, min, 0, 100);
-    
-    if (percentage7 > 100) {
-      percentage7 = 100;
+
+      uint32_t rssi_value7 = _readRSSI();
+      float percentage7 = map(rssi_value7, max, min, 0, 100);
+
+      if (percentage7 > 100) {
+        percentage7 = 100;
+      }
+      else if (percentage7 < 0) {
+        percentage7 = 0;
+      }
+
+      TV.draw_rect(96, (13 + voffset), 14, 67, BLACK, BLACK);
+      TV.draw_rect(96, ((70 - (percentage7 * 0.5)) + voffset), 10, (percentage7 * 0.5), WHITE, WHITE);
+      TV.print(96, (75 + voffset), "CH7");
+      if ((percentage7 < 100) && (percentage7 >= 10)) {
+        TV.print(98, ((63 - (percentage7 * 0.5)) + voffset), percentage7, 0); 
+      }
+      else if (percentage7 < 10) {
+        TV.print(100, ((63 - (percentage7 * 0.5)) + voffset), percentage7, 0); 
+      }
+      else {
+        TV.print(96, ((63 - (percentage7 * 0.5)) + voffset), percentage7, 0); 
+      }
+      //TV.print("%");
+      ACT_channel = 8;
     }
-    else if (percentage7 < 0) {
-      percentage7 = 0;
-    }
-    
-    TV.draw_rect(96, 8, 14, 67, BLACK, BLACK);
-    TV.draw_rect(96, (65 - (percentage7 * 0.5)), 10, (percentage7 * 0.5), WHITE, WHITE);
-    TV.print(96, 70, "CH7");
-    TV.print(98, (58 - (percentage7 * 0.5)), percentage7, 0); //for debugging only
-    //TV.print("%");
-    ACT_channel = 8;
-    }
-    
+
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH8
     else if (ACT_channel == 8) {
-    //TV.delay(10);
-    //TV.print(0, 0, ACT_channel); //for debugging only
-     
-    uint32_t rssi_value8 = _readRSSI();
-    float percentage8 = map(rssi_value8, max, min, 0, 100);
-    
-    if (percentage8 > 100) {
-      percentage8 = 100;
+
+      uint32_t rssi_value8 = _readRSSI();
+      float percentage8 = map(rssi_value8, max, min, 0, 100);
+
+      if (percentage8 > 100) {
+        percentage8 = 100;
+      }
+      else if (percentage8 < 0) {
+        percentage8 = 0;
+      }
+
+      TV.draw_rect(112, (13 + voffset), 14, 67, BLACK, BLACK);
+      TV.draw_rect(112, ((70 - (percentage8 * 0.5)) + voffset), 10, (percentage8 * 0.5), WHITE, WHITE);
+      TV.print(112, (75 + voffset), "CH8");
+      if ((percentage8 < 100) && (percentage8 >= 10)) {
+        TV.print(114, ((63 - (percentage8 * 0.5)) + voffset), percentage8, 0); 
+      }
+      else if (percentage8 < 10) {
+        TV.print(116, ((63 - (percentage8 * 0.5)) + voffset), percentage8, 0); 
+      }
+      else {
+        TV.print(112, ((63 - (percentage8 * 0.5)) + voffset), percentage8, 0); 
+      }
+      //TV.print("%");
+      ACT_channel = 1;
     }
-    else if (percentage8 < 0) {
-      percentage8 = 0;
-    }
-    
-    TV.draw_rect(112, 8, 14, 67, BLACK, BLACK);
-    TV.draw_rect(112, (65 - (percentage8 * 0.5)), 10, (percentage8 * 0.5), WHITE, WHITE);
-    TV.print(112, 70, "CH8");
-    TV.print(114, (58 - (percentage8 * 0.5)), percentage8, 0); //for debugging only
-    //TV.print("%");
-    ACT_channel = 1;
-    }
-   
-    
+
+
     if (pressedbut == 1) {
 #ifdef OSD
       TV.clear_screen();
@@ -1533,7 +1591,7 @@ void bandscan() {
 
 
 
-//STORING STUFF
+//STORING STUFF FOR LATER
 
 // u8g.drawBitmapP(5, 20, 7, 32, bitmap_nkizw);   //goggle
 // u8g.drawBitmapP(5, 20, 7, 32, bitmap_hd85pj);  //bandscan
@@ -1543,4 +1601,3 @@ void bandscan() {
 // u8g.drawBitmapP(5, 20, 7, 32, bitmap_be8bbq);  //exit
 // u8g.drawBitmapP(5, 20, 7, 32, bitmap_dock);    //dockking
 // u8g.drawBitmapP(5, 20, 1, 8, bitmap_lock);     //mini lock icon
-
