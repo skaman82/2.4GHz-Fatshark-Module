@@ -122,6 +122,9 @@ void setup() {
   pinMode(FS_pin2,      INPUT); //google c2
   pinMode(FS_pin3,      INPUT); //google c3
   pinMode(ButtonCenter, INPUT_PULLUP); //Button
+#ifdef RSSI_mod
+  pinMode(RSSI_pin, INPUT);
+#endif
 
 #ifdef V2
   pinMode(ButtonLeft,   INPUT_PULLUP); //Button left
