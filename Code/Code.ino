@@ -135,9 +135,10 @@ void setup() {
   RSSImaxEEP = EEPROM.read(RSSImaxADDR)  * 2;
   RSSIminEEP = EEPROM.read(RSSIminADDR)  * 2;
 
-  max = RSSImaxEEP;
-  min = RSSIminEEP;
-
+  //max = RSSImaxEEP;
+  //min = RSSIminEEP;
+max = 410; //0% RSSI 365
+min = 385; //100% RSSI 338
 
   if (channelvalueEEP <= 8)
   {
@@ -207,7 +208,6 @@ void setup() {
 
   osd_mode = 1;
 
-  //bandscan(); //for debugging only
 }
 
 
@@ -500,7 +500,9 @@ void control() {
       TV.clear_screen();
 #endif
       menuactive = 1;
-      calibration();
+      //calibration();
+        bandscan(); //for debugging only
+
     }
     else if (menuactive == 1) {
       TV.fill(BLACK);
@@ -1329,94 +1331,199 @@ void bandscan() {
 
   byte exit = 0;
   while (exit == 0) {
-
+  
+    menuactive = 1; //for debugging only
     buttoncheck();
     channeltable();
 
     TV.select_font(font4x6);
     TV.print(35, 0, "BAND SCANNER ");
+    TV.draw_line(0, 65, 112, 65, WHITE);
 
-    ACT_channel = 1;
+   //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH1
+    if (ACT_channel == 1) {
+    //TV.delay(10);
+    //TV.print(0, 0, ACT_channel); //for debugging only
 
-    uint32_t rssi_value = _readRSSI();
-
-    float percentage = map(rssi_value, max, min, 0, 100);
-    if (percentage > 100) {
-      percentage = 100;
+    uint32_t rssi_value1 = _readRSSI();
+    float percentage1 = map(rssi_value1, max, min, 0, 100);
+    if (percentage1 > 100) {
+      percentage1 = 100;
     }
-    else if (percentage < 0) {
-      percentage = 0;
+    else if (percentage1 < 0) {
+      percentage1 = 0;
     }
 
-    float rssibar1 = percentage * 0.81; //scaling the bar a bit down
-    TV.print(0, 90, "CH1");
-    TV.draw_rect(0, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(0, (85 - rssibar1), 10, rssibar1, WHITE, WHITE);
-
+    TV.draw_rect(0, 8, 14, 67, BLACK, BLACK);
+    TV.draw_rect(0, (65 - (percentage1 * 0.5)), 10, (percentage1 * 0.5), WHITE, WHITE);
+    TV.print(0, 70, "CH1");
+    TV.print(2, (58 - (percentage1 * 0.5)), percentage1, 0); //for debugging only
+    //TV.print("%");
     ACT_channel = 2;
-    TV.delay(10);
-    rssi_value = _readRSSI();
-    float rssibar2 = percentage * 0.81; //scaling the bar a bit down
-    TV.print(16, 90, "CH2");
-    TV.draw_rect(16, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(16, (85 - rssibar2), 10, rssibar2, WHITE, WHITE);
-
+    }
+    
+   //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH2
+    else if (ACT_channel == 2) {
+    //TV.delay(10);
+    //TV.print(0, 0, ACT_channel); //for debugging only
+    
+    uint32_t rssi_value2 = _readRSSI();
+    float percentage2 = map(rssi_value2, max, min, 0, 100);
+    if (percentage2 > 100) {
+      percentage2 = 100;
+    }
+    else if (percentage2 < 0) {
+      percentage2 = 0;
+    }
+    
+    TV.draw_rect(16, 8, 14, 67, BLACK, BLACK);
+    TV.draw_rect(16, (65 - (percentage2 * 0.5)), 10, (percentage2 * 0.5), WHITE, WHITE);
+    TV.print(16, 70, "CH2");
+    TV.print(18, (58 - (percentage2 * 0.5)), percentage2, 0); //for debugging only
+    //TV.print("%");
     ACT_channel = 3;
-    TV.delay(10);
-    rssi_value = _readRSSI();
-    float rssibar3 = percentage * 0.81; //scaling the bar a bit down
-    TV.print(32, 90, "CH3");
-    TV.draw_rect(32, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(32, (85 - rssibar3), 10, rssibar3, WHITE, WHITE);
-
+    }
+    
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH3
+    else if (ACT_channel == 3) {
+    //TV.delay(10);
+    //TV.print(0, 0, ACT_channel); //for debugging only
+    
+    uint32_t rssi_value3 = _readRSSI();
+    float percentage3 = map(rssi_value3, max, min, 0, 100);
+    if (percentage3 > 100) {
+      percentage3 = 100;
+    }
+    else if (percentage3 < 0) {
+      percentage3 = 0;
+    }
+    
+    TV.draw_rect(32, 8, 14, 67, BLACK, BLACK);
+    TV.draw_rect(32, (65 - (percentage3 * 0.5)), 10, (percentage3 * 0.5), WHITE, WHITE);
+    TV.print(32, 70, "CH3");
+    TV.print(34, (58 - (percentage3 * 0.5)), percentage3, 0); //for debugging only
+    //TV.print("%");
     ACT_channel = 4;
-    TV.delay(10);
-    rssi_value = _readRSSI();
-    float rssibar4 = percentage * 0.81; //scaling the bar a bit down
-    TV.print(48, 90, "CH4");
-    TV.draw_rect(48, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(48, (85 - rssibar4), 10, rssibar4, WHITE, WHITE);
+  }
+    
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH4
+    else if (ACT_channel == 4) {
+    //TV.delay(10);
+    //TV.print(0, 0, ACT_channel); //for debugging only
 
+    uint32_t rssi_value4 = _readRSSI();
+    float percentage4 = map(rssi_value4, max, min, 0, 100);
+    if (percentage4 > 100) {
+      percentage4 = 100;
+    }
+    else if (percentage4 < 0) {
+      percentage4 = 0;
+    }
+    TV.draw_rect(48, 8, 14, 67, BLACK, BLACK);
+    TV.draw_rect(48, (65 - (percentage4 * 0.5)), 10, (percentage4 * 0.5), WHITE, WHITE);
+    TV.print(48, 70, "CH4");
+    TV.print(50, (58 - (percentage4 * 0.5)), percentage4, 0); //for debugging only
+    //TV.print("%");
     ACT_channel = 5;
-    TV.delay(10);
-    rssi_value = _readRSSI();
-    float rssibar5 = percentage * 0.81; //scaling the bar a bit down
-    TV.print(64, 90, "CH5");
-    TV.draw_rect(64, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(64, (85 - rssibar5), 10, rssibar5, WHITE, WHITE);
-
+    }
+    
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH5
+    else if (ACT_channel == 5) {
+    //TV.delay(10);
+    //TV.print(0, 0, ACT_channel); //for debugging only
+    
+    uint32_t rssi_value5 = _readRSSI();
+    float percentage5 = map(rssi_value5, max, min, 0, 100);
+    if (percentage5 > 100) {
+      percentage5 = 100;
+    }
+    else if (percentage5 < 0) {
+      percentage5 = 0;
+    }
+    
+    TV.draw_rect(64, 8, 14, 67, BLACK, BLACK);
+    TV.draw_rect(64, (65 - (percentage5 * 0.5)), 10, (percentage5 * 0.5), WHITE, WHITE);
+    TV.print(64, 70, "CH5");
+    TV.print(66, (58 - (percentage5 * 0.5)), percentage5, 0); //for debugging only
+    //TV.print("%");
     ACT_channel = 6;
-    TV.delay(10);
-    rssi_value = _readRSSI();
-    float rssibar6 = percentage * 0.81; //scaling the bar a bit down
-    TV.print(80, 90, "CH6");
-    TV.draw_rect(80, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(80, (85 - rssibar6), 10, rssibar6, WHITE, WHITE);
-
-
+    }
+    
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH6
+    else if (ACT_channel == 6) {
+    //TV.delay(10);
+    //TV.print(0, 0, ACT_channel); //for debugging only
+    
+    uint32_t rssi_value6 = _readRSSI();
+    float percentage6 = map(rssi_value6, max, min, 0, 100);
+    
+    if (percentage6 > 100) {
+      percentage6 = 100;
+    }
+    else if (percentage6 < 0) {
+      percentage6 = 0;
+    }
+    
+    TV.draw_rect(80, 8, 14, 67, BLACK, BLACK);
+    TV.draw_rect(80, (65 - (percentage6 * 0.5)), 10, (percentage6 * 0.5), WHITE, WHITE);
+    TV.print(80, 70, "CH6");
+    TV.print(82, (58 - (percentage6 * 0.5)), percentage6, 0); //for debugging only
+    //TV.print("%");
     ACT_channel = 7;
-    TV.delay(10);
-    rssi_value = _readRSSI();
-    float rssibar7 = percentage * 0.81; //scaling the bar a bit down
-    TV.print(96, 90, "CH7");
-    TV.draw_rect(96, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(96, (85 - rssibar7), 10, rssibar7, WHITE, WHITE);
+   }
 
+   //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH7
+    else if (ACT_channel == 7) {
+    //TV.delay(10);
+    //TV.print(0, 0, ACT_channel); //for debugging only
+    
+    uint32_t rssi_value7 = _readRSSI();
+    float percentage7 = map(rssi_value7, max, min, 0, 100);
+    
+    if (percentage7 > 100) {
+      percentage7 = 100;
+    }
+    else if (percentage7 < 0) {
+      percentage7 = 0;
+    }
+    
+    TV.draw_rect(96, 8, 14, 67, BLACK, BLACK);
+    TV.draw_rect(96, (65 - (percentage7 * 0.5)), 10, (percentage7 * 0.5), WHITE, WHITE);
+    TV.print(96, 70, "CH7");
+    TV.print(98, (58 - (percentage7 * 0.5)), percentage7, 0); //for debugging only
+    //TV.print("%");
     ACT_channel = 8;
-    TV.delay(10);
-    rssi_value = _readRSSI();
-    float rssibar8 = percentage * 0.81; //scaling the bar a bit down
-    TV.print(112, 90, "CH8");
-    TV.draw_rect(112, 35, 10, 50, BLACK, BLACK);
-    TV.draw_rect(112, (85 - rssibar8), 10, rssibar8, WHITE, WHITE);
-
-    TV.print(0, 0, rssi_value); //for debugging only
-
-
+    }
+    
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH8
+    else if (ACT_channel == 8) {
+    //TV.delay(10);
+    //TV.print(0, 0, ACT_channel); //for debugging only
+     
+    uint32_t rssi_value8 = _readRSSI();
+    float percentage8 = map(rssi_value8, max, min, 0, 100);
+    
+    if (percentage8 > 100) {
+      percentage8 = 100;
+    }
+    else if (percentage8 < 0) {
+      percentage8 = 0;
+    }
+    
+    TV.draw_rect(112, 8, 14, 67, BLACK, BLACK);
+    TV.draw_rect(112, (65 - (percentage8 * 0.5)), 10, (percentage8 * 0.5), WHITE, WHITE);
+    TV.print(112, 70, "CH8");
+    TV.print(114, (58 - (percentage8 * 0.5)), percentage8, 0); //for debugging only
+    //TV.print("%");
+    ACT_channel = 1;
+    }
+   
+    
     if (pressedbut == 1) {
 #ifdef OSD
       TV.clear_screen();
 #endif
+      menuactive = 0; //for debugging only
       exit = 1;
     }
   }
