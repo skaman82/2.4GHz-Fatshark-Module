@@ -137,12 +137,10 @@ void setup() {
 #endif
 
   channelvalueEEP = EEPROM.read(chanADDR);
-
-  lockmodeEEP = EEPROM.read(chanADDR); //TODO
-  fscontrollEEP = EEPROM.read(fscontrollADDR); //TODO
+  lockmodeEEP = EEPROM.read(lockmodeADDR); //TODO
+  fscontrollEEP = EEPROM.read(fscontrollADDR);
   displayEEP = EEPROM.read(displayADDR); //TODO
   serialEEP = EEPROM.read(serialADDR); //TODO
-
   RSSImaxEEP = EEPROM.read(RSSImaxADDR)  * 2;
   RSSIminEEP = EEPROM.read(RSSIminADDR)  * 2;
 
