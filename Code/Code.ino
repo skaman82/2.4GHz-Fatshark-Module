@@ -67,8 +67,8 @@ word freq;
 unsigned long previousOsdMillis = 0;
 
 #ifdef V3
-unsigned long BTinterval = 1000;
-unsigned long BTinterval_FIXED = 1000;
+unsigned long BTinterval = 2000;
+unsigned long BTinterval_FIXED = 2000;
 #endif
 
 #ifndef V3
@@ -149,14 +149,23 @@ void setup() {
   //min = RSSIminEEP;
   max = 0; //0% RSSI 365
   min = 70; //100% RSSI 338
+  
+  
+  if ((fscontrollEEP != 0) || (fscontrollEEP != 1)) {
+    fscontrollEEP = 1; //setting the  default state of no valid value
+    }
 
+  if ((lockmodeEEP != 0) || (lockmodeEEP != 1)) {
+    lockmodeEEP = 0; //setting the  default state of no valid value
+    }
+    
   if (channelvalueEEP <= 8)
   {
     SAVED_channel = channelvalueEEP;
   }
   if (channelvalueEEP > 8)
   {
-    SAVED_channel = 1;
+    SAVED_channel = 1; //setting the  default state of no valid value
   }
 
 
@@ -740,7 +749,11 @@ void loop() {
   do {
 #endif
     buttoncheck();
+    
+    if (fscontrollEEP == 1) {
     fs_buttons();
+    }
+    
     control();
     rx_update();
     channeltable();
@@ -1018,11 +1031,26 @@ void menu() {
       TV.select_font(font6x8);
       TV.bitmap(35, (25 + voffset), bitmap_nkizw_OSD); //goggle
       TV.print(15, (70 + voffset), "Goggle control:");
+      if (fscontrollEEP == 1) {
       TV.print("ON");
+      }
+      else {
+       TV.print("OFF");
+       }
 #endif
 
       if (pressedbut == 1) {
-#ifdef OSD
+
+        if (fscontrollEEP == 1) {
+        fscontrollEEP = 0;
+        EEPROM.write(fscontrollADDR, fscontrollEEP);
+        }
+        else {
+        fscontrollEEP = 1;
+        EEPROM.write(fscontrollADDR, fscontrollEEP);
+        }
+        
+        #ifdef OSD
         TV.clear_screen();
 #endif
       }
@@ -1075,8 +1103,31 @@ void menu() {
       TV.select_font(font6x8);
       TV.bitmap(35, (25 + voffset), bitmap_w113l_OSD); //lock
       TV.print(39, (70 + voffset), "Lock:");
-      TV.print("OFF");
+      
+      if (lockmodeEEP == 1) {
+      TV.print("ON");
+      }
+      else {
+       TV.print("OFF");
+       }
 
+if (pressedbut == 1) {
+
+        if (lockmodeEEP == 1) {
+        lockmodeEEP = 0;
+        EEPROM.write(lockmodeADDR, lockmodeEEP);
+        }
+        else {
+        lockmodeEEP = 1;
+        EEPROM.write(lockmodeADDR, lockmodeEEP);
+        }
+        
+        #ifdef OSD
+        TV.clear_screen();
+#endif
+      }
+
+      
       if (pressedbut == 4) {
 #ifdef OSD
         TV.clear_screen();
