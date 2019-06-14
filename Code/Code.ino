@@ -77,8 +77,9 @@ unsigned long BTinterval = 4000;
 unsigned long BTinterval_FIXED = 4000;
 #endif
 
+#ifdef V3
 int voffset = 20;
-
+#endif
 #ifndef V3
 int voffset = 0;
 #endif
@@ -137,7 +138,7 @@ void setup() {
 #endif
 
   channelvalueEEP = EEPROM.read(chanADDR);
-  lockmodeEEP = EEPROM.read(lockmodeADDR); //TODO
+  lockmodeEEP = EEPROM.read(lockmodeADDR); 
   fscontrollEEP = EEPROM.read(fscontrollADDR);
   displayEEP = EEPROM.read(displayADDR); //TODO
   serialEEP = EEPROM.read(serialADDR); //TODO
@@ -150,11 +151,11 @@ void setup() {
   min = 70; //100% RSSI 338
 
 
-  if ((fscontrollEEP != 0) || (fscontrollEEP != 1)) {
+  if (fscontrollEEP >= 2) {
     fscontrollEEP = 1; //setting the  default state of no valid value
   }
 
-  if ((lockmodeEEP != 0) || (lockmodeEEP != 1)) {
+  if (lockmodeEEP >= 2) {
     lockmodeEEP = 0; //setting the  default state of no valid value
   }
 
@@ -179,7 +180,7 @@ void setup() {
   TV.begin(_PAL, 146, 120); //original 128x96px, 160x120max
 #endif
 #ifndef V3
-  TV.begin(_PAL, 112, 78);
+  TV.begin(_PAL, 120, 78);
 #ifdef debug
   //TV.begin(_PAL, 120, 86);
 #endif
@@ -434,7 +435,6 @@ void control() {
 
 
     if (menuactive == 0) {
-      //  button short action here
       Old_FS_channel = FS_channel;
       BT_update = 1;
       FS_control = 0;
@@ -502,7 +502,7 @@ void control() {
       TV.clear_screen();
 #endif
       menuactive = 1;
-      calibration();
+      //calibration();
     }
     else if (menuactive == 1) {
     }
@@ -518,8 +518,7 @@ void control() {
       TV.clear_screen();
 #endif
       menuactive = 1;
-      //calibration();
-      bandscan(); //for debugging only
+      calibration();
 
     }
     else if (menuactive == 1) {
@@ -1373,10 +1372,14 @@ void calibration() {     // Calibration wizzard
 #ifdef OSD
         TV.clear_screen();
 #endif
-        calstep = 0;
+
         max = RSSImaxEEP;
         min = RSSIminEEP;
-
+        calstep = 0;
+#ifdef V1
+        menuactive = 0;
+        osd_mode = 0;
+#endif
         exit = 1;
       }
     }
