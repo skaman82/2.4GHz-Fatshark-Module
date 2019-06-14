@@ -3,13 +3,14 @@
 
 // TO DOS & FIXMEs:
 // X Main Menu structure
-// X Calibrate wizzard
-// X Bandscan
+// X Calibrate function
+// X Bandscan function
+// X FS Button Control setting
 
 // • Finder Screen
-// • Lock Mode
-// • OLED screens
-// • Find OSD button bug not enabaling the osd on first press
+// • Lock Mode function
+// • OLED screens & menus
+// • Find OSD button bug not enabaling the OSD on first press
 
 
 #include <TVout.h>
@@ -77,7 +78,7 @@ unsigned long BTinterval_FIXED = 4000;
 #endif
 
 int voffset = 20;
-  
+
 #ifndef V3
 int voffset = 0;
 #endif
@@ -149,16 +150,16 @@ void setup() {
   //min = RSSIminEEP;
   max = 0; //0% RSSI 365
   min = 70; //100% RSSI 338
-  
-  
+
+
   if ((fscontrollEEP != 0) || (fscontrollEEP != 1)) {
     fscontrollEEP = 1; //setting the  default state of no valid value
-    }
+  }
 
   if ((lockmodeEEP != 0) || (lockmodeEEP != 1)) {
     lockmodeEEP = 0; //setting the  default state of no valid value
-    }
-    
+  }
+
   if (channelvalueEEP <= 8)
   {
     SAVED_channel = channelvalueEEP;
@@ -749,11 +750,11 @@ void loop() {
   do {
 #endif
     buttoncheck();
-    
+
     if (fscontrollEEP == 1) {
-    fs_buttons();
+      fs_buttons();
     }
-    
+
     control();
     rx_update();
     channeltable();
@@ -1032,25 +1033,25 @@ void menu() {
       TV.bitmap(35, (25 + voffset), bitmap_nkizw_OSD); //goggle
       TV.print(15, (70 + voffset), "Goggle control:");
       if (fscontrollEEP == 1) {
-      TV.print("ON");
+        TV.print("ON");
       }
       else {
-       TV.print("OFF");
-       }
+        TV.print("OFF");
+      }
 #endif
 
       if (pressedbut == 1) {
 
         if (fscontrollEEP == 1) {
-        fscontrollEEP = 0;
-        EEPROM.write(fscontrollADDR, fscontrollEEP);
+          fscontrollEEP = 0;
+          EEPROM.write(fscontrollADDR, fscontrollEEP);
         }
         else {
-        fscontrollEEP = 1;
-        EEPROM.write(fscontrollADDR, fscontrollEEP);
+          fscontrollEEP = 1;
+          EEPROM.write(fscontrollADDR, fscontrollEEP);
         }
-        
-        #ifdef OSD
+
+#ifdef OSD
         TV.clear_screen();
 #endif
       }
@@ -1103,31 +1104,31 @@ void menu() {
       TV.select_font(font6x8);
       TV.bitmap(35, (25 + voffset), bitmap_w113l_OSD); //lock
       TV.print(39, (70 + voffset), "Lock:");
-      
+
       if (lockmodeEEP == 1) {
-      TV.print("ON");
+        TV.print("ON");
       }
       else {
-       TV.print("OFF");
-       }
+        TV.print("OFF");
+      }
 
-if (pressedbut == 1) {
+      if (pressedbut == 1) {
 
         if (lockmodeEEP == 1) {
-        lockmodeEEP = 0;
-        EEPROM.write(lockmodeADDR, lockmodeEEP);
+          lockmodeEEP = 0;
+          EEPROM.write(lockmodeADDR, lockmodeEEP);
         }
         else {
-        lockmodeEEP = 1;
-        EEPROM.write(lockmodeADDR, lockmodeEEP);
+          lockmodeEEP = 1;
+          EEPROM.write(lockmodeADDR, lockmodeEEP);
         }
-        
-        #ifdef OSD
+
+#ifdef OSD
         TV.clear_screen();
 #endif
       }
 
-      
+
       if (pressedbut == 4) {
 #ifdef OSD
         TV.clear_screen();
@@ -1417,14 +1418,14 @@ void bandscan() {
       TV.draw_rect(0, ((70 - (percentage1 * 0.46)) + voffset), 10, (percentage1 * 0.46), WHITE, WHITE);
       TV.print(0, (75 + voffset), "CH1");
       if ((percentage1 < 100) && (percentage1 >= 10)) {
-      TV.print(2, ((63 - (percentage1 * 0.46)) + voffset), percentage1, 0); 
+        TV.print(2, ((63 - (percentage1 * 0.46)) + voffset), percentage1, 0);
       }
       else if (percentage1 < 10) {
-      TV.print(4, ((63 - (percentage1 * 0.46)) + voffset), percentage1, 0); 
+        TV.print(4, ((63 - (percentage1 * 0.46)) + voffset), percentage1, 0);
       }
       else {
-        TV.print(0, ((63 - (percentage1 * 0.46)) + voffset), percentage1, 0); 
-        }
+        TV.print(0, ((63 - (percentage1 * 0.46)) + voffset), percentage1, 0);
+      }
       //TV.print("%");
       ACT_channel = 2;
     }
@@ -1445,14 +1446,14 @@ void bandscan() {
       TV.draw_rect(16, ((70 - (percentage2 * 0.46)) + voffset), 10, (percentage2 * 0.46), WHITE, WHITE);
       TV.print(16, (75 + voffset), "CH2");
       if ((percentage2 < 100) && (percentage2 >= 10)) {
-      TV.print(18, ((63 - (percentage2 * 0.46)) + voffset), percentage2, 0); 
+        TV.print(18, ((63 - (percentage2 * 0.46)) + voffset), percentage2, 0);
       }
       else if (percentage2 < 10) {
-      TV.print(20, ((63 - (percentage2 * 0.46)) + voffset), percentage2, 0); 
+        TV.print(20, ((63 - (percentage2 * 0.46)) + voffset), percentage2, 0);
       }
       else {
-        TV.print(16, ((63 - (percentage2 * 0.46)) + voffset), percentage2, 0); 
-        }
+        TV.print(16, ((63 - (percentage2 * 0.46)) + voffset), percentage2, 0);
+      }
       //TV.print("%");
       ACT_channel = 3;
     }
@@ -1473,14 +1474,14 @@ void bandscan() {
       TV.draw_rect(32, ((70 - (percentage3 * 0.46)) + voffset), 10, (percentage3 * 0.46), WHITE, WHITE);
       TV.print(32, (75 + voffset), "CH3");
       if ((percentage3 < 100) && (percentage3 >= 10)) {
-      TV.print(34, ((63 - (percentage3 * 0.46)) + voffset), percentage3, 0); 
+        TV.print(34, ((63 - (percentage3 * 0.46)) + voffset), percentage3, 0);
       }
       else if (percentage3 < 10) {
-      TV.print(36, ((63 - (percentage3 * 0.46)) + voffset), percentage3, 0); 
+        TV.print(36, ((63 - (percentage3 * 0.46)) + voffset), percentage3, 0);
       }
       else {
         TV.print(32, ((63 - (percentage3 * 0.46)) + voffset), percentage3, 0);
-        }
+      }
       //TV.print("%");
       ACT_channel = 4;
     }
@@ -1500,14 +1501,14 @@ void bandscan() {
       TV.draw_rect(48, ((70 - (percentage4 * 0.46)) + voffset), 10, (percentage4 * 0.46), WHITE, WHITE);
       TV.print(48, (75 + voffset), "CH4");
       if ((percentage4 < 100) && (percentage4 >= 10)) {
-      TV.print(50, ((63 - (percentage4 * 0.46)) + voffset), percentage4, 0); 
+        TV.print(50, ((63 - (percentage4 * 0.46)) + voffset), percentage4, 0);
       }
       else if (percentage4 < 10) {
-      TV.print(52, ((63 - (percentage4 * 0.46)) + voffset), percentage4, 0); 
+        TV.print(52, ((63 - (percentage4 * 0.46)) + voffset), percentage4, 0);
       }
       else {
-        TV.print(48, ((63 - (percentage4 * 0.46)) + voffset), percentage4, 0); 
-        }
+        TV.print(48, ((63 - (percentage4 * 0.46)) + voffset), percentage4, 0);
+      }
       //TV.print("%");
       ACT_channel = 5;
     }
@@ -1528,14 +1529,14 @@ void bandscan() {
       TV.draw_rect(64, ((70 - (percentage5 * 0.46)) + voffset), 10, (percentage5 * 0.46), WHITE, WHITE);
       TV.print(64, (75 + voffset), "CH5");
       if ((percentage5 < 100) && (percentage5 >= 10)) {
-      TV.print(66, ((63 - (percentage5 * 0.46)) + voffset), percentage5, 0); 
+        TV.print(66, ((63 - (percentage5 * 0.46)) + voffset), percentage5, 0);
       }
       else if (percentage5 < 10) {
-      TV.print(68, ((63 - (percentage5 * 0.46)) + voffset), percentage5, 0); 
+        TV.print(68, ((63 - (percentage5 * 0.46)) + voffset), percentage5, 0);
       }
       else {
-        TV.print(64, ((63 - (percentage5 * 0.46)) + voffset), percentage5, 0); 
-        }
+        TV.print(64, ((63 - (percentage5 * 0.46)) + voffset), percentage5, 0);
+      }
       //TV.print("%");
       ACT_channel = 6;
     }
@@ -1557,14 +1558,14 @@ void bandscan() {
       TV.draw_rect(80, ((70 - (percentage6 * 0.46)) + voffset), 10, (percentage6 * 0.46), WHITE, WHITE);
       TV.print(80, (75 + voffset), "CH6");
       if ((percentage6 < 100) && (percentage6 >= 10)) {
-      TV.print(82, ((63 - (percentage6 * 0.46)) + voffset), percentage6, 0); 
+        TV.print(82, ((63 - (percentage6 * 0.46)) + voffset), percentage6, 0);
       }
       else if (percentage6 < 10) {
-      TV.print(84, ((63 - (percentage6 * 0.46)) + voffset), percentage6, 0); 
+        TV.print(84, ((63 - (percentage6 * 0.46)) + voffset), percentage6, 0);
       }
       else {
-        TV.print(80, ((63 - (percentage6 * 0.46)) + voffset), percentage6, 0); 
-        }
+        TV.print(80, ((63 - (percentage6 * 0.46)) + voffset), percentage6, 0);
+      }
       //TV.print("%");
       ACT_channel = 7;
     }
@@ -1586,13 +1587,13 @@ void bandscan() {
       TV.draw_rect(96, ((70 - (percentage7 * 0.46)) + voffset), 10, (percentage7 * 0.46), WHITE, WHITE);
       TV.print(96, (75 + voffset), "CH7");
       if ((percentage7 < 100) && (percentage7 >= 10)) {
-        TV.print(98, ((63 - (percentage7 * 0.46)) + voffset), percentage7, 0); 
+        TV.print(98, ((63 - (percentage7 * 0.46)) + voffset), percentage7, 0);
       }
       else if (percentage7 < 10) {
-        TV.print(100, ((63 - (percentage7 * 0.46)) + voffset), percentage7, 0); 
+        TV.print(100, ((63 - (percentage7 * 0.46)) + voffset), percentage7, 0);
       }
       else {
-        TV.print(96, ((63 - (percentage7 * 0.46)) + voffset), percentage7, 0); 
+        TV.print(96, ((63 - (percentage7 * 0.46)) + voffset), percentage7, 0);
       }
       //TV.print("%");
       ACT_channel = 8;
@@ -1615,13 +1616,13 @@ void bandscan() {
       TV.draw_rect(112, ((70 - (percentage8 * 0.46)) + voffset), 10, (percentage8 * 0.46), WHITE, WHITE);
       TV.print(112, (75 + voffset), "CH8");
       if ((percentage8 < 100) && (percentage8 >= 10)) {
-        TV.print(114, ((63 - (percentage8 * 0.46)) + voffset), percentage8, 0); 
+        TV.print(114, ((63 - (percentage8 * 0.46)) + voffset), percentage8, 0);
       }
       else if (percentage8 < 10) {
-        TV.print(116, ((63 - (percentage8 * 0.46)) + voffset), percentage8, 0); 
+        TV.print(116, ((63 - (percentage8 * 0.46)) + voffset), percentage8, 0);
       }
       else {
-        TV.print(112, ((63 - (percentage8 * 0.46)) + voffset), percentage8, 0); 
+        TV.print(112, ((63 - (percentage8 * 0.46)) + voffset), percentage8, 0);
       }
       //TV.print("%");
       ACT_channel = 1;
