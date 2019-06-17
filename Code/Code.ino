@@ -64,8 +64,10 @@ int BT_update = 0;
 int pressedbut = 0;
 int i_butt = 0;
 word freq;
+int lockmode;
 
 unsigned long previousOsdMillis = 0;
+unsigned long previousTimeoutMillis = 0;
 
 #ifdef V3
 unsigned long BTinterval = 2000;
@@ -78,7 +80,7 @@ unsigned long BTinterval_FIXED = 4000;
 #endif
 
 #ifdef V3
-int voffset = 20;
+int voffset = 10; //20
 #endif
 #ifndef V3
 int voffset = 0;
@@ -90,8 +92,7 @@ TVout TV;
 
 void setup() {
 
-  //Serial.begin(9600);
-  //Serial.println("Hello");
+  Serial.begin(19200);
 
 #ifdef OLED
   // assign default color value
@@ -141,7 +142,7 @@ void setup() {
 #endif
 
   channelvalueEEP = EEPROM.read(chanADDR);
-  lockmodeEEP = EEPROM.read(lockmodeADDR); 
+  lockmodeEEP = EEPROM.read(lockmodeADDR);
   fscontrollEEP = EEPROM.read(fscontrollADDR);
   displayEEP = EEPROM.read(displayADDR); //TODO
   serialEEP = EEPROM.read(serialADDR); //TODO
@@ -155,7 +156,7 @@ void setup() {
 
 
   if (fscontrollEEP >= 2) {
-    fscontrollEEP = 1; //setting the  default state of no valid value
+    fscontrollEEP = 0; //setting the  default state of no valid value
   }
 
   if (lockmodeEEP >= 2) {
@@ -180,7 +181,7 @@ void setup() {
 #ifdef OSD
 #ifdef PAL_FORMAT
 #ifdef V3
-  TV.begin(_PAL, 146, 120); //original 128x96px, 160x120max
+  TV.begin(_PAL, 128, 96); //original 128x96px, 160x120max (146x120)
 #endif
 #ifndef V3
   TV.begin(_PAL, 120, 78);
@@ -229,7 +230,8 @@ void setup() {
 #endif
 
   osd_mode = 1;
-
+  menuactive = 0;
+  lockmode = 0;
 }
 
 
@@ -374,13 +376,27 @@ void fs_buttons() {
 
 void control() {
   if (pressedbut == 1) {
+
+    if (lockmode == 0) {
 #ifdef OSD
-    TV.tone(800, 80);
+      TV.tone(800, 80);
 #endif
 #ifndef OSD
-    tone(11, 800, 80);
+      tone(11, 800, 80);
 #endif
-
+    }
+    else {
+#ifdef OSD
+      TV.tone(100, 100);
+      TV.delay(200);
+      TV.tone(100, 100);
+#endif
+#ifndef OSD
+      tone(11, 100, 100);
+      delay(200);
+      tone(11, 100, 100);
+#endif
+    }
 #ifdef V1
 
     if (menuactive == 0) {
@@ -408,20 +424,21 @@ void control() {
 #endif
 
 #ifndef V1
-
-    if (menuactive == 0) {
+    if (lockmode == 0) {
+      if (menuactive == 0) {
 #ifdef OSD
-      TV.clear_screen();
+        TV.clear_screen();
 #endif
-      menuactive = 1;
-      menu();
-      //bandscan();
-    }
-    else if (menuactive == 1) {
-      TV.fill(BLACK);
-      TV.delay(10);
-      //menuactive = 0;
-      return;
+        menuactive = 1;
+        menu();
+        //bandscan();
+      }
+      else if (menuactive == 1) {
+        TV.fill(BLACK);
+        TV.delay(10);
+        //menuactive = 0;
+        return;
+      }
     }
 
 #endif
@@ -429,29 +446,49 @@ void control() {
 
   if (pressedbut == 2) {
 
+    if (lockmode == 0) {
 #ifdef OSD
-    TV.tone(800, 80);
+      TV.tone(800, 80);
 #endif
 #ifndef OSD
-    tone(11, 800, 80);
+      tone(11, 800, 80);
 #endif
+    }
+    else {
+#ifdef OSD
+      TV.tone(100, 100);
+      TV.delay(200);
+      TV.tone(100, 100);
+#endif
+#ifndef OSD
+      tone(11, 100, 100);
+      delay(200);
+      tone(11, 100, 100);
+#endif
+    }
+    if (lockmode == 0) {
+      if (menuactive == 0) {
+        Old_FS_channel = FS_channel;
+        BT_update = 1;
+        FS_control = 0;
 
 
-    if (menuactive == 0) {
-      Old_FS_channel = FS_channel;
-      BT_update = 1;
-      FS_control = 0;
+        if (osd_mode == 1) {
 
-      if (osd_mode == 1) {
-        BTinterval += 500;
+          BTinterval += 500;
 
 
-        if (BT_channel >= 2) {
-          BT_channel -= 1;
+          if (BT_channel >= 2) {
+            BT_channel -= 1;
+          }
+
+          else {
+            BT_channel = 8;
+          }
         }
 
         else {
-          BT_channel = 8;
+          callOSD();
         }
       }
       else {
@@ -465,32 +502,56 @@ void control() {
 
   if (pressedbut == 3) {
 
+    if (lockmode == 0) {
 #ifdef OSD
-    TV.tone(800, 80);
+      TV.tone(800, 80);
 #endif
 #ifndef OSD
-    tone(11, 800, 80);
+      tone(11, 800, 80);
 #endif
+    }
+    else {
+#ifdef OSD
+      TV.tone(100, 100);
+      TV.delay(200);
+      TV.tone(100, 100);
+#endif
+#ifndef OSD
+      tone(11, 100, 100);
+      delay(200);
+      tone(11, 100, 100);
+#endif
+    }
 
-    if (menuactive == 0) {
-      //  button short action here
-      Old_FS_channel = FS_channel;
-      BT_update = 1;
-      FS_control = 0;
-
-      if (osd_mode == 1) {
-        BTinterval += 500;
+    if (lockmode == 0) {
+      if (menuactive == 0) {
+        Old_FS_channel = FS_channel;
+        BT_update = 1;
+        FS_control = 0;
 
 
-        if (BT_channel <= 7) {
-          BT_channel += 1;
+        if (osd_mode == 1) {
+
+          BTinterval += 500;
+
+
+          if (BT_channel <= 7) {
+            BT_channel += 1;
+          }
+
+          else {
+            BT_channel = 1;
+          }
         }
 
         else {
-          BT_channel = 1;
+          callOSD();
         }
       }
       else {
+#ifdef OSD
+        TV.clear_screen();
+#endif
         callOSD();
       }
     }
@@ -499,13 +560,19 @@ void control() {
 
   if (pressedbut == 6) {
 
+    if (lockmode == 1) {
+      lockmode = 0;
+      menuactive = 0;
+      callOSD();
+      return;
+    }
+
 #ifndef V1
     if (menuactive == 0) {
 #ifdef OSD
       TV.clear_screen();
 #endif
       menuactive = 1;
-      //calibration();
     }
     else if (menuactive == 1) {
     }
@@ -750,14 +817,18 @@ void loop() {
   do {
 #endif
     buttoncheck();
+    // Serial.println("HelloW");
 
     if (fscontrollEEP == 1) {
-      fs_buttons();
+      if (lockmode == 0) {
+        fs_buttons();
+      }
     }
 
     control();
     rx_update();
     channeltable();
+    runlocktimer();
 
 #ifdef OSD
     osd();
@@ -924,15 +995,16 @@ void loop() {
     u8g.setFont(u8g_font_5x7r);
     u8g.print(" MHz");
 
-    const long testval = millis();
-    u8g.setPrintPos(42, 33);
-    u8g.print(testval);
+    //const long testval = millis();
+    //u8g.setPrintPos(42, 33);
+    //u8g.print(testval);
 
 #ifdef RSSI_mod
     u8g.setFont(u8g_font_5x7r);
     u8g.setPrintPos(42, 42);
-    //u8g.print("RSSI: ");
-    //u8g.print(percentage, 0);
+    u8g.print("RSSI:");
+    u8g.print(percentage, 0);
+    u8g.print(lockmode);
 
     u8g.drawBox(45, 48, (rssibar * 0.90), 5); //
     u8g.drawFrame(42, 45, 78, 11);
@@ -953,33 +1025,40 @@ void loop() {
     if (ACT_channel == 1) {
       u8g.drawBitmapP(0, 8, 5, 48, bitmap_one);
     }
-    if (ACT_channel == 2) {
+    else if (ACT_channel == 2) {
       u8g.drawBitmapP(0, 8, 5, 48, bitmap_two);
     }
-    if (ACT_channel == 3) {
+    else if (ACT_channel == 3) {
       u8g.drawBitmapP(0, 8, 5, 48, bitmap_three);
     }
-    if (ACT_channel == 4) {
+    else if (ACT_channel == 4) {
       u8g.drawBitmapP(0, 8, 5, 48, bitmap_four);
     }
-    if (ACT_channel == 5) {
+    else if (ACT_channel == 5) {
       u8g.drawBitmapP(0, 8, 5, 48, bitmap_five);
     }
-    if (ACT_channel == 6) {
+    else if (ACT_channel == 6) {
       u8g.drawBitmapP(0, 8, 5, 48, bitmap_six);
     }
-    if (ACT_channel == 7) {
+    else if (ACT_channel == 7) {
       u8g.drawBitmapP(0, 8, 5, 48, bitmap_seven);
     }
-    if (ACT_channel == 8) {
+    else if (ACT_channel == 8) {
       u8g.drawBitmapP(0, 8, 5, 48, bitmap_eight);
+    }
+
+    if (lockmode == 1) {
+      u8g.drawBitmapP(105, 33, 2, 8, bitmap_lock);     //mini lock icon
     }
 
 #ifdef OSD
 #ifdef V3
 
-    //TV.draw_rect(0, 0, 119, 89, WHITE);
 
+
+
+
+    //TV.draw_rect(0, 0, 119, 89, WHITE);
     //TV.delay_frame(1);
     //display.output_delay = 55;
     //TV.delay_frame(1);
@@ -1055,7 +1134,7 @@ void menu() {
         TV.clear_screen();
 #endif
       }
-      if (pressedbut == 4) {
+      if (pressedbut == 2) {
 #ifdef OSD
         TV.clear_screen();
 #endif
@@ -1081,13 +1160,13 @@ void menu() {
         bandscan();
       }
 
-      if (pressedbut == 4) {
+      if (pressedbut == 2) {
 #ifdef OSD
         TV.clear_screen();
 #endif
         menu_position = 3;
       }
-      if (pressedbut == 5) {
+      if (pressedbut == 3) {
 #ifdef OSD
         TV.clear_screen();
 #endif
@@ -1129,13 +1208,13 @@ void menu() {
       }
 
 
-      if (pressedbut == 4) {
+      if (pressedbut == 2) {
 #ifdef OSD
         TV.clear_screen();
 #endif
         menu_position = 4;
       }
-      if (pressedbut == 5) {
+      if (pressedbut == 3) {
 #ifdef OSD
         TV.clear_screen();
 #endif
@@ -1154,13 +1233,13 @@ void menu() {
       TV.bitmap(35, (25 + voffset), bitmap_ydywrn_OSD); //search
       TV.print(35, (70 + voffset), "Find mode");
 
-      if (pressedbut == 4) {
+      if (pressedbut == 2) {
 #ifdef OSD
         TV.clear_screen();
 #endif
         menu_position = 5;
       }
-      if (pressedbut == 5) {
+      if (pressedbut == 3) {
 #ifdef OSD
         TV.clear_screen();
 #endif
@@ -1188,13 +1267,13 @@ void menu() {
         calibration();
       }
 
-      if (pressedbut == 4) {
+      if (pressedbut == 2) {
 #ifdef OSD
         TV.clear_screen();
 #endif
         menu_position = 6;
       }
-      if (pressedbut == 5) {
+      if (pressedbut == 3) {
 #ifdef OSD
         TV.clear_screen();
 #endif
@@ -1224,7 +1303,7 @@ void menu() {
         exit = 1;
       }
 
-      if (pressedbut == 5) {
+      if (pressedbut == 3) {
 #ifdef OSD
         TV.clear_screen();
 #endif
@@ -1645,7 +1724,38 @@ void bandscan() {
 }
 
 
+void runlocktimer() {
+  buttoncheck();
+  control();
+  osd();
 
+  if (lockmodeEEP == 1)  {
+    if ((lockmode == 0) && (menuactive == 0)) {
+      const long timeout = millis();
+      //TV.print(84, (50 + voffset), ((16 - (timeout - previousTimeoutMillis) / 600)));
+      if (timeout - previousTimeoutMillis >= 30000) {
+        previousTimeoutMillis = timeout;
+        lockmode = 1;
+
+
+
+      }
+      else {
+        lockmode = 0;
+      }
+    }
+    else {  }
+
+
+
+    if (lockmode == 1) {
+      TV.bitmap(92, (48 + voffset), bitmap_minilock_OSD);
+    }
+
+  }
+  else { }
+
+}
 
 //STORING STUFF FOR LATER
 
@@ -1656,4 +1766,3 @@ void bandscan() {
 // u8g.drawBitmapP(5, 20, 7, 32, bitmap_calib);   //calibrate
 // u8g.drawBitmapP(5, 20, 7, 32, bitmap_be8bbq);  //exit
 // u8g.drawBitmapP(5, 20, 7, 32, bitmap_dock);    //dockking
-// u8g.drawBitmapP(5, 20, 1, 8, bitmap_lock);     //mini lock icon

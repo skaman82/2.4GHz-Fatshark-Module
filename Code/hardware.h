@@ -71,7 +71,7 @@
   #define ButtonUp     23
   #define ButtonDown   22
   #define BUZZ         15 //OC2A
-  #define LED_pin      7
+  #define LED_pin      10 //orig 7 (blinking) 10 could work better
   #define OSD_ctr1     11
   #define OSD_ctr2     12
 #endif
