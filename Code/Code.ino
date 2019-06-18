@@ -6,9 +6,9 @@
 // X Calibrate function
 // X Bandscan function
 // X FS Button Control setting
+// X Lock Mode function
 
 // • Finder Screen
-// • Lock Mode function
 // • OLED screens & menus
 // • Find OSD button bug not enabaling the OSD on first press
 
@@ -92,7 +92,7 @@ TVout TV;
 
 void setup() {
 
-  Serial.begin(19200);
+  //Serial.begin(19200);
 
 #ifdef OLED
   // assign default color value
@@ -172,6 +172,7 @@ void setup() {
     SAVED_channel = 1; //setting the  default state of no valid value
   }
 
+  clearOLED();
 
 #ifdef OLED
   clearOLED();
@@ -237,13 +238,11 @@ void setup() {
 
 void clearOLED()
 {
-#ifdef OLED
   u8g.firstPage();
   do
   {
   }
   while ( u8g.nextPage() );
-#endif
 
 }
 
@@ -995,10 +994,6 @@ void loop() {
     u8g.setFont(u8g_font_5x7r);
     u8g.print(" MHz");
 
-    //const long testval = millis();
-    //u8g.setPrintPos(42, 33);
-    //u8g.print(testval);
-
 #ifdef RSSI_mod
     u8g.setFont(u8g_font_5x7r);
     u8g.setPrintPos(42, 42);
@@ -1095,222 +1090,282 @@ uint16_t _readRSSI() {
 void menu() {
 
   int menu_position = 1;
-
   byte exit = 0;
-  while (exit == 0) {
-    osd();
-    menuactive = 1;
-    osd_mode = 1;
+  clearOLED();
 
-    if (menu_position == 1) {
-      buttoncheck();
+  while (exit == 0) {
+
+    u8g.firstPage();
+    do {
+      osd();
+      menuactive = 1;
+      osd_mode = 1;
+
+      if (menu_position == 1) {
+        buttoncheck();
 
 #ifdef OSD
-      TV.select_font(font4x6);
-      TV.print(55, (0 + voffset), "MENU");
-      TV.select_font(font6x8);
-      TV.bitmap(35, (25 + voffset), bitmap_nkizw_OSD); //goggle
-      TV.print(15, (70 + voffset), "Goggle control:");
-      if (fscontrollEEP == 1) {
-        TV.print("ON");
-      }
-      else {
-        TV.print("OFF");
-      }
-#endif
-
-      if (pressedbut == 1) {
-
+        TV.select_font(font4x6);
+        TV.print(55, (0 + voffset), "MENU");
+        TV.select_font(font6x8);
+        TV.bitmap(35, (25 + voffset), bitmap_nkizw_OSD); //goggle
+        TV.print(15, (70 + voffset), "Goggle control:");
         if (fscontrollEEP == 1) {
-          fscontrollEEP = 0;
-          EEPROM.write(fscontrollADDR, fscontrollEEP);
+          TV.print("ON");
         }
         else {
-          fscontrollEEP = 1;
-          EEPROM.write(fscontrollADDR, fscontrollEEP);
+          TV.print("OFF");
+        }
+#endif
+#ifdef OLED
+        u8g.drawBitmapP(38, 10, 7, 32, bitmap_nkizw);   //goggle
+        u8g.setFont(u8g_font_5x7r);
+        u8g.setPrintPos(20, 55);
+        u8g.print("GOGGLE CONTROLL:");
+        if (fscontrollEEP == 1) {
+          u8g.print("ON");
+        }
+        else {
+          u8g.print("OFF");
+        }
+#endif
+        if (pressedbut == 1) {
+
+          if (fscontrollEEP == 1) {
+            fscontrollEEP = 0;
+            EEPROM.write(fscontrollADDR, fscontrollEEP);
+          }
+          else {
+            fscontrollEEP = 1;
+            EEPROM.write(fscontrollADDR, fscontrollEEP);
+          }
+
+#ifdef OSD
+          TV.clear_screen();
+#endif
+        }
+        if (pressedbut == 2) {
+#ifdef OSD
+          TV.clear_screen();
+#endif
+          menu_position = 2;
+        }
+      }
+
+      else if (menu_position == 2) {
+
+        buttoncheck();
+
+        //do stuff pos2
+        TV.select_font(font4x6);
+        TV.print(55, (0 + voffset), "MENU");
+        TV.select_font(font6x8);
+        TV.bitmap(35, (25 + voffset), bitmap_hd85pj_OSD); //scan
+        TV.print(38, (70 + voffset), "Bandscan");
+
+#ifdef OLED
+        u8g.drawBitmapP(38, 10, 7, 32, bitmap_hd85pj);   //scan
+        u8g.setFont(u8g_font_5x7r);
+        u8g.setPrintPos(45, 55);
+        u8g.print("BANDSCAN");
+#endif
+        if (pressedbut == 1) {
+#ifdef OSD
+          TV.clear_screen();
+#endif
+          bandscan();
         }
 
+        if (pressedbut == 2) {
 #ifdef OSD
-        TV.clear_screen();
+          TV.clear_screen();
 #endif
-      }
-      if (pressedbut == 2) {
+          menu_position = 3;
+        }
+        if (pressedbut == 3) {
 #ifdef OSD
-        TV.clear_screen();
+          TV.clear_screen();
 #endif
-        menu_position = 2;
-      }
-    }
-
-    else if (menu_position == 2) {
-
-      buttoncheck();
-
-      //do stuff pos2
-      TV.select_font(font4x6);
-      TV.print(55, (0 + voffset), "MENU");
-      TV.select_font(font6x8);
-      TV.bitmap(35, (25 + voffset), bitmap_hd85pj_OSD); //scan
-      TV.print(38, (70 + voffset), "Bandscan");
-
-      if (pressedbut == 1) {
-#ifdef OSD
-        TV.clear_screen();
-#endif
-        bandscan();
+          menu_position = 1;
+        }
       }
 
-      if (pressedbut == 2) {
-#ifdef OSD
-        TV.clear_screen();
-#endif
-        menu_position = 3;
-      }
-      if (pressedbut == 3) {
-#ifdef OSD
-        TV.clear_screen();
-#endif
-        menu_position = 1;
-      }
-    }
+      else if (menu_position == 3) {
 
-    else if (menu_position == 3) {
+        buttoncheck();
 
-      buttoncheck();
-
-      TV.select_font(font4x6);
-      TV.print(55, (0 + voffset), "MENU");
-      TV.select_font(font6x8);
-      TV.bitmap(35, (25 + voffset), bitmap_w113l_OSD); //lock
-      TV.print(39, (70 + voffset), "Lock:");
-
-      if (lockmodeEEP == 1) {
-        TV.print("ON");
-      }
-      else {
-        TV.print("OFF");
-      }
-
-      if (pressedbut == 1) {
+        TV.select_font(font4x6);
+        TV.print(55, (0 + voffset), "MENU");
+        TV.select_font(font6x8);
+        TV.bitmap(35, (25 + voffset), bitmap_w113l_OSD); //lock
+        TV.print(39, (70 + voffset), "Lock:");
 
         if (lockmodeEEP == 1) {
-          lockmodeEEP = 0;
-          EEPROM.write(lockmodeADDR, lockmodeEEP);
+          TV.print("ON");
         }
         else {
-          lockmodeEEP = 1;
-          EEPROM.write(lockmodeADDR, lockmodeEEP);
+          TV.print("OFF");
+        }
+#ifdef OLED
+        u8g.drawBitmapP(38, 10, 7, 32, bitmap_w113l);   //lock
+        u8g.setFont(u8g_font_5x7r);
+        u8g.setPrintPos(35, 55);
+        u8g.print("LOCK MODE:");
+
+        if (lockmodeEEP == 1) {
+          u8g.print("ON");
+        }
+        else {
+          u8g.print("OFF");
+        }
+#endif
+        if (pressedbut == 1) {
+
+          if (lockmodeEEP == 1) {
+            lockmodeEEP = 0;
+            EEPROM.write(lockmodeADDR, lockmodeEEP);
+          }
+          else {
+            lockmodeEEP = 1;
+            EEPROM.write(lockmodeADDR, lockmodeEEP);
+          }
+
+#ifdef OSD
+          TV.clear_screen();
+#endif
         }
 
+
+        if (pressedbut == 2) {
 #ifdef OSD
-        TV.clear_screen();
+          TV.clear_screen();
 #endif
+          menu_position = 4;
+        }
+        if (pressedbut == 3) {
+#ifdef OSD
+          TV.clear_screen();
+#endif
+          menu_position = 2;
+        }
       }
 
+      else if (menu_position == 4) {
 
-      if (pressedbut == 2) {
-#ifdef OSD
-        TV.clear_screen();
+        buttoncheck();
+
+        //do stuff pos4
+        TV.select_font(font4x6);
+        TV.print(55, (0 + voffset), "MENU");
+        TV.select_font(font6x8);
+        TV.bitmap(35, (25 + voffset), bitmap_ydywrn_OSD); //search
+        TV.print(35, (70 + voffset), "Find mode");
+
+#ifdef OLED
+        u8g.drawBitmapP(38, 10, 7, 32, bitmap_ydywrn);   //search
+        u8g.setFont(u8g_font_5x7r);
+        u8g.setPrintPos(45, 55);
+        u8g.print("FIND MODE");
 #endif
-        menu_position = 4;
-      }
-      if (pressedbut == 3) {
+
+        if (pressedbut == 2) {
 #ifdef OSD
-        TV.clear_screen();
+          TV.clear_screen();
 #endif
-        menu_position = 2;
-      }
-    }
-
-    else if (menu_position == 4) {
-
-      buttoncheck();
-
-      //do stuff pos4
-      TV.select_font(font4x6);
-      TV.print(55, (0 + voffset), "MENU");
-      TV.select_font(font6x8);
-      TV.bitmap(35, (25 + voffset), bitmap_ydywrn_OSD); //search
-      TV.print(35, (70 + voffset), "Find mode");
-
-      if (pressedbut == 2) {
+          menu_position = 5;
+        }
+        if (pressedbut == 3) {
 #ifdef OSD
-        TV.clear_screen();
+          TV.clear_screen();
 #endif
-        menu_position = 5;
-      }
-      if (pressedbut == 3) {
-#ifdef OSD
-        TV.clear_screen();
-#endif
-        menu_position = 3;
+          menu_position = 3;
 
-      }
-    }
-
-    else if (menu_position == 5) {
-
-      buttoncheck();
-
-      //do stuff pos5
-      TV.select_font(font4x6);
-      TV.print(55, (0 + voffset), "MENU");
-      TV.select_font(font6x8);
-      TV.bitmap(35, (25 + voffset), bitmap_949gqh_OSD); //tools
-      TV.print(37, (70 + voffset), "Calibrate");
-
-
-      if (pressedbut == 1) {
-#ifdef OSD
-        TV.clear_screen();
-#endif
-        calibration();
+        }
       }
 
-      if (pressedbut == 2) {
-#ifdef OSD
-        TV.clear_screen();
+      else if (menu_position == 5) {
+
+        buttoncheck();
+
+        //do stuff pos5
+        TV.select_font(font4x6);
+        TV.print(55, (0 + voffset), "MENU");
+        TV.select_font(font6x8);
+        TV.bitmap(35, (25 + voffset), bitmap_949gqh_OSD); //tools
+        TV.print(37, (70 + voffset), "Calibrate");
+
+
+#ifdef OLED
+        u8g.drawBitmapP(38, 10, 7, 32, bitmap_calib);   //tools
+        u8g.setFont(u8g_font_5x7r);
+        u8g.setPrintPos(45, 55);
+        u8g.print("CALIBRATE");
 #endif
-        menu_position = 6;
-      }
-      if (pressedbut == 3) {
+
+
+        if (pressedbut == 1) {
 #ifdef OSD
-        TV.clear_screen();
+          TV.clear_screen();
 #endif
-        menu_position = 4;
+          calibration();
+        }
 
-      }
-    }
-
-    else if (menu_position == 6) {
-
-      buttoncheck();
-
-      //do stuff pos6
-      TV.select_font(font4x6);
-      TV.print(55, (0 + voffset), "MENU");
-      TV.select_font(font6x8);
-      TV.bitmap(35, (25 + voffset), bitmap_be8bbq_OSD); //exit
-      TV.print(50, (70 + voffset), "EXIT");
-
-      if (pressedbut == 1) {
+        if (pressedbut == 2) {
 #ifdef OSD
-        TV.clear_screen();
+          TV.clear_screen();
 #endif
-        menu_position = 0;
-        menuactive = 0;
-        osd_mode = 0;
-        exit = 1;
+          menu_position = 6;
+        }
+        if (pressedbut == 3) {
+#ifdef OSD
+          TV.clear_screen();
+#endif
+          menu_position = 4;
+
+        }
       }
 
-      if (pressedbut == 3) {
-#ifdef OSD
-        TV.clear_screen();
+      else if (menu_position == 6) {
+
+        buttoncheck();
+
+        //do stuff pos6
+        TV.select_font(font4x6);
+        TV.print(55, (0 + voffset), "MENU");
+        TV.select_font(font6x8);
+        TV.bitmap(35, (25 + voffset), bitmap_be8bbq_OSD); //exit
+        TV.print(50, (70 + voffset), "EXIT");
+
+#ifdef OLED
+        u8g.drawBitmapP(38, 10, 7, 32, bitmap_be8bbq);   //exit
+        u8g.setFont(u8g_font_5x7r);
+        u8g.setPrintPos(55, 55);
+        u8g.print("EXIT");
 #endif
-        menu_position = 5;
+
+        if (pressedbut == 1) {
+#ifdef OSD
+          TV.clear_screen();
+#endif
+          menu_position = 0;
+          menuactive = 0;
+          osd_mode = 0;
+          exit = 1;
+          return;
+        }
+
+        if (pressedbut == 3) {
+#ifdef OSD
+          TV.clear_screen();
+#endif
+          menu_position = 5;
+        }
       }
-    }
+#ifdef OLED
+    } while ( u8g.nextPage() );
+#endif
   }
+
 }
 
 
@@ -1759,10 +1814,5 @@ void runlocktimer() {
 
 //STORING STUFF FOR LATER
 
-// u8g.drawBitmapP(5, 20, 7, 32, bitmap_nkizw);   //goggle
-// u8g.drawBitmapP(5, 20, 7, 32, bitmap_hd85pj);  //bandscan
-// u8g.drawBitmapP(5, 20, 7, 32, bitmap_w113l);   //lock
-// u8g.drawBitmapP(5, 20, 7, 32, bitmap_ydywrn);  //search
-// u8g.drawBitmapP(5, 20, 7, 32, bitmap_calib);   //calibrate
-// u8g.drawBitmapP(5, 20, 7, 32, bitmap_be8bbq);  //exit
+
 // u8g.drawBitmapP(5, 20, 7, 32, bitmap_dock);    //dockking
