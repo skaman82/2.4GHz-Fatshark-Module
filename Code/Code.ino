@@ -68,16 +68,8 @@ int lockmode;
 
 unsigned long previousOsdMillis = 0;
 unsigned long previousTimeoutMillis = 0;
-
-#ifdef V3
 unsigned long BTinterval = 2000;
 unsigned long BTinterval_FIXED = 2000;
-#endif
-
-#ifndef V3
-unsigned long BTinterval = 4000;
-unsigned long BTinterval_FIXED = 4000;
-#endif
 
 #ifdef V3
 int voffset = 10; //20
@@ -149,10 +141,10 @@ void setup() {
   RSSImaxEEP = EEPROM.read(RSSImaxADDR)  * 2;
   RSSIminEEP = EEPROM.read(RSSIminADDR)  * 2;
 
-  //max = RSSImaxEEP;
-  //min = RSSIminEEP;
-  max = 0; //0% RSSI 365
-  min = 70; //100% RSSI 338
+  max = RSSImaxEEP;
+  min = RSSIminEEP;
+  //max = 0; //0% RSSI 365
+  //min = 70; //100% RSSI 338
 
 
   if (fscontrollEEP >= 2) {
@@ -953,7 +945,7 @@ void loop() {
     }
     TV.draw_line(18, (64 + voffset), 100, (64 + voffset), WHITE);
 
-    TV.print(1, (53 + voffset), rssi_value); //for debugging only
+    //TV.print(1, (53 + voffset), rssi_value); //for debugging only
 
 #endif
 
@@ -999,7 +991,7 @@ void loop() {
     u8g.setPrintPos(42, 42);
     u8g.print("RSSI:");
     u8g.print(percentage, 0);
-    u8g.print(lockmode);
+    //u8g.print(lockmode);
 
     u8g.drawBox(45, 48, (rssibar * 0.90), 5); //
     u8g.drawFrame(42, 45, 78, 11);

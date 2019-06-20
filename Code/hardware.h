@@ -1,7 +1,7 @@
 //#define debug
 
 #define V3 //V1, V2 or V3
-#define RX28 //RX28 or SM186R
+#define RX28 //RX28 (S-RX28) or SM186R
 #define RSSI_mod //If RSSI mod is done on the rtc6711 chip (see datasheet)
 #define OLED //V3 ONLY due space limitations
 #define OSD 
@@ -23,7 +23,7 @@
   #define FS_pin2      1 
   #define FS_pin3      0 
   #define ButtonCenter 4
-  #define LED_pin      3
+  #define LED_pin      13
   #define OSD_ctr1     5
   #define OSD_ctr2     6
   #define BUZZ         11 
@@ -71,7 +71,7 @@
   #define ButtonUp     23
   #define ButtonDown   22
   #define BUZZ         15 //OC2A
-  #define LED_pin      10 //orig 7 (blinking) 10 could work better
+  #define LED_pin      10 
   #define OSD_ctr1     11
   #define OSD_ctr2     12
 #endif
