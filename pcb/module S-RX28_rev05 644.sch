@@ -13871,6 +13871,105 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 </deviceset>
 </devicesets>
 </library>
+<library name="SparkFun-Jumpers" urn="urn:adsk.eagle:library:528">
+<description>&lt;h3&gt;SparkFun Jumpers&lt;/h3&gt;
+In this library you'll find jumpers, or other semipermanent means of changing current paths. The least permanent form is the solder jumper. These can be changed by adding, removing, or moving solder. In cases that are less likely to be changed we have jumpers that are connected with traces. These can be cut with a razor, or reconnected with solder. Reference designator JP.
+&lt;br&gt;
+&lt;br&gt;
+We've spent an enormous amount of time creating and checking these footprints and parts, but it is &lt;b&gt; the end user's responsibility&lt;/b&gt; to ensure correctness and suitablity for a given componet or application. 
+&lt;br&gt;
+&lt;br&gt;If you enjoy using this library, please buy one of our products at &lt;a href=" www.sparkfun.com"&gt;SparkFun.com&lt;/a&gt;.
+&lt;br&gt;
+&lt;br&gt;
+&lt;b&gt;Licensing:&lt;/b&gt; Creative Commons ShareAlike 4.0 International - https://creativecommons.org/licenses/by-sa/4.0/ 
+&lt;br&gt;
+&lt;br&gt;
+You are welcome to use this library for commercial purposes. For attribution, we ask that when you begin to sell your device using our footprint, you email us with a link to the product being sold. We want bragging rights that we helped (in a very small part) to create your 8th world wonder. We would like the opportunity to feature your device on our homepage.</description>
+<packages>
+<package name="SMT-JUMPER_2_NC_PASTE_NO-SILK" urn="urn:adsk.eagle:footprint:39260/1" library_version="1">
+<text x="0" y="1.143" size="0.6096" layer="25" font="vector" ratio="20" align="bottom-center">&gt;NAME</text>
+<text x="0" y="-1.143" size="0.6096" layer="27" font="vector" ratio="20" align="top-center">&gt;VALUE</text>
+<rectangle x1="-1.2446" y1="-1.1176" x2="1.2446" y2="1.1176" layer="31"/>
+<smd name="1" x="-0.4064" y="0" dx="0.635" dy="1.27" layer="1" cream="no"/>
+<smd name="2" x="0.4064" y="0" dx="0.635" dy="1.27" layer="1" cream="no"/>
+</package>
+<package name="SMT-JUMPER_2_NC_PASTE_SILK" urn="urn:adsk.eagle:footprint:39261/1" library_version="1">
+<text x="0" y="1.143" size="0.6096" layer="25" font="vector" ratio="20" align="bottom-center">&gt;NAME</text>
+<text x="0" y="-1.143" size="0.6096" layer="27" font="vector" ratio="20" align="top-center">&gt;VALUE</text>
+<wire x1="0.8636" y1="-1.016" x2="-0.8636" y2="-1.016" width="0.1524" layer="21"/>
+<wire x1="0.8636" y1="1.016" x2="1.1176" y2="0.762" width="0.1524" layer="21" curve="-90"/>
+<wire x1="-1.1176" y1="0.762" x2="-0.8636" y2="1.016" width="0.1524" layer="21" curve="-90"/>
+<wire x1="-1.1176" y1="-0.762" x2="-0.8636" y2="-1.016" width="0.1524" layer="21" curve="90"/>
+<wire x1="0.8636" y1="-1.016" x2="1.1176" y2="-0.762" width="0.1524" layer="21" curve="90"/>
+<wire x1="1.1176" y1="-0.762" x2="1.1176" y2="0.762" width="0.1524" layer="21"/>
+<wire x1="-1.1176" y1="-0.762" x2="-1.1176" y2="0.762" width="0.1524" layer="21"/>
+<wire x1="-0.8636" y1="1.016" x2="0.8636" y2="1.016" width="0.1524" layer="21"/>
+<rectangle x1="-1.2446" y1="-1.1176" x2="1.2446" y2="1.1176" layer="31"/>
+<smd name="1" x="-0.4064" y="0" dx="0.635" dy="1.27" layer="1" cream="no"/>
+<smd name="2" x="0.4064" y="0" dx="0.635" dy="1.27" layer="1" cream="no"/>
+</package>
+</packages>
+<packages3d>
+<package3d name="SMT-JUMPER_2_NC_PASTE_NO-SILK" urn="urn:adsk.eagle:package:39283/1" type="box" library_version="1">
+<packageinstances>
+<packageinstance name="SMT-JUMPER_2_NC_PASTE_NO-SILK"/>
+</packageinstances>
+</package3d>
+<package3d name="SMT-JUMPER_2_NC_PASTE_SILK" urn="urn:adsk.eagle:package:39282/1" type="box" library_version="1">
+<packageinstances>
+<packageinstance name="SMT-JUMPER_2_NC_PASTE_SILK"/>
+</packageinstances>
+</package3d>
+</packages3d>
+<symbols>
+<symbol name="SMT-JUMPER_2_NC_PASTE" urn="urn:adsk.eagle:symbol:39259/1" library_version="1">
+<wire x1="0.381" y1="0.635" x2="0.381" y2="-0.635" width="1.27" layer="94" curve="-180" cap="flat"/>
+<wire x1="-0.381" y1="-0.635" x2="-0.381" y2="0.635" width="1.27" layer="94" curve="-180" cap="flat"/>
+<wire x1="2.54" y1="0" x2="1.651" y2="0" width="0.1524" layer="94"/>
+<wire x1="-2.54" y1="0" x2="-1.651" y2="0" width="0.1524" layer="94"/>
+<text x="-2.54" y="2.54" size="1.778" layer="95" font="vector">&gt;NAME</text>
+<text x="-2.54" y="-2.54" size="1.778" layer="96" font="vector" align="top-left">&gt;VALUE</text>
+<pin name="2" x="5.08" y="0" visible="off" length="short" direction="pas" swaplevel="1" rot="R180"/>
+<pin name="1" x="-5.08" y="0" visible="off" length="short" direction="pas" swaplevel="1"/>
+<circle x="0" y="0" radius="1.93440625" width="0" layer="95"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="JUMPER-SMT_2_NC_PASTE" urn="urn:adsk.eagle:component:39299/1" prefix="JP" library_version="1">
+<description>&lt;h3&gt;Normally closed solder jumper&lt;/h3&gt;
+&lt;p&gt;This jumper has an aperture in the stencil to allow solder paste to bridge the split in the wire so it's normally closed (NC). Wick off the solder to open the connection. Reapply solder to reclose the connection.&lt;/p&gt;</description>
+<gates>
+<gate name="G$1" symbol="SMT-JUMPER_2_NC_PASTE" x="0" y="0"/>
+</gates>
+<devices>
+<device name="_NO-SILK" package="SMT-JUMPER_2_NC_PASTE_NO-SILK">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<package3dinstances>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:39283/1"/>
+</package3dinstances>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="_SILK" package="SMT-JUMPER_2_NC_PASTE_SILK">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<package3dinstances>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:39282/1"/>
+</package3dinstances>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -13913,7 +14012,7 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <part name="CH3" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TP" device="TP15SQ" package3d_urn="urn:adsk.eagle:package:27975/1" value="TPTP15SQ"/>
 <part name="GND5" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="R5" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="0.05OHM" device="-0603-1/5W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="1k"/>
-<part name="Y2" library="SparkFun-Clocks" library_urn="urn:adsk.eagle:library:511" deviceset="RESONATOR-16MHZ" device="SMD_3.2X1.3" package3d_urn="urn:adsk.eagle:package:37551/1" value="16MHz"/>
+<part name="Y1" library="SparkFun-Clocks" library_urn="urn:adsk.eagle:library:511" deviceset="RESONATOR-16MHZ" device="SMD_3.2X1.3" package3d_urn="urn:adsk.eagle:package:37551/1" value="16MHz"/>
 <part name="1K" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="0.27OHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value=""/>
 <part name="470" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="0.27OHM" device="-0603-1/10W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value=""/>
 <part name="C2" library="SparkFun-Passives" deviceset="CAP_POL" device="7343" value="470uf"/>
@@ -13948,6 +14047,10 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <part name="GND" library="testpad" library_urn="urn:adsk.eagle:library:385" deviceset="TPSQ" device="B1,27" package3d_urn="urn:adsk.eagle:package:27944/2" value="GND"/>
 <part name="U1" library="ATMEGA644PA-AU" deviceset="ATMEGA644PA-AU" device=""/>
 <part name="GND13" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
+<part name="D2" library="SparkFun-LED" library_urn="urn:adsk.eagle:library:529" deviceset="LED" device="0603" package3d_urn="urn:adsk.eagle:package:39354/1"/>
+<part name="R9" library="SparkFun-Resistors" library_urn="urn:adsk.eagle:library:532" deviceset="0.05OHM" device="-0603-1/5W-1%" package3d_urn="urn:adsk.eagle:package:39650/1" value="330"/>
+<part name="GND10" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
+<part name="BUZZ" library="SparkFun-Jumpers" library_urn="urn:adsk.eagle:library:528" deviceset="JUMPER-SMT_2_NC_PASTE" device="_SILK" package3d_urn="urn:adsk.eagle:package:39282/1"/>
 </parts>
 <sheets>
 <sheet>
@@ -14060,7 +14163,7 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <attribute name="NAME" x="116.84" y="8.636" size="1.778" layer="95" font="vector" rot="R180" align="bottom-center"/>
 <attribute name="VALUE" x="116.84" y="11.684" size="1.778" layer="96" font="vector" rot="R180" align="top-center"/>
 </instance>
-<instance part="Y2" gate="G$1" x="35.56" y="121.92" smashed="yes" rot="R270">
+<instance part="Y1" gate="G$1" x="35.56" y="121.92" smashed="yes" rot="R270">
 <attribute name="NAME" x="33.02" y="120.142" size="1.778" layer="95" font="vector" rot="R270" align="center-right"/>
 <attribute name="VALUE" x="37.592" y="121.92" size="1.778" layer="96" font="vector" rot="R270" align="bottom-center"/>
 </instance>
@@ -14072,15 +14175,15 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <attribute name="NAME" x="120.396" y="68.58" size="1.778" layer="95" font="vector" rot="R90" align="bottom-center"/>
 <attribute name="VALUE" x="123.444" y="68.58" size="1.778" layer="96" font="vector" rot="R90" align="top-center"/>
 </instance>
-<instance part="C2" gate="G$1" x="88.9" y="137.16" smashed="yes">
-<attribute name="NAME" x="89.916" y="137.795" size="1.778" layer="95"/>
-<attribute name="VALUE" x="89.916" y="132.969" size="1.778" layer="96"/>
+<instance part="C2" gate="G$1" x="83.82" y="137.16" smashed="yes">
+<attribute name="NAME" x="84.836" y="137.795" size="1.778" layer="95"/>
+<attribute name="VALUE" x="84.836" y="132.969" size="1.778" layer="96"/>
 </instance>
-<instance part="P+8" gate="G$1" x="88.9" y="142.24" smashed="yes">
-<attribute name="VALUE" x="87.884" y="145.796" size="1.778" layer="96"/>
+<instance part="P+8" gate="G$1" x="83.82" y="142.24" smashed="yes">
+<attribute name="VALUE" x="82.804" y="145.796" size="1.778" layer="96"/>
 </instance>
-<instance part="GND16" gate="1" x="88.9" y="116.84" smashed="yes">
-<attribute name="VALUE" x="86.36" y="114.3" size="1.778" layer="96"/>
+<instance part="GND16" gate="1" x="83.82" y="116.84" smashed="yes">
+<attribute name="VALUE" x="81.28" y="114.3" size="1.778" layer="96"/>
 </instance>
 <instance part="R6" gate="G$1" x="195.58" y="137.16" smashed="yes">
 <attribute name="NAME" x="191.77" y="138.6586" size="1.778" layer="95"/>
@@ -14185,6 +14288,21 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <instance part="GND13" gate="1" x="12.7" y="7.62" smashed="yes">
 <attribute name="VALUE" x="10.16" y="5.08" size="1.778" layer="96"/>
 </instance>
+<instance part="D2" gate="G$1" x="99.06" y="127" smashed="yes">
+<attribute name="NAME" x="95.631" y="122.428" size="1.778" layer="95" font="vector" rot="R90"/>
+<attribute name="VALUE" x="100.965" y="122.428" size="1.778" layer="96" font="vector" rot="R90" align="top-left"/>
+</instance>
+<instance part="R9" gate="G$1" x="99.06" y="134.62" smashed="yes" rot="R270">
+<attribute name="NAME" x="100.584" y="134.62" size="1.778" layer="95" font="vector" rot="R270" align="bottom-center"/>
+<attribute name="VALUE" x="97.536" y="134.62" size="1.778" layer="96" font="vector" rot="R270" align="top-center"/>
+</instance>
+<instance part="GND10" gate="1" x="99.06" y="116.84" smashed="yes">
+<attribute name="VALUE" x="96.52" y="114.3" size="1.778" layer="96"/>
+</instance>
+<instance part="BUZZ" gate="G$1" x="142.24" y="83.82" smashed="yes" rot="R90">
+<attribute name="NAME" x="139.7" y="81.28" size="1.778" layer="95" font="vector" rot="R90"/>
+<attribute name="VALUE" x="144.78" y="81.28" size="1.778" layer="96" font="vector" rot="R90" align="top-left"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -14198,7 +14316,7 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <segment>
 <wire x1="27.94" y1="121.92" x2="25.4" y2="121.92" width="0.1524" layer="91"/>
 <pinref part="GND8" gate="1" pin="GND"/>
-<pinref part="Y2" gate="G$1" pin="2"/>
+<pinref part="Y1" gate="G$1" pin="2"/>
 </segment>
 <segment>
 <pinref part="C1" gate="G$1" pin="2"/>
@@ -14230,7 +14348,7 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <segment>
 <pinref part="C2" gate="G$1" pin="-"/>
 <pinref part="GND16" gate="1" pin="GND"/>
-<wire x1="88.9" y1="119.38" x2="88.9" y2="132.08" width="0.1524" layer="91"/>
+<wire x1="83.82" y1="119.38" x2="83.82" y2="132.08" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="GND7" gate="1" pin="GND"/>
@@ -14311,6 +14429,11 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <wire x1="12.7" y1="20.32" x2="-5.08" y2="20.32" width="0.1524" layer="91"/>
 <wire x1="-5.08" y1="20.32" x2="-5.08" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="C5" gate="G$1" pin="2"/>
+</segment>
+<segment>
+<pinref part="D2" gate="G$1" pin="C"/>
+<pinref part="GND10" gate="1" pin="GND"/>
+<wire x1="99.06" y1="121.92" x2="99.06" y2="119.38" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="RED" class="0">
@@ -14398,7 +14521,7 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <segment>
 <pinref part="P+8" gate="G$1" pin="3.3V"/>
 <pinref part="C2" gate="G$1" pin="+"/>
-<wire x1="88.9" y1="142.24" x2="88.9" y2="139.7" width="0.1524" layer="91"/>
+<wire x1="83.82" y1="142.24" x2="83.82" y2="139.7" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <wire x1="182.88" y1="147.32" x2="187.96" y2="147.32" width="0.1524" layer="91"/>
@@ -14444,6 +14567,11 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <junction x="10.16" y="91.44"/>
 <wire x1="-5.08" y1="91.44" x2="-5.08" y2="45.72" width="0.1524" layer="91"/>
 <pinref part="C5" gate="G$1" pin="1"/>
+</segment>
+<segment>
+<pinref part="R9" gate="G$1" pin="1"/>
+<wire x1="99.06" y1="144.78" x2="99.06" y2="139.7" width="0.1524" layer="91"/>
+<label x="99.06" y="144.78" size="1.778" layer="95" rot="R90" xref="yes"/>
 </segment>
 </net>
 <net name="VIDEO" class="1">
@@ -14705,6 +14833,11 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <wire x1="182.88" y1="91.44" x2="187.96" y2="91.44" width="0.1524" layer="91"/>
 <label x="187.96" y="91.44" size="1.778" layer="95" xref="yes"/>
 </segment>
+<segment>
+<pinref part="U1" gate="A" pin="PB0"/>
+<wire x1="17.78" y1="50.8" x2="12.7" y2="50.8" width="0.1524" layer="91"/>
+<label x="12.7" y="50.8" size="1.778" layer="95" rot="R180" xref="yes"/>
+</segment>
 </net>
 <net name="DTR" class="0">
 <segment>
@@ -14739,7 +14872,7 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <label x="10.16" y="81.28" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
 <segment>
-<pinref part="Y2" gate="G$1" pin="1"/>
+<pinref part="Y1" gate="G$1" pin="1"/>
 <wire x1="35.56" y1="124.46" x2="45.72" y2="124.46" width="0.1524" layer="91"/>
 <label x="45.72" y="124.46" size="1.778" layer="95" xref="yes"/>
 </segment>
@@ -14751,7 +14884,7 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <label x="60.96" y="99.06" size="1.778" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="Y2" gate="G$1" pin="3"/>
+<pinref part="Y1" gate="G$1" pin="3"/>
 <wire x1="35.56" y1="119.38" x2="45.72" y2="119.38" width="0.1524" layer="91"/>
 <label x="45.72" y="119.38" size="1.778" layer="95" xref="yes"/>
 </segment>
@@ -14781,9 +14914,9 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <label x="60.96" y="53.34" size="1.778" layer="95" xref="yes"/>
 </segment>
 <segment>
-<wire x1="142.24" y1="76.2" x2="142.24" y2="83.82" width="0.1524" layer="91"/>
-<label x="142.24" y="83.82" size="1.778" layer="95" rot="R90" xref="yes"/>
-<pinref part="B+" gate="G$1" pin="TP"/>
+<pinref part="BUZZ" gate="G$1" pin="2"/>
+<wire x1="142.24" y1="88.9" x2="142.24" y2="93.98" width="0.1524" layer="91"/>
+<label x="142.24" y="93.98" size="1.778" layer="95" rot="R90" xref="yes"/>
 </segment>
 </net>
 <net name="BT1" class="0">
@@ -14870,6 +15003,19 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <pinref part="GOOGLE_IO" gate="G$1" pin="7"/>
 <label x="193.04" y="27.94" size="1.778" layer="95" xref="yes"/>
 <wire x1="187.96" y1="27.94" x2="193.04" y2="27.94" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="RED1" class="0">
+<segment>
+<pinref part="D2" gate="G$1" pin="A"/>
+<pinref part="R9" gate="G$1" pin="2"/>
+</segment>
+</net>
+<net name="N$2" class="0">
+<segment>
+<pinref part="BUZZ" gate="G$1" pin="1"/>
+<pinref part="B+" gate="G$1" pin="TP"/>
+<wire x1="142.24" y1="78.74" x2="142.24" y2="76.2" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
