@@ -102,31 +102,24 @@ void setup() {
   pinMode(OSD_ctr2,     OUTPUT); //ctrl2
   pinMode(CH1_pin,      OUTPUT); //module c1
   pinMode(CH2_pin,      OUTPUT); //module c2
-#ifndef SM186R
-  pinMode(CH3_pin,      OUTPUT); //module c3
-#endif
   pinMode(BX_pin,       OUTPUT); //module BX
   pinMode(FS_pin1,      INPUT); //google c1
   pinMode(FS_pin2,      INPUT); //google c2
   pinMode(FS_pin3,      INPUT); //google c3
   pinMode(ButtonCenter, INPUT_PULLUP); //Button
-#ifdef RSSI_mod
-  pinMode(RSSI_pin, INPUT);
-#endif
-
-#ifdef V2
-  pinMode(ButtonLeft,   INPUT_PULLUP); //Button left
-  pinMode(ButtonRight,  INPUT_PULLUP); //Button right
-  pinMode(BUZZ,         OUTPUT); //Buzzer
-#endif
-
-#ifdef V3
   pinMode(ButtonLeft,   INPUT_PULLUP); //Button left
   pinMode(ButtonRight,  INPUT_PULLUP); //Button right
   pinMode(ButtonUp,     INPUT_PULLUP); //Button left
   pinMode(ButtonDown,   INPUT_PULLUP); //Button right
   pinMode(BUZZ,         OUTPUT); //Buzzer
   pinMode(RST_pin,      OUTPUT); // NEW reset
+
+#ifdef RSSI_mod
+  pinMode(RSSI_pin, INPUT);
+#endif
+
+#ifndef SM186R
+  pinMode(CH3_pin,      OUTPUT); //module c3
 #endif
 
   channelvalueEEP = EEPROM.read(chanADDR);
@@ -265,7 +258,6 @@ byte buttoncheck()
     }
   }
 
-#ifndef V1
   if (digitalRead(ButtonLeft) != 1)
   {
     while (digitalRead(ButtonLeft) != 1)
@@ -285,9 +277,7 @@ byte buttoncheck()
     }
     buttonz = 3;
   }
-#endif
 
-#ifdef V3
   if (digitalRead(ButtonUp) != 1)
   {
     while (digitalRead(ButtonUp) != 1)
@@ -307,7 +297,7 @@ byte buttoncheck()
     }
     buttonz = 5;
   }
-#endif
+
   pressedbut = buttonz;
   return buttonz;
 }
@@ -528,22 +518,8 @@ void control() {
 
       callOSD();
       return;
-    }
+    }    
 
-    if (menuactive == 0) {
-      if (display_setting == 0) {
-        TV.clear_screen();
-      }
-      menuactive = 1;
-    }
-    else if (menuactive == 1) {
-    }
-
-    else {
-      if (display_setting == 0) {
-        TV.fill(BLACK);
-      }
-    }
   }
 }
 
@@ -1273,7 +1249,6 @@ void calibration() {     // Calibration wizzard
 
       }
 
-#ifndef V1
       if (ACT_channel <= 7) {
         if (pressedbut == 4) {
           ACT_channel += 1;
@@ -1285,8 +1260,6 @@ void calibration() {     // Calibration wizzard
           ACT_channel -= 1;
         }
       }
-
-#endif
 
       if (pressedbut == 1) {
 
@@ -1371,10 +1344,6 @@ void calibration() {     // Calibration wizzard
         min = RSSIminEEP;
         calstep = 0;
         
-#ifdef V1
-        menuactive = 0;
-        osd_mode = 0;
-#endif
         exit = 1;
       }
     }
@@ -1677,7 +1646,5 @@ void runlocktimer() {
 }
 
 //STORING STUFF FOR LATER
-
-
-// u8g.drawBitmapP(5, 20, 7, 32, bitmap_dock);    //dockking
-// u8g.drawBitmapP(5, 20, 7, 32, bitmap_display);    //dockking
+// u8g.drawBitmapP(5, 20, 7, 32, bitmap_dock);    //serial
+// u8g.drawBitmapP(5, 20, 7, 32, bitmap_display);    //display
