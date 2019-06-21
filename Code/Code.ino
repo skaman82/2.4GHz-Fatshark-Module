@@ -24,7 +24,6 @@
 
 #include <EEPROM.h>
 
-//U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);  // I2C / TWI
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_NO_ACK | U8G_I2C_OPT_FAST); // Fast I2C / TWI
 //U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_FAST);  // Dev 0, Fast I2C / TWI
 
@@ -66,24 +65,20 @@ int i_butt = 0;
 word freq;
 int lockmode;
 
-unsigned long previousOsdMillis = 0;
-unsigned long previousTimeoutMillis = 0;
-unsigned long BTinterval = 2000;
-unsigned long BTinterval_FIXED = 2000;
 
 byte voffset = 10; //20
-
-byte refresh = 0; //NEW
-byte osd_timeout; //NEW
-byte lock_timeout; // NEW - do the same for lockmode later
-byte display_setting = 0; //NEW setting for display modes. 0 = OLED+OSD | 1 = ONLY OSD | 2 = ONLY OLED (will require a reboot)
+byte rssiupdate = 0; //NEW
+int refresh_osd = 0; //NEW
+int refresh = 0; //NEW
+int osd_timeout; //NEW
+int lock_timeout; // NEW - do the same for lockmode later
+byte display_setting; //NEW setting for display modes. 0 = OLED+OSD | 1 = ONLY OSD | 2 = ONLY OLED (will require a reboot)
 
 
 TVout TV;
 
 void setup() {
-
-  digitalWrite(RST_pin, HIGH); // pull reset high
+  digitalWrite(RST_pin, HIGH); // pull reset pin high
   //Serial.begin(19200);
 
 #ifdef OLED
@@ -144,8 +139,6 @@ void setup() {
 
   max = RSSImaxEEP;
   min = RSSIminEEP;
-  //max = 0; //0% RSSI 365
-  //min = 70; //100% RSSI 338
 
 
   if (fscontrollEEP >= 2) {
@@ -164,6 +157,8 @@ void setup() {
   {
     SAVED_channel = 1; //setting the  default state of no valid value
   }
+
+  display_setting = 0; //just for testing
 
   clearOLED();
 
@@ -187,24 +182,20 @@ void setup() {
     TV.bitmap(2, (20 + voffset), logo);
 
     osd_timeout = 100; //looptime setting for osd timeout
-    lock_timeout = 500; //looptime setting for lockmode timeout
+    lock_timeout = 300; //looptime setting for lockmode timeout
   }
   else {
-    osd_timeout = 500; //looptime setting for osd timeout
-    lock_timeout = 2500; //looptime setting for lockmode timeout
+    osd_timeout = 100; //looptime setting for osd timeout
+    lock_timeout = 300; //looptime setting for lockmode timeout
   }
-#endif
-
-
-  digitalWrite(OSD_ctr1, HIGH);
-  digitalWrite(OSD_ctr2, LOW);
-  digitalWrite(LED_pin, HIGH);
-
-#ifndef OSD
-  tone(BUZZ, 500, 200);
 #endif
 
   if (display_setting == 0) {
+
+    digitalWrite(OSD_ctr1, HIGH);
+    digitalWrite(OSD_ctr2, LOW);
+    digitalWrite(LED_pin, HIGH);
+
     TV.select_font(font6x8);
     TV.print(25, (50 + voffset), "2G4 MODULE");
     TV.select_font(font4x6);
@@ -212,14 +203,18 @@ void setup() {
     TV.delay(3000);
     TV.tone(500, 200);
     TV.clear_screen();
-  }
 
+    osd_mode = 1;
+  }
+  else {
+    tone(BUZZ, 500, 200);
+    osd_mode = 0;
+  }
 
 #ifdef OLED
   clearOLED();
 #endif
 
-  osd_mode = 1;
   menuactive = 0;
   lockmode = 0;
 }
@@ -242,7 +237,7 @@ void showlogo()
   do
   {
     // splashscreen goes here
-    u8g.drawBitmapP(5, 20, 14, 18, logo_OLED);
+    u8g.drawBitmapP(10, 20, 14, 18, logo_OLED);
     u8g.setFont(u8g_font_5x7r);
     u8g.setPrintPos(23, 55);
     u8g.print("#RUININGTHEHOBBY");
@@ -268,7 +263,6 @@ byte buttoncheck()
     {
       buttonz += 5;
     }
-
   }
 
 #ifndef V1
@@ -438,11 +432,9 @@ void control() {
         BT_update = 1;
         FS_control = 0;
 
-
         if (osd_mode == 1) {
-
-          refresh = 1; //reset timer
-
+          refresh_osd = 1; //reset  OSD timer
+          refresh = 1; //reset  lock timer
 
           if (BT_channel >= 2) {
             BT_channel -= 1;
@@ -495,11 +487,10 @@ void control() {
         BT_update = 1;
         FS_control = 0;
 
-
         if (osd_mode == 1) {
 
+          refresh_osd = 1; //reset  osd timer
           refresh = 1; //reset timer
-
 
           if (BT_channel <= 7) {
             BT_channel += 1;
@@ -521,7 +512,6 @@ void control() {
         callOSD();
       }
     }
-
   }
 
   if (pressedbut == 6) {
@@ -529,6 +519,13 @@ void control() {
     if (lockmode == 1) {
       lockmode = 0;
       menuactive = 0;
+      if (display_setting == 0) {
+        TV.tone(400, 450);
+      }
+      else {
+        tone(BUZZ, 400, 450);
+      }
+
       callOSD();
       return;
     }
@@ -547,8 +544,6 @@ void control() {
         TV.fill(BLACK);
       }
     }
-
-
   }
 }
 
@@ -582,8 +577,6 @@ void rx_update() {
   else {
     ACT_channel = BT_channel; //if nothing from above applies, set tha active channel acording to module button state
   }
-
-
 }
 
 
@@ -720,6 +713,7 @@ void channeltable() {
 }
 
 void callOSD() {
+
   if (osd_mode != 1) {
     osd_mode = 1;
     return;
@@ -732,24 +726,21 @@ void callOSD() {
 void osd() {
 
   if (osd_mode == 1) {
-    digitalWrite(OSD_ctr1, HIGH);
-    digitalWrite(OSD_ctr2, LOW);
-    digitalWrite(LED_pin, LOW);
-
-
+    if (display_setting == 0) {
+      digitalWrite(OSD_ctr1, HIGH);
+      digitalWrite(OSD_ctr2, LOW);
+      digitalWrite(LED_pin, LOW);
+    }
   }
 
   else if (osd_mode == 0) {
     digitalWrite(OSD_ctr1, LOW);
     digitalWrite(OSD_ctr2, HIGH);
     digitalWrite(LED_pin, HIGH);
-
-
   }
   else {
     //osd_mode = 1;
   }
-
 }
 
 
@@ -784,7 +775,6 @@ void loop() {
     //Debug OSD output
 
     osd_mode = 1;
-
     uint32_t rssi_value = _readRSSI();
     float percentage = map(rssi_value, max, min, 0, 100);
 
@@ -817,7 +807,6 @@ void loop() {
       TV.draw_rect(44, (20 + voffset), 55, 20, WHITE);
       TV.print(49, (27 + voffset), freq);
       TV.println(" MHz");
-
     }
 
 #ifdef RSSI_mod
@@ -852,55 +841,54 @@ void loop() {
       TV.draw_line(18, (64 + voffset), 100, (64 + voffset), WHITE);
 
       //TV.print(1, (53 + voffset), rssi_value); //for debugging only
-
     }
 
 #endif
 
 #endif
 
-    //osd timer >>
 #ifndef debug
-    if ((menuactive != 1) && (osd_mode == 1)) {
-      //NEW TIMER
-      refresh++ ;
+    if (display_setting == 0) {
+      if ((menuactive != 1) && (osd_mode == 1)) {
+        //NEW OSD TIMER
+        refresh_osd++ ;
 
-      if (refresh >= osd_timeout) {
-        osd_mode = 0;
-        if (display_setting == 0) {
+        if (refresh_osd >= osd_timeout) {
+          osd_mode = 0;
+
           TV.clear_screen();
           TV.tone(100, 150);
+
+          //saving the last activechannel to EEPROM
+          channelvalueEEP = ACT_channel;
+          EEPROM.write(chanADDR, channelvalueEEP);
+          refresh_osd = 0;
         }
         else {
-          tone(BUZZ, 100, 150);
+          osd_mode = 1;
         }
-        //save the last activechannel to EEPROM
-        channelvalueEEP = ACT_channel;
-        EEPROM.write(chanADDR, channelvalueEEP);
-        refresh = 0;
-      }
-      else {
-        osd_mode = 1;
       }
     }
 #endif
 
 #ifdef OLED
     u8g.setFont(u8g_font_profont22r);
-    u8g.setPrintPos(42, 24);
+    u8g.setPrintPos(50, 26);
     u8g.print(freq);
     u8g.setFont(u8g_font_5x7r);
     u8g.print(" MHz");
 
 #ifdef RSSI_mod
+
     u8g.setFont(u8g_font_5x7r);
-    u8g.setPrintPos(42, 42);
+    u8g.setPrintPos(50, 39);
     u8g.print("RSSI:");
     u8g.print(percentage, 0);
-    //u8g.print(lockmode);
 
-    u8g.drawBox(45, 48, (rssibar * 0.90), 5); //
-    u8g.drawFrame(42, 45, 78, 11);
+    //rssibar = 100;
+
+    u8g.drawBox(53, 48, (rssibar * 0.60), 3); //
+    u8g.drawFrame(50, 45, 66, 9);
     //u8g.setColorIndex(0);
     //u8g.drawVLine(53,48,5);
     //u8g.drawVLine(61,48,5);
@@ -910,54 +898,40 @@ void loop() {
     //u8g.drawVLine(93,48,5);
     //u8g.drawVLine(101,48,5);
     //u8g.drawVLine(109,48,5);
-
-    u8g.setColorIndex(1);
-
+    //u8g.setColorIndex(1);
 #endif
 
     if (ACT_channel == 1) {
-      u8g.drawBitmapP(0, 8, 5, 48, bitmap_one);
+      u8g.drawBitmapP(12, 12, 4, 41, bitmap_one);
     }
     else if (ACT_channel == 2) {
-      u8g.drawBitmapP(0, 8, 5, 48, bitmap_two);
+      u8g.drawBitmapP(12, 12, 4, 41, bitmap_two);
     }
     else if (ACT_channel == 3) {
-      u8g.drawBitmapP(0, 8, 5, 48, bitmap_three);
+      u8g.drawBitmapP(12, 12, 4, 41, bitmap_three);
     }
     else if (ACT_channel == 4) {
-      u8g.drawBitmapP(0, 8, 5, 48, bitmap_four);
+      u8g.drawBitmapP(12, 12, 4, 41, bitmap_four);
     }
     else if (ACT_channel == 5) {
-      u8g.drawBitmapP(0, 8, 5, 48, bitmap_five);
+      u8g.drawBitmapP(12, 12, 4, 41, bitmap_five);
     }
     else if (ACT_channel == 6) {
-      u8g.drawBitmapP(0, 8, 5, 48, bitmap_six);
+      u8g.drawBitmapP(12, 12, 4, 41, bitmap_six);
     }
     else if (ACT_channel == 7) {
-      u8g.drawBitmapP(0, 8, 5, 48, bitmap_seven);
+      u8g.drawBitmapP(12, 12, 4, 41, bitmap_seven);
     }
     else if (ACT_channel == 8) {
-      u8g.drawBitmapP(0, 8, 5, 48, bitmap_eight);
+      u8g.drawBitmapP(12, 12, 4, 41, bitmap_eight);
     }
 
-    if (lockmode == 1) {
-      u8g.drawBitmapP(105, 33, 2, 8, bitmap_lock);     //mini lock icon
+    if ((lockmodeEEP == 1) && (lockmode == 1)) {
+      u8g.drawBitmapP(109, 32, 2, 8, bitmap_lock);     //mini lock icon
     }
-
-#ifdef OSD
-#ifdef V3
-
-
-
-
-
-    //TV.draw_rect(0, 0, 119, 89, WHITE);
-    //TV.delay_frame(1);
-    //display.output_delay = 55;
-    //TV.delay_frame(1);
-
-#endif
-#endif
+    else if ((lockmodeEEP == 1) && (lockmode == 0)) {
+      u8g.drawBitmapP(109, 32, 2, 8, bitmap_lockopen);     //mini lock icon
+    }
 
   } while ( u8g.nextPage() );
 #endif
@@ -968,15 +942,15 @@ void loop() {
 //RSSI READOUT ************************ simple avg of 4 value
 
 uint16_t _readRSSI() {
+
+  rssiupdate++;
   volatile uint32_t sum = 0;
-  analogRead(RSSI_pin);
-  delay(10);
   sum = analogRead(RSSI_pin);
-  //delay(10);
+  delay(1);
   sum += analogRead(RSSI_pin);
-  //delay(10);
+  delay(10);
   sum += analogRead(RSSI_pin);
-  //delay(10);
+  delay(10);
   sum += analogRead(RSSI_pin);
   return sum / 4;
 }
@@ -1134,7 +1108,6 @@ void menu() {
           }
         }
 
-
         if (pressedbut == 2) {
           if (display_setting == 0) {
             TV.clear_screen();
@@ -1178,7 +1151,6 @@ void menu() {
             TV.clear_screen();
           }
           menu_position = 3;
-
         }
       }
 
@@ -1220,7 +1192,6 @@ void menu() {
             TV.clear_screen();
           }
           menu_position = 4;
-
         }
       }
 
@@ -1260,17 +1231,16 @@ void menu() {
           menu_position = 5;
         }
       }
+
 #ifdef OLED
     } while ( u8g.nextPage() );
 #endif
   }
-
 }
 
 
 
 //CALIBRATION MENU ************************
-
 
 void calibration() {     // Calibration wizzard
 
@@ -1323,7 +1293,6 @@ void calibration() {     // Calibration wizzard
         if (display_setting == 0) {
           TV.clear_screen();
         }
-
         calstep = 2;
       }
     }
@@ -1401,6 +1370,7 @@ void calibration() {     // Calibration wizzard
         max = RSSImaxEEP;
         min = RSSIminEEP;
         calstep = 0;
+        
 #ifdef V1
         menuactive = 0;
         osd_mode = 0;
@@ -1415,7 +1385,6 @@ void calibration() {     // Calibration wizzard
 //BANDSCAN MENU ************************
 
 void bandscan() {
-
 
   byte exit = 0;
   while (exit == 0) {
@@ -1675,7 +1644,6 @@ void bandscan() {
       exit = 1;
     }
   }
-
 }
 
 
@@ -1686,35 +1654,30 @@ void runlocktimer() {
 
   if (lockmodeEEP == 1)  {
     if ((lockmode == 0) && (menuactive == 0)) {
-      const long timeout = millis();
-      //TV.print(84, (50 + voffset), ((16 - (timeout - previousTimeoutMillis) / 600)));
-      if (timeout - previousTimeoutMillis >= 30000) {
-        previousTimeoutMillis = timeout;
+      refresh++ ;
+
+      if (refresh >= lock_timeout) {
         lockmode = 1;
-
-
-
+        refresh = 0;
       }
       else {
         lockmode = 0;
       }
     }
-    else {  }
 
-
-
-    if (lockmode == 1) {
-      if (display_setting == 0) {
+    if (display_setting == 0) {
+      if ((lockmodeEEP == 1) && (lockmode == 1)) {
         TV.bitmap(92, (48 + voffset), bitmap_minilock_OSD);
       }
+      else if ((lockmodeEEP == 1) && (lockmode == 0)) {
+        TV.bitmap(92, (48 + voffset), bitmap_minilockopen_OSD);
+      }
     }
-
   }
-  else { }
-
 }
 
 //STORING STUFF FOR LATER
 
 
 // u8g.drawBitmapP(5, 20, 7, 32, bitmap_dock);    //dockking
+// u8g.drawBitmapP(5, 20, 7, 32, bitmap_display);    //dockking

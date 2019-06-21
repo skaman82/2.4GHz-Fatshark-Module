@@ -7,4 +7,6 @@ extern const unsigned char bitmap_ydywrn_OSD[];
 extern const unsigned char bitmap_949gqh_OSD[];
 extern const unsigned char bitmap_be8bbq_OSD[];
 extern const unsigned char bitmap_6zuzag_OSD[];
+extern const unsigned char bitmap_display_OSD[];
 extern const unsigned char bitmap_minilock_OSD[];
+extern const unsigned char bitmap_minilockopen_OSD[];
