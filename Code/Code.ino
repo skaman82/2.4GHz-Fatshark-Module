@@ -62,14 +62,13 @@ int i_butt = 0;
 word freq;
 int lockmode;
 
-
-byte voffset = 10; //20
-byte rssiupdate = 0; //NEW
-int refresh_osd = 0; //NEW
-int refresh = 0; //NEW
-int osd_timeout; //NEW
-int lock_timeout; // NEW - do the same for lockmode later
-byte display_setting; //NEW setting for display modes. 0 = OLED+OSD | 1 = ONLY OSD | 2 = ONLY OLED (will require a reboot)
+byte voffset = 10;
+byte rssiupdate = 0;
+int refresh_osd = 0;
+int refresh = 0;
+int osd_timeout;
+int lock_timeout;
+byte display_setting; //NEW setting for display modes. 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED (will require a reboot)
 
 
 TVout TV;
@@ -147,16 +146,22 @@ void setup() {
     SAVED_channel = 1; //setting the  default state of no valid value
   }
 
-  display_setting = 0; //just for testing
+  if (displayEEP > 2)
+  {
+    display_setting = 1; //setting the  default state of no valid value
+  }
+
+  display_setting = 2; //just for testing 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED
 
   clearOLED();
 
-  showlogo();
-
+  if (display_setting >= 1) {
+    showlogo();
+  }
 
 #ifdef PAL_FORMAT
 
-  if (display_setting == 0) {  //NEW
+  if (display_setting <= 1) {  //NEW
 #ifdef PAL_FORMAT
     TV.begin(_PAL, 128, 96); //original 128x96px, 160x120max (146x120)
 #endif
@@ -178,7 +183,7 @@ void setup() {
   }
 #endif
 
-  if (display_setting == 0) {
+  if (display_setting <= 1) {
 
     digitalWrite(OSD_ctr1, HIGH);
     digitalWrite(OSD_ctr2, LOW);
@@ -341,7 +346,7 @@ void control() {
   if (pressedbut == 1) {
 
     if (lockmode == 0) {
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.tone(800, 80);
       }
       else {
@@ -349,7 +354,7 @@ void control() {
       }
     }
     else {
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.tone(100, 100);
         TV.delay(200);
         TV.tone(100, 100);
@@ -364,20 +369,18 @@ void control() {
 
     if (lockmode == 0) {
       if (menuactive == 0) {
-
-        if (display_setting == 0) {
+        if (display_setting <= 1) {
           TV.clear_screen();
         }
         menuactive = 1;
         menu();
-        //bandscan();
+
       }
       else if (menuactive == 1) {
-        if (display_setting == 0) {
+        if (display_setting <= 1) {
           TV.fill(BLACK);
           TV.delay(10);
         }
-        //menuactive = 0;
         return;
       }
     }
@@ -388,7 +391,7 @@ void control() {
   if (pressedbut == 2) {
 
     if (lockmode == 0) {
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.tone(800, 80);
       }
       else {
@@ -396,7 +399,7 @@ void control() {
       }
     }
     else {
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.tone(100, 100);
         TV.delay(200);
         TV.tone(100, 100);
@@ -431,7 +434,7 @@ void control() {
         }
       }
       else {
-        if (display_setting == 0) {
+        if (display_setting <= 1) {
           TV.clear_screen();
         }
         callOSD();
@@ -442,7 +445,7 @@ void control() {
   if (pressedbut == 3) {
 
     if (lockmode == 0) {
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.tone(800, 80);
       }
       else {
@@ -450,7 +453,7 @@ void control() {
       }
     }
     else {
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.tone(100, 100);
         TV.delay(200);
         TV.tone(100, 100);
@@ -487,7 +490,7 @@ void control() {
         }
       }
       else {
-        if (display_setting == 0) {
+        if (display_setting <= 1) {
           TV.clear_screen();
         }
         callOSD();
@@ -500,17 +503,22 @@ void control() {
     if (lockmode == 1) {
       lockmode = 0;
       menuactive = 0;
-      if (display_setting == 0) {
-        TV.tone(400, 450);
+      if (display_setting <= 1) {
+        TV.tone(600, 400);
       }
       else {
-        tone(BUZZ, 400, 450);
+        tone(BUZZ, 600, 400);
       }
 
       callOSD();
       return;
-    }    
-
+    }
+    else {
+      if (display_setting <= 1) {
+        TV.clear_screen();
+      }
+      reboot_modal();
+    }
   }
 }
 
@@ -693,17 +701,17 @@ void callOSD() {
 void osd() {
 
   if (osd_mode == 1) {
-    if (display_setting == 0) {
+    if (display_setting <= 1) {
       digitalWrite(OSD_ctr1, HIGH);
       digitalWrite(OSD_ctr2, LOW);
-      digitalWrite(LED_pin, LOW);
+      digitalWrite(LED_pin, HIGH);
     }
   }
 
   else if (osd_mode == 0) {
     digitalWrite(OSD_ctr1, LOW);
     digitalWrite(OSD_ctr2, HIGH);
-    digitalWrite(LED_pin, HIGH);
+    digitalWrite(LED_pin, LOW);
   }
   else {
     //osd_mode = 1;
@@ -753,7 +761,7 @@ void loop() {
     int p2_value = digitalRead(FS_pin2);
     int p3_value = digitalRead(FS_pin3);
 
-    if (display_setting == 0) {
+    if (display_setting <= 1) {
       //do OSD stuff
     }
 
@@ -761,7 +769,7 @@ void loop() {
 
 #ifndef debug
 
-    if (display_setting == 0) {
+    if (display_setting <= 1) {
       //Main OSD code
       TV.select_font(font6x8);
       TV.print(23, (27 + voffset), "CH");
@@ -785,7 +793,7 @@ void loop() {
 
     float rssibar = percentage * 0.81; //scaling the bar a bit down
 
-    if (display_setting == 0) {
+    if (display_setting <= 1) {
       TV.select_font(font4x6);
       TV.print(18, (50 + voffset), "RSSI ");
       TV.println((percentage - 0), 0);
@@ -812,7 +820,7 @@ void loop() {
 #endif
 
 #ifndef debug
-    if (display_setting == 0) {
+    if (display_setting <= 1) {
       if ((menuactive != 1) && (osd_mode == 1)) {
         //NEW OSD TIMER
         refresh_osd++ ;
@@ -835,70 +843,71 @@ void loop() {
     }
 #endif
 
+    if (display_setting >= 1) {
+      u8g.setFont(u8g_font_profont22r);
+      u8g.setPrintPos(50, 26);
+      u8g.print(freq);
+      u8g.setFont(u8g_font_5x7r);
+      u8g.print(" MHz");
+    }
 
-    u8g.setFont(u8g_font_profont22r);
-    u8g.setPrintPos(50, 26);
-    u8g.print(freq);
-    u8g.setFont(u8g_font_5x7r);
-    u8g.print(" MHz");
-
+    if (display_setting >= 1) {
 #ifdef RSSI_mod
+      u8g.setFont(u8g_font_5x7r);
+      u8g.setPrintPos(50, 40);
+      u8g.print("RSSI:");
+      u8g.print(percentage, 0);
 
-    u8g.setFont(u8g_font_5x7r);
-    u8g.setPrintPos(50, 39);
-    u8g.print("RSSI:");
-    u8g.print(percentage, 0);
+      //rssibar = 100;
 
-    //rssibar = 100;
+      u8g.drawBox(53, 48, (rssibar * 0.60), 3); //
+      u8g.drawFrame(50, 45, 66, 9);
+      //u8g.setColorIndex(0);
+      //u8g.drawVLine(53,48,5);
+      //u8g.drawVLine(61,48,5);
+      //u8g.drawVLine(69,48,5);
+      //u8g.drawVLine(77,48,5);
+      //u8g.drawVLine(85,48,5);
+      //u8g.drawVLine(93,48,5);
+      //u8g.drawVLine(101,48,5);
+      //u8g.drawVLine(109,48,5);
+      //u8g.setColorIndex(1);
 
-    u8g.drawBox(53, 48, (rssibar * 0.60), 3); //
-    u8g.drawFrame(50, 45, 66, 9);
-    //u8g.setColorIndex(0);
-    //u8g.drawVLine(53,48,5);
-    //u8g.drawVLine(61,48,5);
-    //u8g.drawVLine(69,48,5);
-    //u8g.drawVLine(77,48,5);
-    //u8g.drawVLine(85,48,5);
-    //u8g.drawVLine(93,48,5);
-    //u8g.drawVLine(101,48,5);
-    //u8g.drawVLine(109,48,5);
-    //u8g.setColorIndex(1);
-
-
-    if (ACT_channel == 1) {
-      u8g.drawBitmapP(12, 12, 4, 41, bitmap_one);
-    }
-    else if (ACT_channel == 2) {
-      u8g.drawBitmapP(12, 12, 4, 41, bitmap_two);
-    }
-    else if (ACT_channel == 3) {
-      u8g.drawBitmapP(12, 12, 4, 41, bitmap_three);
-    }
-    else if (ACT_channel == 4) {
-      u8g.drawBitmapP(12, 12, 4, 41, bitmap_four);
-    }
-    else if (ACT_channel == 5) {
-      u8g.drawBitmapP(12, 12, 4, 41, bitmap_five);
-    }
-    else if (ACT_channel == 6) {
-      u8g.drawBitmapP(12, 12, 4, 41, bitmap_six);
-    }
-    else if (ACT_channel == 7) {
-      u8g.drawBitmapP(12, 12, 4, 41, bitmap_seven);
-    }
-    else if (ACT_channel == 8) {
-      u8g.drawBitmapP(12, 12, 4, 41, bitmap_eight);
-    }
-
-    if ((lockmodeEEP == 1) && (lockmode == 1)) {
-      u8g.drawBitmapP(109, 32, 2, 8, bitmap_lock);     //mini lock icon
-    }
-    else if ((lockmodeEEP == 1) && (lockmode == 0)) {
-      u8g.drawBitmapP(109, 32, 2, 8, bitmap_lockopen);     //mini lock icon
-    }
-
-  } while ( u8g.nextPage() );
 #endif
+      if (ACT_channel == 1) {
+        u8g.drawBitmapP(12, 12, 4, 41, bitmap_one);
+      }
+      else if (ACT_channel == 2) {
+        u8g.drawBitmapP(12, 12, 4, 41, bitmap_two);
+      }
+      else if (ACT_channel == 3) {
+        u8g.drawBitmapP(12, 12, 4, 41, bitmap_three);
+      }
+      else if (ACT_channel == 4) {
+        u8g.drawBitmapP(12, 12, 4, 41, bitmap_four);
+      }
+      else if (ACT_channel == 5) {
+        u8g.drawBitmapP(12, 12, 4, 41, bitmap_five);
+      }
+      else if (ACT_channel == 6) {
+        u8g.drawBitmapP(12, 12, 4, 41, bitmap_six);
+      }
+      else if (ACT_channel == 7) {
+        u8g.drawBitmapP(12, 12, 4, 41, bitmap_seven);
+      }
+      else if (ACT_channel == 8) {
+        u8g.drawBitmapP(12, 12, 4, 41, bitmap_eight);
+      }
+
+      if ((lockmodeEEP == 1) && (lockmode == 1)) {
+        u8g.drawBitmapP(109, 32, 2, 8, bitmap_lock);     //mini lock icon
+      }
+      else if ((lockmodeEEP == 1) && (lockmode == 0)) {
+        u8g.drawBitmapP(109, 32, 2, 8, bitmap_lockopen);     //mini lock icon
+      }
+    }
+  } while ( u8g.nextPage() );
+
 }
 
 
@@ -940,7 +949,7 @@ void menu() {
       if (menu_position == 1) {
         buttoncheck();
 
-        if (display_setting == 0) {
+        if (display_setting <= 1) {
           TV.select_font(font4x6);
           TV.print(55, (0 + voffset), "MENU");
           TV.select_font(font6x8);
@@ -976,12 +985,12 @@ void menu() {
             EEPROM.write(fscontrollADDR, fscontrollEEP);
           }
 
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
         }
         if (pressedbut == 2) {
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
           menu_position = 2;
@@ -992,7 +1001,7 @@ void menu() {
 
         buttoncheck();
 
-        if (display_setting == 0) {
+        if (display_setting <= 1) {
           TV.select_font(font4x6);
           TV.print(55, (0 + voffset), "MENU");
           TV.select_font(font6x8);
@@ -1006,20 +1015,20 @@ void menu() {
         u8g.print("BANDSCAN");
 
         if (pressedbut == 1) {
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
           bandscan();
         }
 
         if (pressedbut == 2) {
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
           menu_position = 3;
         }
         if (pressedbut == 3) {
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
           menu_position = 1;
@@ -1029,7 +1038,7 @@ void menu() {
       else if (menu_position == 3) {
 
         buttoncheck();
-        if (display_setting == 0) {
+        if (display_setting <= 1) {
           TV.select_font(font4x6);
           TV.print(55, (0 + voffset), "MENU");
           TV.select_font(font6x8);
@@ -1067,19 +1076,19 @@ void menu() {
             EEPROM.write(lockmodeADDR, lockmodeEEP);
           }
 
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
         }
 
         if (pressedbut == 2) {
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
           menu_position = 4;
         }
         if (pressedbut == 3) {
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
           menu_position = 2;
@@ -1090,7 +1099,7 @@ void menu() {
 
         buttoncheck();
 
-        if (display_setting == 0) {
+        if (display_setting <= 1) {
           TV.select_font(font4x6);
           TV.print(55, (0 + voffset), "MENU");
           TV.select_font(font6x8);
@@ -1105,13 +1114,13 @@ void menu() {
 
 
         if (pressedbut == 2) {
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
           menu_position = 5;
         }
         if (pressedbut == 3) {
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
           menu_position = 3;
@@ -1122,7 +1131,7 @@ void menu() {
 
         buttoncheck();
 
-        if (display_setting == 0) {
+        if (display_setting <= 1) {
           TV.select_font(font4x6);
           TV.print(55, (0 + voffset), "MENU");
           TV.select_font(font6x8);
@@ -1136,20 +1145,20 @@ void menu() {
         u8g.print("CALIBRATE");
 
         if (pressedbut == 1) {
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
           calibration();
         }
 
         if (pressedbut == 2) {
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
           menu_position = 6;
         }
         if (pressedbut == 3) {
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
           menu_position = 4;
@@ -1160,14 +1169,14 @@ void menu() {
 
         buttoncheck();
 
-        if (display_setting == 0) {
+        if (display_setting <= 1) {
           TV.select_font(font4x6);
           TV.print(55, (0 + voffset), "MENU");
           TV.select_font(font6x8);
           TV.bitmap(35, (25 + voffset), bitmap_be8bbq_OSD); //exit
           TV.print(50, (70 + voffset), "EXIT");
         }
-        
+
         u8g.drawBitmapP(38, 10, 7, 32, bitmap_be8bbq);   //exit
         u8g.setFont(u8g_font_5x7r);
         u8g.setPrintPos(55, 55);
@@ -1175,7 +1184,7 @@ void menu() {
 
 
         if (pressedbut == 1) {
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
           menu_position = 0;
@@ -1186,7 +1195,7 @@ void menu() {
         }
 
         if (pressedbut == 3) {
-          if (display_setting == 0) {
+          if (display_setting <= 1) {
             TV.clear_screen();
           }
           menu_position = 5;
@@ -1214,7 +1223,7 @@ void calibration() {     // Calibration wizzard
       buttoncheck();
       channeltable();
 
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
 
         TV.select_font(font4x6);
         TV.print(30, (0 + voffset), "RSSI CALIBRATION");
@@ -1248,7 +1257,7 @@ void calibration() {     // Calibration wizzard
 
       if (pressedbut == 1) {
 
-        if (display_setting == 0) {
+        if (display_setting <= 1) {
           TV.clear_screen();
         }
         calstep = 2;
@@ -1259,7 +1268,7 @@ void calibration() {     // Calibration wizzard
       buttoncheck();
       uint32_t rssi_value = _readRSSI();
 
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.print(30, (0 + voffset), "RSSI CALIBRATION");
         TV.select_font(font6x8);
         TV.print(0, (30 + voffset), "2:Remove antenna and switch off the VTX");
@@ -1272,7 +1281,7 @@ void calibration() {     // Calibration wizzard
         RSSImaxEEP = rssi_value / 2;
         EEPROM.write(RSSImaxADDR, RSSImaxEEP);
 
-        if (display_setting == 0) {
+        if (display_setting <= 1) {
           TV.clear_screen();
         }
         calstep = 3;
@@ -1282,7 +1291,7 @@ void calibration() {     // Calibration wizzard
       buttoncheck();
       uint32_t rssi_value = _readRSSI();
 
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.print(30, (0 + voffset), "RSSI CALIBRATION");
         TV.select_font(font6x8);
         TV.print(0, (30 + voffset), "3:Put on the antenna and switch on the VTX");
@@ -1295,7 +1304,7 @@ void calibration() {     // Calibration wizzard
         RSSIminEEP = rssi_value / 2;
         EEPROM.write(RSSIminADDR, RSSIminEEP);
 
-        if (display_setting == 0) {
+        if (display_setting <= 1) {
           TV.clear_screen();
         }
         calstep = 4;
@@ -1307,7 +1316,7 @@ void calibration() {     // Calibration wizzard
       RSSIminEEP = EEPROM.read(RSSIminADDR) * 2;
       RSSImaxEEP = EEPROM.read(RSSImaxADDR) * 2;
 
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.print(30, (0 + voffset), "RSSI CALIBRATION");
         TV.select_font(font6x8);
         TV.print(8, (30 + voffset), "4:Calibration done!");
@@ -1321,14 +1330,14 @@ void calibration() {     // Calibration wizzard
       }
       if (pressedbut == 1) {
 
-        if (display_setting == 0) {
+        if (display_setting <= 1) {
           TV.clear_screen();
         }
 
         max = RSSImaxEEP;
         min = RSSIminEEP;
         calstep = 0;
-        
+
         exit = 1;
       }
     }
@@ -1347,7 +1356,7 @@ void bandscan() {
     buttoncheck();
     channeltable();
 
-    if (display_setting == 0) {
+    if (display_setting <= 1) {
       TV.select_font(font4x6);
       TV.print(35, (0 + voffset), "BAND SCANNER ");
       TV.draw_line(0, (70 + voffset), 123, (70 + voffset), WHITE);
@@ -1363,7 +1372,7 @@ void bandscan() {
       else if (percentage1 < 0) {
         percentage1 = 0;
       }
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.draw_rect(0, (13 + voffset), 14, 67, BLACK, BLACK);
         TV.draw_rect(0, ((70 - (percentage1 * 0.46)) + voffset), 10, (percentage1 * 0.46), WHITE, WHITE);
         TV.print(0, (75 + voffset), "CH1");
@@ -1377,7 +1386,6 @@ void bandscan() {
           TV.print(0, ((63 - (percentage1 * 0.46)) + voffset), percentage1, 0);
         }
       }
-      //TV.print("%");
       ACT_channel = 2;
     }
 
@@ -1392,7 +1400,7 @@ void bandscan() {
       else if (percentage2 < 0) {
         percentage2 = 0;
       }
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.draw_rect(16, (13 + voffset), 14, 67, BLACK, BLACK);
         TV.draw_rect(16, ((70 - (percentage2 * 0.46)) + voffset), 10, (percentage2 * 0.46), WHITE, WHITE);
         TV.print(16, (75 + voffset), "CH2");
@@ -1406,7 +1414,6 @@ void bandscan() {
           TV.print(16, ((63 - (percentage2 * 0.46)) + voffset), percentage2, 0);
         }
       }
-      //TV.print("%");
       ACT_channel = 3;
     }
 
@@ -1422,7 +1429,7 @@ void bandscan() {
         percentage3 = 0;
       }
 
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.draw_rect(32, (13 + voffset), 14, 67, BLACK, BLACK);
         TV.draw_rect(32, ((70 - (percentage3 * 0.46)) + voffset), 10, (percentage3 * 0.46), WHITE, WHITE);
         TV.print(32, (75 + voffset), "CH3");
@@ -1436,7 +1443,6 @@ void bandscan() {
           TV.print(32, ((63 - (percentage3 * 0.46)) + voffset), percentage3, 0);
         }
       }
-      //TV.print("%");
       ACT_channel = 4;
     }
 
@@ -1451,7 +1457,7 @@ void bandscan() {
       else if (percentage4 < 0) {
         percentage4 = 0;
       }
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.draw_rect(48, (13 + voffset), 14, 67, BLACK, BLACK);
         TV.draw_rect(48, ((70 - (percentage4 * 0.46)) + voffset), 10, (percentage4 * 0.46), WHITE, WHITE);
         TV.print(48, (75 + voffset), "CH4");
@@ -1465,7 +1471,6 @@ void bandscan() {
           TV.print(48, ((63 - (percentage4 * 0.46)) + voffset), percentage4, 0);
         }
       }
-      //TV.print("%");
       ACT_channel = 5;
     }
 
@@ -1480,7 +1485,7 @@ void bandscan() {
       else if (percentage5 < 0) {
         percentage5 = 0;
       }
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.draw_rect(64, (13 + voffset), 14, 67, BLACK, BLACK);
         TV.draw_rect(64, ((70 - (percentage5 * 0.46)) + voffset), 10, (percentage5 * 0.46), WHITE, WHITE);
         TV.print(64, (75 + voffset), "CH5");
@@ -1494,7 +1499,6 @@ void bandscan() {
           TV.print(64, ((63 - (percentage5 * 0.46)) + voffset), percentage5, 0);
         }
       }
-      //TV.print("%");
       ACT_channel = 6;
     }
 
@@ -1511,7 +1515,7 @@ void bandscan() {
         percentage6 = 0;
       }
 
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.draw_rect(80, (13 + voffset), 14, 67, BLACK, BLACK);
         TV.draw_rect(80, ((70 - (percentage6 * 0.46)) + voffset), 10, (percentage6 * 0.46), WHITE, WHITE);
         TV.print(80, (75 + voffset), "CH6");
@@ -1525,7 +1529,6 @@ void bandscan() {
           TV.print(80, ((63 - (percentage6 * 0.46)) + voffset), percentage6, 0);
         }
       }
-      //TV.print("%");
       ACT_channel = 7;
     }
 
@@ -1541,7 +1544,7 @@ void bandscan() {
       else if (percentage7 < 0) {
         percentage7 = 0;
       }
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.draw_rect(96, (13 + voffset), 14, 67, BLACK, BLACK);
         TV.draw_rect(96, ((70 - (percentage7 * 0.46)) + voffset), 10, (percentage7 * 0.46), WHITE, WHITE);
         TV.print(96, (75 + voffset), "CH7");
@@ -1555,7 +1558,6 @@ void bandscan() {
           TV.print(96, ((63 - (percentage7 * 0.46)) + voffset), percentage7, 0);
         }
       }
-      //TV.print("%");
       ACT_channel = 8;
     }
 
@@ -1571,7 +1573,7 @@ void bandscan() {
       else if (percentage8 < 0) {
         percentage8 = 0;
       }
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.draw_rect(112, (13 + voffset), 14, 67, BLACK, BLACK);
         TV.draw_rect(112, ((70 - (percentage8 * 0.46)) + voffset), 10, (percentage8 * 0.46), WHITE, WHITE);
         TV.print(112, (75 + voffset), "CH8");
@@ -1585,13 +1587,12 @@ void bandscan() {
           TV.print(112, ((63 - (percentage8 * 0.46)) + voffset), percentage8, 0);
         }
       }
-      //TV.print("%");
       ACT_channel = 1;
     }
 
 
     if (pressedbut == 1) {
-      if (display_setting == 0) {
+      if (display_setting <= 1) {
         TV.clear_screen();
       }
       menuactive = 0; //for debugging only
@@ -1613,23 +1614,70 @@ void runlocktimer() {
       if (refresh >= lock_timeout) {
         lockmode = 1;
         refresh = 0;
+        if (display_setting <= 1) {
+        TV.tone(600, 50);
+      }
+      else {
+        tone(BUZZ, 600, 50);
+      }
       }
       else {
         lockmode = 0;
       }
     }
 
-    if (display_setting == 0) {
-      if ((lockmodeEEP == 1) && (lockmode == 1)) {
-        TV.bitmap(92, (48 + voffset), bitmap_minilock_OSD);
-      }
-      else if ((lockmodeEEP == 1) && (lockmode == 0)) {
-        TV.bitmap(92, (48 + voffset), bitmap_minilockopen_OSD);
-      }
+
+    if ((lockmodeEEP == 1) && (lockmode == 1)) {
+      TV.bitmap(92, (48 + voffset), bitmap_minilock_OSD);
     }
+    else if ((lockmodeEEP == 1) && (lockmode == 0)) {
+      TV.bitmap(92, (48 + voffset), bitmap_minilockopen_OSD);
+    }
+
   }
 }
 
+
+void reboot_modal() {
+  byte exit = 0;
+  clearOLED();
+
+  while (exit == 0) {
+
+    u8g.firstPage();
+    do {
+      osd();
+      buttoncheck();
+      menuactive = 1;
+      osd_mode = 1;
+
+      if (display_setting <= 1) {
+        TV.print(10, (10 + voffset), "reboot needed");
+      }
+      if (display_setting >= 1) {
+        u8g.setPrintPos(10, 10);
+        u8g.print("reboot needed");
+      }
+
+      if (pressedbut == 1) {
+
+        //restart
+        digitalWrite(RST_pin, LOW); // pull reset pin to low for reset
+
+        //following code doesn't happen if the reset is done:
+        menuactive = 0; //for debugging only
+        if (display_setting <= 1) {
+          TV.clear_screen();
+        }
+        exit = 1;
+        return;
+      }
+
+
+    } while ( u8g.nextPage() );
+  }
+
+}
 //STORING STUFF FOR LATER
 // u8g.drawBitmapP(5, 20, 7, 32, bitmap_dock);    //serial
 // u8g.drawBitmapP(5, 20, 7, 32, bitmap_display);    //display
