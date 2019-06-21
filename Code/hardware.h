@@ -2,8 +2,6 @@
 
 #define RX28 //RX28 (S-RX28) or SM186R
 #define RSSI_mod //If RSSI mod is done on the rtc6711 chip (see datasheet)
-#define OLED //V3 ONLY due space limitations
-#define OSD 
 #define PAL_FORMAT //PAL_FORMAT or NTSC_FORMAT for OSD (NTSC may not work)
 
 

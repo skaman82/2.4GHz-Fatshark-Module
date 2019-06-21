@@ -27,12 +27,9 @@
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_NO_ACK | U8G_I2C_OPT_FAST); // Fast I2C / TWI
 //U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_FAST);  // Dev 0, Fast I2C / TWI
 
-#ifdef OLED
 #include "bitmaps.h"
-#endif
 
 #define longpresstime         1000  // in ms
-
 #define chanADDR                 1  // EEPROM Adress
 #define lockmodeADDR             2  // EEPROM Adress
 #define fscontrollADDR           3  // EEPROM Adress
@@ -81,7 +78,7 @@ void setup() {
   digitalWrite(RST_pin, HIGH); // pull reset pin high
   //Serial.begin(19200);
 
-#ifdef OLED
+
   // assign default color value
   if ( u8g.getMode() == U8G_MODE_R3G3B2 ) {
     u8g.setColorIndex(255);     // white
@@ -95,7 +92,6 @@ void setup() {
   else if ( u8g.getMode() == U8G_MODE_HICOLOR ) {
     u8g.setHiColorByRGB(255, 255, 255);
   }
-#endif
 
   pinMode(LED_pin,      OUTPUT); //LED
   pinMode(OSD_ctr1,     OUTPUT); //ctrl1
@@ -155,9 +151,8 @@ void setup() {
 
   clearOLED();
 
-#ifdef OLED
   showlogo();
-#endif
+
 
 #ifdef PAL_FORMAT
 
@@ -204,9 +199,7 @@ void setup() {
     osd_mode = 0;
   }
 
-#ifdef OLED
   clearOLED();
-#endif
 
   menuactive = 0;
   lockmode = 0;
@@ -225,7 +218,6 @@ void clearOLED()
 
 void showlogo()
 {
-#ifdef OLED
   u8g.firstPage();
   do
   {
@@ -236,7 +228,6 @@ void showlogo()
     u8g.print("#RUININGTHEHOBBY");
   }
   while (u8g.nextPage());
-#endif
 }
 
 byte buttoncheck()
@@ -373,7 +364,7 @@ void control() {
 
     if (lockmode == 0) {
       if (menuactive == 0) {
-#ifdef OSD
+
         if (display_setting == 0) {
           TV.clear_screen();
         }
@@ -391,7 +382,7 @@ void control() {
       }
     }
 
-#endif
+
   }
 
   if (pressedbut == 2) {
@@ -725,10 +716,9 @@ void osd() {
 
 void loop() {
 
-#ifdef OLED
   u8g.firstPage();
   do {
-#endif
+
     buttoncheck();
     // Serial.println("HelloW");
 
@@ -742,10 +732,8 @@ void loop() {
     rx_update();
     channeltable();
     runlocktimer();
-
-#ifdef OSD
     osd();
-#endif
+
 
 #ifdef debug
     //Debug OSD output
@@ -847,7 +835,7 @@ void loop() {
     }
 #endif
 
-#ifdef OLED
+
     u8g.setFont(u8g_font_profont22r);
     u8g.setPrintPos(50, 26);
     u8g.print(freq);
@@ -875,7 +863,7 @@ void loop() {
     //u8g.drawVLine(101,48,5);
     //u8g.drawVLine(109,48,5);
     //u8g.setColorIndex(1);
-#endif
+
 
     if (ACT_channel == 1) {
       u8g.drawBitmapP(12, 12, 4, 41, bitmap_one);
@@ -965,7 +953,7 @@ void menu() {
             TV.print("OFF");
           }
         }
-#ifdef OLED
+
         u8g.drawBitmapP(38, 10, 7, 32, bitmap_nkizw);   //goggle
         u8g.setFont(u8g_font_5x7r);
         u8g.setPrintPos(20, 55);
@@ -976,7 +964,7 @@ void menu() {
         else {
           u8g.print("OFF");
         }
-#endif
+
         if (pressedbut == 1) {
 
           if (fscontrollEEP == 1) {
@@ -1011,12 +999,12 @@ void menu() {
           TV.bitmap(35, (25 + voffset), bitmap_hd85pj_OSD); //scan
           TV.print(38, (70 + voffset), "Bandscan");
         }
-#ifdef OLED
+
         u8g.drawBitmapP(38, 10, 7, 32, bitmap_hd85pj);   //scan
         u8g.setFont(u8g_font_5x7r);
         u8g.setPrintPos(45, 55);
         u8g.print("BANDSCAN");
-#endif
+
         if (pressedbut == 1) {
           if (display_setting == 0) {
             TV.clear_screen();
@@ -1055,7 +1043,7 @@ void menu() {
             TV.print("OFF");
           }
         }
-#ifdef OLED
+
         u8g.drawBitmapP(38, 10, 7, 32, bitmap_w113l);   //lock
         u8g.setFont(u8g_font_5x7r);
         u8g.setPrintPos(35, 55);
@@ -1067,7 +1055,7 @@ void menu() {
         else {
           u8g.print("OFF");
         }
-#endif
+
         if (pressedbut == 1) {
 
           if (lockmodeEEP == 1) {
@@ -1109,12 +1097,12 @@ void menu() {
           TV.bitmap(35, (25 + voffset), bitmap_ydywrn_OSD); //search
           TV.print(35, (70 + voffset), "Find mode");
         }
-#ifdef OLED
+
         u8g.drawBitmapP(38, 10, 7, 32, bitmap_ydywrn);   //search
         u8g.setFont(u8g_font_5x7r);
         u8g.setPrintPos(45, 55);
         u8g.print("FIND MODE");
-#endif
+
 
         if (pressedbut == 2) {
           if (display_setting == 0) {
@@ -1142,13 +1130,10 @@ void menu() {
           TV.print(37, (70 + voffset), "Calibrate");
         }
 
-#ifdef OLED
         u8g.drawBitmapP(38, 10, 7, 32, bitmap_calib);   //tools
         u8g.setFont(u8g_font_5x7r);
         u8g.setPrintPos(45, 55);
         u8g.print("CALIBRATE");
-#endif
-
 
         if (pressedbut == 1) {
           if (display_setting == 0) {
@@ -1182,12 +1167,12 @@ void menu() {
           TV.bitmap(35, (25 + voffset), bitmap_be8bbq_OSD); //exit
           TV.print(50, (70 + voffset), "EXIT");
         }
-#ifdef OLED
+        
         u8g.drawBitmapP(38, 10, 7, 32, bitmap_be8bbq);   //exit
         u8g.setFont(u8g_font_5x7r);
         u8g.setPrintPos(55, 55);
         u8g.print("EXIT");
-#endif
+
 
         if (pressedbut == 1) {
           if (display_setting == 0) {
@@ -1208,9 +1193,9 @@ void menu() {
         }
       }
 
-#ifdef OLED
+
     } while ( u8g.nextPage() );
-#endif
+
   }
 }
 
