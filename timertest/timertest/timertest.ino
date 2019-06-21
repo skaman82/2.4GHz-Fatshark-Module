@@ -64,7 +64,7 @@ void setup() {
 
   clearOLED();
 
-  if (osd_setting == 1) {  //NEW
+  if (display_setting == 1) {  //NEW
     TV.begin(_PAL, 120, 90);
     osd_timeout = 100; //looptime setting for osd timeout
     lock_timeout = 500; //looptime setting for lockmode timeout
@@ -123,7 +123,7 @@ void control() {
     if (osd_mode == 1) {
 
       refresh = 1; //reset timer
-              digitalWrite(RST_pin, LOW); // pull reset LOW for reset
+      digitalWrite(RST_pin, LOW); // pull reset LOW for reset
 
     }
   }
@@ -196,8 +196,14 @@ void loop() {
 
       if (refresh >= osd_timeout) {
         osd_mode = 0;
+    #ifdef OSD
+        TV.clear_screen();
+        TV.tone(100, 150);
+    #endif
+        //save the last activechannel to EEPROM
+        channelvalueEEP = ACT_channel;
+        EEPROM.write(chanADDR, channelvalueEEP);
         refresh = 0;
-        clearOLED();
       }
 
       else {

@@ -74,4 +74,5 @@
   #define LED_pin      10 
   #define OSD_ctr1     11
   #define OSD_ctr2     12
+  #define RST_pin       0 //NEW
 #endif
