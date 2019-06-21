@@ -956,8 +956,8 @@ void menu() {
 
         u8g.drawBitmapP(38, 10, 7, 32, bitmap_nkizw);   //goggle
         u8g.setFont(u8g_font_5x7r);
-        u8g.setPrintPos(20, 55);
-        u8g.print("GOGGLE CONTROLL:");
+        u8g.setPrintPos(23, 55);
+        u8g.print("GOGGLE CONTROL:");
         if (fscontrollEEP == 1) {
           u8g.print("ON");
         }
