@@ -2,15 +2,10 @@
 // This Project is created by Albert Kravcov
 
 // TO DOS & FIXMEs:
-// X Main Menu structure
-// X Calibrate function
-// X Bandscan function
-// X FS Button Control setting
-// X Lock Mode function
-// X Find OSD button bug not enabaling the OSD on first press
-
-// • Finder Screen
-// • OLED screens & menus
+// • Finder Screen (OLED + OSD)
+// • Calibarte Screen (OLED)
+// • Display menu setting (OLED + OSD)
+// • Serial menu setting (OLED + OSD)
 
 
 #include <TVout.h>
@@ -40,12 +35,12 @@ U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_NO_ACK | U8G_I2C_OPT_F
 #define serialADDR               7  // EEPROM Adress
 
 int channelvalueEEP;
-int lockmodeEEP;    //TODO: lock mode setting (all buttons deactivated)
-int fscontrollEEP;  //TODO: FS Buttons disabled
+int lockmodeEEP;
+int fscontrollEEP;
 int displayEEP;     //TODO: display settings
 int RSSImaxEEP;     // RSSI calibration
 int RSSIminEEP;     // RSSI calibration
-int serialEEP;     // serial communication
+int serialEEP;     // TODO serial communication
 int max; //= 365; //0% RSSI
 int min; // = 338; //100% RSSI
 
@@ -76,8 +71,6 @@ TVout TV;
 
 void setup() {
   digitalWrite(RST_pin, HIGH); // pull reset pin high
-  //Serial.begin(19200);
-
 
   // assign default color value
   if ( u8g.getMode() == U8G_MODE_R3G3B2 ) {
@@ -151,22 +144,23 @@ void setup() {
     display_setting = 1; //setting the  default state of no valid value
   }
 
-  display_setting = 1; //just for testing 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED
+  display_setting = 0; //just for testing 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED
 
 
-  if (fscontrollEEP == 0) {
+  if (fscontrollEEP == 1) { // change to "serialEEP == 1" later
     Serial.begin(9600);
   }
-
-
 
   clearOLED();
 
   if (display_setting >= 1) {
     showlogo();
+
+    if (display_setting == 2) {
+      delay(2000);
+    }
   }
 
-#ifdef PAL_FORMAT
 
   if (display_setting <= 1) {  //NEW
 #ifdef PAL_FORMAT
@@ -188,7 +182,6 @@ void setup() {
     osd_timeout = 100; //looptime setting for osd timeout
     lock_timeout = 300; //looptime setting for lockmode timeout
   }
-#endif
 
   if (display_setting <= 1) {
 
@@ -197,9 +190,9 @@ void setup() {
     digitalWrite(LED_pin, HIGH);
 
     TV.select_font(font6x8);
-    TV.print(25, (50 + voffset), "2G4 MODULE");
+    TV.print(28, (50 + voffset), "2G4 MODULE");
     TV.select_font(font4x6);
-    TV.print(24, (69 + voffset), "#RUININGTHEHOBBY");
+    TV.print(27, (69 + voffset), "#RUININGTHEHOBBY");
     TV.delay(3000);
     TV.tone(500, 200);
     TV.clear_screen();
@@ -215,6 +208,7 @@ void setup() {
 
   menuactive = 0;
   lockmode = 0;
+
 }
 
 
@@ -875,9 +869,7 @@ void loop() {
       u8g.print(freq);
       u8g.setFont(u8g_font_5x7r);
       u8g.print(" MHz");
-    }
 
-    if (display_setting >= 1) {
 #ifdef RSSI_mod
       u8g.setFont(u8g_font_5x7r);
       u8g.setPrintPos(50, 40);
@@ -1392,6 +1384,17 @@ void calibration() {     // Calibration wizzard
 
 void bandscan() {
 
+  clearOLED();
+
+  int percentage1 = 0;
+  int percentage2 = 0;
+  int percentage3 = 0;
+  int percentage4 = 0;
+  int percentage5 = 0;
+  int percentage6 = 0;
+  int percentage7 = 0;
+  int percentage8 = 0;
+
 
   byte exit = 0;
   while (exit == 0) {
@@ -1405,21 +1408,17 @@ void bandscan() {
 
       if (display_setting <= 1) {
         TV.select_font(font4x6);
-        TV.print(35, (0 + voffset), "BAND SCANNER ");
+        TV.print(35, (0 + voffset), "BAND SCANNER");
         TV.draw_line(0, (70 + voffset), 123, (70 + voffset), WHITE);
       }
 
-      if (display_setting >= 1) {
-        u8g.setPrintPos(10, 10);
-        u8g.print("BAND SCANNER");
-      }
 
 
       //>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CH1
       if (ACT_channel == 1) {
 
         uint32_t rssi_value1 = _readRSSI();
-        float percentage1 = map(rssi_value1, max, min, 0, 100);
+        percentage1 = map(rssi_value1, max, min, 0, 100);
         if (percentage1 > 100) {
           percentage1 = 100;
         }
@@ -1431,15 +1430,16 @@ void bandscan() {
           TV.draw_rect(0, ((70 - (percentage1 * 0.46)) + voffset), 10, (percentage1 * 0.46), WHITE, WHITE);
           TV.print(0, (75 + voffset), "CH1");
           if ((percentage1 < 100) && (percentage1 >= 10)) {
-            TV.print(2, ((63 - (percentage1 * 0.46)) + voffset), percentage1, 0);
+            TV.print(2, ((63 - (percentage1 * 0.46)) + voffset), percentage1);
           }
           else if (percentage1 < 10) {
-            TV.print(4, ((63 - (percentage1 * 0.46)) + voffset), percentage1, 0);
+            TV.print(4, ((63 - (percentage1 * 0.46)) + voffset), percentage1);
           }
           else {
-            TV.print(0, ((63 - (percentage1 * 0.46)) + voffset), percentage1, 0);
+            TV.print(0, ((63 - (percentage1 * 0.46)) + voffset), percentage1);
           }
         }
+
         ACT_channel = 2;
       }
 
@@ -1447,7 +1447,7 @@ void bandscan() {
       else if (ACT_channel == 2) {
 
         uint32_t rssi_value2 = _readRSSI();
-        float percentage2 = map(rssi_value2, max, min, 0, 100);
+        percentage2 = map(rssi_value2, max, min, 0, 100);
         if (percentage2 > 100) {
           percentage2 = 100;
         }
@@ -1459,13 +1459,13 @@ void bandscan() {
           TV.draw_rect(16, ((70 - (percentage2 * 0.46)) + voffset), 10, (percentage2 * 0.46), WHITE, WHITE);
           TV.print(16, (75 + voffset), "CH2");
           if ((percentage2 < 100) && (percentage2 >= 10)) {
-            TV.print(18, ((63 - (percentage2 * 0.46)) + voffset), percentage2, 0);
+            TV.print(18, ((63 - (percentage2 * 0.46)) + voffset), percentage2);
           }
           else if (percentage2 < 10) {
-            TV.print(20, ((63 - (percentage2 * 0.46)) + voffset), percentage2, 0);
+            TV.print(20, ((63 - (percentage2 * 0.46)) + voffset), percentage2);
           }
           else {
-            TV.print(16, ((63 - (percentage2 * 0.46)) + voffset), percentage2, 0);
+            TV.print(16, ((63 - (percentage2 * 0.46)) + voffset), percentage2);
           }
         }
         ACT_channel = 3;
@@ -1475,7 +1475,7 @@ void bandscan() {
       else if (ACT_channel == 3) {
 
         uint32_t rssi_value3 = _readRSSI();
-        float percentage3 = map(rssi_value3, max, min, 0, 100);
+        percentage3 = map(rssi_value3, max, min, 0, 100);
         if (percentage3 > 100) {
           percentage3 = 100;
         }
@@ -1488,13 +1488,13 @@ void bandscan() {
           TV.draw_rect(32, ((70 - (percentage3 * 0.46)) + voffset), 10, (percentage3 * 0.46), WHITE, WHITE);
           TV.print(32, (75 + voffset), "CH3");
           if ((percentage3 < 100) && (percentage3 >= 10)) {
-            TV.print(34, ((63 - (percentage3 * 0.46)) + voffset), percentage3, 0);
+            TV.print(34, ((63 - (percentage3 * 0.46)) + voffset), percentage3);
           }
           else if (percentage3 < 10) {
-            TV.print(36, ((63 - (percentage3 * 0.46)) + voffset), percentage3, 0);
+            TV.print(36, ((63 - (percentage3 * 0.46)) + voffset), percentage3);
           }
           else {
-            TV.print(32, ((63 - (percentage3 * 0.46)) + voffset), percentage3, 0);
+            TV.print(32, ((63 - (percentage3 * 0.46)) + voffset), percentage3);
           }
         }
         ACT_channel = 4;
@@ -1504,7 +1504,7 @@ void bandscan() {
       else if (ACT_channel == 4) {
 
         uint32_t rssi_value4 = _readRSSI();
-        float percentage4 = map(rssi_value4, max, min, 0, 100);
+        percentage4 = map(rssi_value4, max, min, 0, 100);
         if (percentage4 > 100) {
           percentage4 = 100;
         }
@@ -1516,13 +1516,13 @@ void bandscan() {
           TV.draw_rect(48, ((70 - (percentage4 * 0.46)) + voffset), 10, (percentage4 * 0.46), WHITE, WHITE);
           TV.print(48, (75 + voffset), "CH4");
           if ((percentage4 < 100) && (percentage4 >= 10)) {
-            TV.print(50, ((63 - (percentage4 * 0.46)) + voffset), percentage4, 0);
+            TV.print(50, ((63 - (percentage4 * 0.46)) + voffset), percentage4);
           }
           else if (percentage4 < 10) {
-            TV.print(52, ((63 - (percentage4 * 0.46)) + voffset), percentage4, 0);
+            TV.print(52, ((63 - (percentage4 * 0.46)) + voffset), percentage4);
           }
           else {
-            TV.print(48, ((63 - (percentage4 * 0.46)) + voffset), percentage4, 0);
+            TV.print(48, ((63 - (percentage4 * 0.46)) + voffset), percentage4);
           }
         }
         ACT_channel = 5;
@@ -1532,7 +1532,7 @@ void bandscan() {
       else if (ACT_channel == 5) {
 
         uint32_t rssi_value5 = _readRSSI();
-        float percentage5 = map(rssi_value5, max, min, 0, 100);
+        percentage5 = map(rssi_value5, max, min, 0, 100);
         if (percentage5 > 100) {
           percentage5 = 100;
         }
@@ -1544,13 +1544,13 @@ void bandscan() {
           TV.draw_rect(64, ((70 - (percentage5 * 0.46)) + voffset), 10, (percentage5 * 0.46), WHITE, WHITE);
           TV.print(64, (75 + voffset), "CH5");
           if ((percentage5 < 100) && (percentage5 >= 10)) {
-            TV.print(66, ((63 - (percentage5 * 0.46)) + voffset), percentage5, 0);
+            TV.print(66, ((63 - (percentage5 * 0.46)) + voffset), percentage5);
           }
           else if (percentage5 < 10) {
-            TV.print(68, ((63 - (percentage5 * 0.46)) + voffset), percentage5, 0);
+            TV.print(68, ((63 - (percentage5 * 0.46)) + voffset), percentage5);
           }
           else {
-            TV.print(64, ((63 - (percentage5 * 0.46)) + voffset), percentage5, 0);
+            TV.print(64, ((63 - (percentage5 * 0.46)) + voffset), percentage5);
           }
         }
         ACT_channel = 6;
@@ -1560,7 +1560,7 @@ void bandscan() {
       else if (ACT_channel == 6) {
 
         uint32_t rssi_value6 = _readRSSI();
-        float percentage6 = map(rssi_value6, max, min, 0, 100);
+        percentage6 = map(rssi_value6, max, min, 0, 100);
 
         if (percentage6 > 100) {
           percentage6 = 100;
@@ -1574,13 +1574,13 @@ void bandscan() {
           TV.draw_rect(80, ((70 - (percentage6 * 0.46)) + voffset), 10, (percentage6 * 0.46), WHITE, WHITE);
           TV.print(80, (75 + voffset), "CH6");
           if ((percentage6 < 100) && (percentage6 >= 10)) {
-            TV.print(82, ((63 - (percentage6 * 0.46)) + voffset), percentage6, 0);
+            TV.print(82, ((63 - (percentage6 * 0.46)) + voffset), percentage6);
           }
           else if (percentage6 < 10) {
-            TV.print(84, ((63 - (percentage6 * 0.46)) + voffset), percentage6, 0);
+            TV.print(84, ((63 - (percentage6 * 0.46)) + voffset), percentage6);
           }
           else {
-            TV.print(80, ((63 - (percentage6 * 0.46)) + voffset), percentage6, 0);
+            TV.print(80, ((63 - (percentage6 * 0.46)) + voffset), percentage6);
           }
         }
         ACT_channel = 7;
@@ -1590,7 +1590,7 @@ void bandscan() {
       else if (ACT_channel == 7) {
 
         uint32_t rssi_value7 = _readRSSI();
-        float percentage7 = map(rssi_value7, max, min, 0, 100);
+        percentage7 = map(rssi_value7, max, min, 0, 100);
 
         if (percentage7 > 100) {
           percentage7 = 100;
@@ -1603,13 +1603,13 @@ void bandscan() {
           TV.draw_rect(96, ((70 - (percentage7 * 0.46)) + voffset), 10, (percentage7 * 0.46), WHITE, WHITE);
           TV.print(96, (75 + voffset), "CH7");
           if ((percentage7 < 100) && (percentage7 >= 10)) {
-            TV.print(98, ((63 - (percentage7 * 0.46)) + voffset), percentage7, 0);
+            TV.print(98, ((63 - (percentage7 * 0.46)) + voffset), percentage7);
           }
           else if (percentage7 < 10) {
-            TV.print(100, ((63 - (percentage7 * 0.46)) + voffset), percentage7, 0);
+            TV.print(100, ((63 - (percentage7 * 0.46)) + voffset), percentage7);
           }
           else {
-            TV.print(96, ((63 - (percentage7 * 0.46)) + voffset), percentage7, 0);
+            TV.print(96, ((63 - (percentage7 * 0.46)) + voffset), percentage7);
           }
         }
         ACT_channel = 8;
@@ -1619,7 +1619,7 @@ void bandscan() {
       else if (ACT_channel == 8) {
 
         uint32_t rssi_value8 = _readRSSI();
-        float percentage8 = map(rssi_value8, max, min, 0, 100);
+        percentage8 = map(rssi_value8, max, min, 0, 100);
 
         if (percentage8 > 100) {
           percentage8 = 100;
@@ -1632,17 +1632,156 @@ void bandscan() {
           TV.draw_rect(112, ((70 - (percentage8 * 0.46)) + voffset), 10, (percentage8 * 0.46), WHITE, WHITE);
           TV.print(112, (75 + voffset), "CH8");
           if ((percentage8 < 100) && (percentage8 >= 10)) {
-            TV.print(114, ((63 - (percentage8 * 0.46)) + voffset), percentage8, 0);
+            TV.print(114, ((63 - (percentage8 * 0.46)) + voffset), percentage8);
           }
           else if (percentage8 < 10) {
-            TV.print(116, ((63 - (percentage8 * 0.46)) + voffset), percentage8, 0);
+            TV.print(116, ((63 - (percentage8 * 0.46)) + voffset), percentage8);
           }
           else {
-            TV.print(112, ((63 - (percentage8 * 0.46)) + voffset), percentage8, 0);
+            TV.print(112, ((63 - (percentage8 * 0.46)) + voffset), percentage8);
           }
         }
         ACT_channel = 1;
       }
+
+
+
+
+
+
+      if (display_setting >= 1) {
+        u8g.setPrintPos(35, 10);
+        u8g.print("BAND SCANNER");
+        u8g.drawHLine(15, 50, 100);
+
+
+        int rssibar_ch1 = round(percentage1 * 0.3);
+        int rssibar_ch2 = round(percentage2 * 0.3);
+        int rssibar_ch3 = round(percentage3 * 0.3);
+        int rssibar_ch4 = round(percentage4 * 0.3);
+        int rssibar_ch5 = round(percentage5 * 0.3);
+        int rssibar_ch6 = round(percentage6 * 0.3);
+        int rssibar_ch7 = round(percentage7 * 0.3);
+        int rssibar_ch8 = round(percentage8 * 0.3);
+
+
+        u8g.setPrintPos(15, 59);
+        u8g.print("C1");
+        u8g.setPrintPos(28, 59);
+        u8g.print("C2");
+        u8g.setPrintPos(41, 59);
+        u8g.print("C3");
+        u8g.setPrintPos(54, 59);
+        u8g.print("C4");
+        u8g.setPrintPos(67, 59);
+        u8g.print("C5");
+        u8g.setPrintPos(80, 59);
+        u8g.print("C6");
+        u8g.setPrintPos(93, 59);
+        u8g.print("C7");
+        u8g.setPrintPos(106, 59);
+        u8g.print("C8");
+
+
+        if (percentage1 > 0) {
+          u8g.drawBox(15, (51 - (rssibar_ch1)), 9, rssibar_ch1);
+        }
+        if (percentage1 <= 9) {
+          u8g.setPrintPos(17, (48 - rssibar_ch1));
+        }
+        else {
+          u8g.setPrintPos(15, (48 - rssibar_ch1));
+        }
+        u8g.print(percentage1);
+
+
+        if (percentage2 > 0) {
+          u8g.drawBox(28, (51 - (rssibar_ch2)), 9, rssibar_ch2);
+        }
+        if (percentage2 <= 9) {
+          u8g.setPrintPos(30, (48 - rssibar_ch2));
+        }
+        else {
+          u8g.setPrintPos(28, (48 - rssibar_ch2));
+        }
+        u8g.print(percentage2);
+
+
+        if (percentage3 > 0) {
+          u8g.drawBox(41, (51 - (rssibar_ch3)), 9, rssibar_ch3);
+        }
+        if (percentage3 <= 9) {
+          u8g.setPrintPos(43, (48 - rssibar_ch3));
+        }
+        else {
+          u8g.setPrintPos(41, (48 - rssibar_ch3));
+        }
+        u8g.print(percentage3);
+
+
+        if (percentage4 > 0) {
+          u8g.drawBox(54, (51 - (rssibar_ch4)), 9, rssibar_ch4);
+        }
+        if (percentage4 <= 9) {
+          u8g.setPrintPos(56, (48 - rssibar_ch4));
+        }
+        else {
+          u8g.setPrintPos(54, (48 - rssibar_ch4));
+        }
+        u8g.print(percentage4);
+
+
+        if (percentage5 > 0) {
+          u8g.drawBox(67, (51 - rssibar_ch5), 9, rssibar_ch5);
+        }
+        if (percentage5 <= 9) {
+          u8g.setPrintPos(69, (48 - rssibar_ch5));
+        }
+        else {
+          u8g.setPrintPos(67, (48 - rssibar_ch5));
+        }
+        u8g.print(percentage5);
+
+
+        if (percentage6 > 0) {
+          u8g.drawBox(80, (51 - (rssibar_ch6)), 9, rssibar_ch6);
+        }
+        if (percentage6 <= 9) {
+          u8g.setPrintPos(82, (48 - rssibar_ch6));
+        }
+        else {
+          u8g.setPrintPos(80, (48 - rssibar_ch6));
+        }
+        u8g.print(percentage6);
+
+
+        if (percentage7 > 0) {
+          u8g.drawBox(93, (51 - (rssibar_ch7)), 9, rssibar_ch7);
+        }
+        if (percentage7 <= 9) {
+          u8g.setPrintPos(95, (48 - rssibar_ch7));
+        }
+        else {
+          u8g.setPrintPos(93, (48 - rssibar_ch7));
+        }
+        u8g.print(percentage7);
+
+
+        if (percentage8 > 0) {
+          u8g.drawBox(106, (51 - (rssibar_ch8)), 9, rssibar_ch8);
+        }
+        if (percentage7 <= 9) {
+          u8g.setPrintPos(108, (48 - rssibar_ch8));
+        }
+        else {
+          u8g.setPrintPos(106, (48 - rssibar_ch8));
+        }
+        u8g.print(percentage8);
+
+      }
+
+
+
 
 
       if (pressedbut == 1) {
@@ -1684,12 +1823,13 @@ void runlocktimer() {
       }
     }
 
-
-    if ((lockmodeEEP == 1) && (lockmode == 1)) {
-      TV.bitmap(104, (38 + voffset), bitmap_minilock_OSD);
-    }
-    else if ((lockmodeEEP == 1) && (lockmode == 0)) {
-      TV.bitmap(104, (38 + voffset), bitmap_minilockopen_OSD);
+    if (display_setting <= 1) {
+      if ((lockmodeEEP == 1) && (lockmode == 1)) {
+        TV.bitmap(104, (38 + voffset), bitmap_minilock_OSD);
+      }
+      else if ((lockmodeEEP == 1) && (lockmode == 0)) {
+        TV.bitmap(104, (38 + voffset), bitmap_minilockopen_OSD);
+      }
     }
   }
 }
