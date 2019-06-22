@@ -14,6 +14,7 @@
 
 
 #include <TVout.h>
+#include <font8x8.h>
 #include <font6x8.h>
 #include <font4x6.h>
 #include "hardware.h"
@@ -121,13 +122,12 @@ void setup() {
   lockmodeEEP = EEPROM.read(lockmodeADDR);
   fscontrollEEP = EEPROM.read(fscontrollADDR);
   displayEEP = EEPROM.read(displayADDR); //TODO
-  serialEEP = EEPROM.read(serialADDR); //TODO
   RSSImaxEEP = EEPROM.read(RSSImaxADDR)  * 2;
   RSSIminEEP = EEPROM.read(RSSIminADDR)  * 2;
+  serialEEP = EEPROM.read(serialADDR); //TODO
 
   max = RSSImaxEEP;
   min = RSSIminEEP;
-
 
   if (fscontrollEEP >= 2) {
     fscontrollEEP = 0; //setting the  default state of no valid value
@@ -152,6 +152,13 @@ void setup() {
   }
 
   display_setting = 1; //just for testing 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED
+
+
+  if (fscontrollEEP == 0) {
+    Serial.begin(9600);
+  }
+
+
 
   clearOLED();
 
@@ -728,7 +735,7 @@ void loop() {
   do {
 
     buttoncheck();
-    // Serial.println("HelloW");
+    Serial.println("HelloWorld");
 
     if (fscontrollEEP == 1) {
       if (lockmode == 0) {
@@ -771,14 +778,37 @@ void loop() {
 
     if (display_setting <= 1) {
       //Main OSD code
-      TV.select_font(font6x8);
-      TV.print(23, (27 + voffset), "CH");
-      TV.println(ACT_channel);
-      TV.draw_rect(18, (20 + voffset), 26, 20, WHITE);
 
-      TV.draw_rect(44, (20 + voffset), 55, 20, WHITE);
-      TV.print(49, (27 + voffset), freq);
-      TV.println(" MHz");
+      TV.select_font(font8x8);
+      TV.print(58, (20 + voffset), freq);
+      TV.select_font(font6x8);
+      TV.println(95, (22 + voffset), "MHz");
+
+      if (ACT_channel == 1) {
+        TV.bitmap(18, (20 + voffset), bitmap_one_OSD);
+      }
+      else if (ACT_channel == 2) {
+        TV.bitmap(18, (20 + voffset), bitmap_two_OSD);
+      }
+      else if (ACT_channel == 3) {
+        TV.bitmap(18, (20 + voffset), bitmap_three_OSD);
+      }
+      else if (ACT_channel == 4) {
+        TV.bitmap(18, (20 + voffset), bitmap_four_OSD);
+      }
+      else if (ACT_channel == 5) {
+        TV.bitmap(18, (20 + voffset), bitmap_five_OSD);
+      }
+      else if (ACT_channel == 6) {
+        TV.bitmap(18, (20 + voffset), bitmap_six_OSD);
+      }
+      else if (ACT_channel == 7) {
+        TV.bitmap(18, (20 + voffset), bitmap_seven_OSD);
+      }
+      else if (ACT_channel == 8) {
+        TV.bitmap(18, (20 + voffset), bitmap_eight_OSD);
+      }
+
     }
 
 #ifdef RSSI_mod
@@ -791,28 +821,24 @@ void loop() {
       percentage = 0;
     }
 
-    float rssibar = percentage * 0.81; //scaling the bar a bit down
+
 
     if (display_setting <= 1) {
       TV.select_font(font4x6);
-      TV.print(18, (50 + voffset), "RSSI ");
+      //TV.draw_rect(58, (41 + voffset), 30, 8, BLACK, BLACK); //mask
+      TV.print(58, (41 + voffset), "RSSI:");
       TV.println((percentage - 0), 0);
 
       if ((percentage < 100) && (percentage >= 10)) {
-        TV.draw_rect(46, (50 + voffset), 4, 4, BLACK, BLACK); //cover the first RSSI number
+        TV.draw_rect(88, (41 + voffset), 4, 4, BLACK, BLACK); //cover the first RSSI number
       }
 
       else if (percentage < 10) {
-        TV.draw_rect(42, (50 + voffset), 8, 4, BLACK, BLACK); //cover the second RSSI number
+        TV.draw_rect(82, (41 + voffset), 8, 4, BLACK, BLACK); //cover the second RSSI number
       }
 
-      TV.draw_rect(18, (58 + voffset), rssibar, 5, WHITE, WHITE);
-      if (percentage < 100) {
-        TV.draw_rect((18 + rssibar), (58 + voffset), (100 - rssibar), 5, BLACK, BLACK);
-      }
-      TV.draw_line(18, (64 + voffset), 100, (64 + voffset), WHITE);
-
-      //TV.print(1, (53 + voffset), rssi_value); //for debugging only
+      TV.draw_rect(58, (53 + voffset), 52, 8, WHITE, BLACK);
+      TV.draw_rect(60, (55 + voffset), (percentage * 0.48) , 4, WHITE, WHITE);
     }
 
 #endif
@@ -860,7 +886,7 @@ void loop() {
 
       //rssibar = 100;
 
-      u8g.drawBox(53, 48, (rssibar * 0.60), 3); //
+      u8g.drawBox(53, 48, (percentage * 0.60), 3); //
       u8g.drawFrame(50, 45, 66, 9);
       //u8g.setColorIndex(0);
       //u8g.drawVLine(53,48,5);
@@ -1660,10 +1686,10 @@ void runlocktimer() {
 
 
     if ((lockmodeEEP == 1) && (lockmode == 1)) {
-      TV.bitmap(92, (48 + voffset), bitmap_minilock_OSD);
+      TV.bitmap(104, (38 + voffset), bitmap_minilock_OSD);
     }
     else if ((lockmodeEEP == 1) && (lockmode == 0)) {
-      TV.bitmap(92, (48 + voffset), bitmap_minilockopen_OSD);
+      TV.bitmap(104, (38 + voffset), bitmap_minilockopen_OSD);
     }
   }
 }
@@ -1742,7 +1768,6 @@ void reboot_modal() {
     } while ( u8g.nextPage() );
   }
 }
-
 
 
 
