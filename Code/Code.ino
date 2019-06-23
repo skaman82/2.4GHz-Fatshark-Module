@@ -144,7 +144,7 @@ void setup() {
     display_setting = 1; //setting the  default state of no valid value
   }
 
-  display_setting = 0; //just for testing 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED
+  display_setting = 1; //just for testing 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED
 
 
   if (fscontrollEEP == 1) { // change to "serialEEP == 1" later
@@ -937,11 +937,11 @@ uint16_t _readRSSI() {
   rssiupdate++;
   volatile uint32_t sum = 0;
   sum = analogRead(RSSI_pin);
-  delay(1);
+  delay(2);
   sum += analogRead(RSSI_pin);
-  delay(10);
+  delay(2);
   sum += analogRead(RSSI_pin);
-  delay(10);
+  delay(2);
   sum += analogRead(RSSI_pin);
   return sum / 4;
 }
@@ -1838,22 +1838,54 @@ void runlocktimer() {
 void finder() {
   byte exit = 0;
   clearOLED();
+  int buzzertimer = 0;
 
   while (exit == 0) {
-
     u8g.firstPage();
     do {
       osd();
       buttoncheck();
+      channeltable();
       menuactive = 1;
       osd_mode = 1;
 
+      uint32_t rssi_value = _readRSSI();
+      int percentage = map(rssi_value, max, min, 0, 100);
+      int delaytime = (101 - percentage);
+
+
+      if (percentage > 100) {
+        percentage = 100;
+      }
+      if (percentage < 0) {
+        percentage = 0;
+      }
+
+
       if (display_setting <= 1) {
-        TV.print(10, (10 + voffset), "finder");
+        TV.print(50, (10 + voffset), "finder");
       }
       if (display_setting >= 1) {
         u8g.setPrintPos(10, 10);
-        u8g.print("finder");
+        u8g.print("CH");
+        u8g.print(ACT_channel);
+        u8g.setPrintPos(10, 30);
+        u8g.print("RSSI: ");
+        u8g.print(percentage);
+        u8g.setPrintPos(10, 40);
+        u8g.print("DELAY: ");
+        u8g.print(delaytime);
+      }
+
+      buzzertimer++;
+      if (buzzertimer > delaytime) {
+        if (display_setting <= 1) {
+          TV.tone(800, 100);
+        }
+        else {
+          tone(BUZZ, 800, 100);
+        }
+        buzzertimer = 0;
       }
 
       if (pressedbut == 1) {
@@ -1863,6 +1895,23 @@ void finder() {
         }
         exit = 1;
         return;
+      }
+      if (pressedbut == 3) {
+        if (ACT_channel <= 7) {
+          ACT_channel += 1;
+        }
+        else {
+          ACT_channel = 1;
+        }
+
+      }
+      if (pressedbut == 2) {
+        if (ACT_channel >= 2) {
+          ACT_channel -= 1;
+        }
+        else {
+          ACT_channel = 8;
+        }
       }
 
 
@@ -1905,6 +1954,8 @@ void reboot_modal() {
         exit = 1;
         return;
       }
+
+
     } while ( u8g.nextPage() );
   }
 }
