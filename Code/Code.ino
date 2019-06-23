@@ -147,7 +147,10 @@ void setup() {
   display_setting = 1; //just for testing 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED
 
 
-  if (fscontrollEEP == 1) { // change to "serialEEP == 1" later
+  if (fscontrollEEP == 0) { // change to "serialEEP == 1" later
+#define serial
+#undef FS_pin2
+#undef FS_pin3
     Serial.begin(9600);
   }
 
@@ -179,8 +182,8 @@ void setup() {
     lock_timeout = 300; //looptime setting for lockmode timeout
   }
   else {
-    osd_timeout = 100; //looptime setting for osd timeout
-    lock_timeout = 300; //looptime setting for lockmode timeout
+    osd_timeout = 0; //looptime setting for osd timeout
+    lock_timeout = 600; //looptime setting for lockmode timeout
   }
 
   if (display_setting <= 1) {
@@ -301,6 +304,7 @@ byte buttoncheck()
 
 
 void fs_buttons() {
+#ifndef serial
   // FS Button mapping:
   //CH1: p1-LOW,  p2-LOW,   p3-LOW
   //CH2: p1-HIGH, p2-LOW,   p3-LOW
@@ -340,6 +344,7 @@ void fs_buttons() {
     FS_channel = 1;
     //BT_update = 1;
   }
+#endif
 }
 
 
@@ -727,9 +732,7 @@ void loop() {
 
   u8g.firstPage();
   do {
-
     buttoncheck();
-    Serial.println("HelloWorld");
 
     if (fscontrollEEP == 1) {
       if (lockmode == 0) {
@@ -815,7 +818,10 @@ void loop() {
       percentage = 0;
     }
 
-
+    if (fscontrollEEP == 0) {
+      Serial.println(percentage, 0);
+      Serial.println(ACT_channel);
+    }
 
     if (display_setting <= 1) {
       TV.select_font(font4x6);
@@ -944,6 +950,7 @@ uint16_t _readRSSI() {
   delay(2);
   sum += analogRead(RSSI_pin);
   return sum / 4;
+
 }
 
 
@@ -1835,23 +1842,33 @@ void runlocktimer() {
 }
 
 
+  
+
 void finder() {
+  u8g.setRot270();
   byte exit = 0;
   clearOLED();
   int buzzertimer = 0;
-
   while (exit == 0) {
     u8g.firstPage();
+    
     do {
       osd();
       buttoncheck();
       channeltable();
       menuactive = 1;
       osd_mode = 1;
-
+      
+      int delaytime;
       uint32_t rssi_value = _readRSSI();
       int percentage = map(rssi_value, max, min, 0, 100);
-      int delaytime = (101 - percentage);
+      
+      if (display_setting <= 1) {
+         delaytime = ((102 - percentage) * 0.6);
+      }
+      else {
+        delaytime = (101 - percentage);
+        }
 
 
       if (percentage > 100) {
@@ -1893,7 +1910,9 @@ void finder() {
         if (display_setting <= 1) {
           TV.clear_screen();
         }
+        fixoled();
         exit = 1;
+        
         return;
       }
       if (pressedbut == 3) {
@@ -1950,8 +1969,8 @@ void reboot_modal() {
         menuactive = 0; //for debugging only
         if (display_setting <= 1) {
           TV.clear_screen();
-        }
-        exit = 1;
+        }      
+        exit = 1;   
         return;
       }
 
@@ -1960,7 +1979,14 @@ void reboot_modal() {
   }
 }
 
-
+void fixoled() {
+  u8g.undoRotation();
+  u8g.firstPage();
+    
+    do {
+      } while ( u8g.nextPage() );
+    
+  }
 
 //STORING STUFF FOR LATER
 // u8g.drawBitmapP(5, 20, 7, 32, bitmap_dock);    //serial
