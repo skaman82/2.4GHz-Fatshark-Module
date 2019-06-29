@@ -1842,7 +1842,7 @@ void runlocktimer() {
 }
 
 
-  
+
 
 void finder() {
   u8g.setRot270();
@@ -1851,25 +1851,19 @@ void finder() {
   int buzzertimer = 0;
   while (exit == 0) {
     u8g.firstPage();
-    
+
     do {
       osd();
       buttoncheck();
       channeltable();
+
       menuactive = 1;
       osd_mode = 1;
-      
+
       int delaytime;
+
       uint32_t rssi_value = _readRSSI();
       int percentage = map(rssi_value, max, min, 0, 100);
-      
-      if (display_setting <= 1) {
-         delaytime = ((102 - percentage) * 0.6);
-      }
-      else {
-        delaytime = (101 - percentage);
-        }
-
 
       if (percentage > 100) {
         percentage = 100;
@@ -1880,19 +1874,51 @@ void finder() {
 
 
       if (display_setting <= 1) {
-        TV.print(50, (10 + voffset), "finder");
+        delaytime = ((102 - percentage) * 0.6);
       }
+      else {
+        delaytime = (101 - percentage);
+      }
+
+
+      if (display_setting <= 1) {
+        TV.print(50, (10 + voffset), "finder");
+        //TODO
+      }
+
       if (display_setting >= 1) {
-        u8g.setPrintPos(10, 10);
+        u8g.setPrintPos(5, 20);
         u8g.print("CH");
         u8g.print(ACT_channel);
-        u8g.setPrintPos(10, 30);
-        u8g.print("RSSI: ");
-        u8g.print(percentage);
-        u8g.setPrintPos(10, 40);
-        u8g.print("DELAY: ");
-        u8g.print(delaytime);
+        u8g.print(" ");
+        u8g.print(freq);
+        u8g.print("MHz");
+
+        u8g.drawFrame(12, 32, 40, 88);
+
+        if (percentage > 0) {
+          u8g.drawBox(16, (116 - (percentage * 0.8)), 32, (percentage * 0.8));
+        }
+        u8g.drawFrame(16, 115, 32, 1);
+
+        if (percentage < 100 ) {
+          u8g.setPrintPos(27, 100);
+        }
+        else {
+          u8g.setPrintPos(24, 100);
+          }
+
+        if (percentage > 26 ) {
+          u8g.setColorIndex(0);
+          u8g.print(percentage);
+          u8g.setColorIndex(1);
+        }
+        else {
+          u8g.print(percentage);
+        }
+
       }
+
 
       buzzertimer++;
       if (buzzertimer > delaytime) {
@@ -1905,6 +1931,7 @@ void finder() {
         buzzertimer = 0;
       }
 
+
       if (pressedbut == 1) {
         menuactive = 0; //for debugging only
         if (display_setting <= 1) {
@@ -1912,9 +1939,9 @@ void finder() {
         }
         fixoled();
         exit = 1;
-        
         return;
       }
+
       if (pressedbut == 3) {
         if (ACT_channel <= 7) {
           ACT_channel += 1;
@@ -1922,8 +1949,8 @@ void finder() {
         else {
           ACT_channel = 1;
         }
-
       }
+
       if (pressedbut == 2) {
         if (ACT_channel >= 2) {
           ACT_channel -= 1;
@@ -1937,6 +1964,7 @@ void finder() {
     } while ( u8g.nextPage() );
   }
 }
+
 
 
 void reboot_modal() {
@@ -1969,8 +1997,8 @@ void reboot_modal() {
         menuactive = 0; //for debugging only
         if (display_setting <= 1) {
           TV.clear_screen();
-        }      
-        exit = 1;   
+        }
+        exit = 1;
         return;
       }
 
@@ -1982,11 +2010,10 @@ void reboot_modal() {
 void fixoled() {
   u8g.undoRotation();
   u8g.firstPage();
-    
-    do {
-      } while ( u8g.nextPage() );
-    
-  }
+
+  do {
+  } while ( u8g.nextPage() );
+}
 
 //STORING STUFF FOR LATER
 // u8g.drawBitmapP(5, 20, 7, 32, bitmap_dock);    //serial
