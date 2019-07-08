@@ -2,10 +2,11 @@
 // This Project is created by Albert Kravcov
 
 // TO DOS & FIXMEs:
-// • Finder Screen (OLED + OSD)
+// • Finder Screen (OSD)
 // • Calibarte Screen (OLED)
-// • Display menu setting (OLED + OSD)
-// • Serial menu setting (OLED + OSD)
+// • Display setting (OLED + OSD)
+// • Serial setting (OLED + OSD)
+// • reorder menu items
 
 
 #include <TVout.h>
@@ -70,7 +71,7 @@ byte display_setting; //NEW setting for display modes. 0 = ONLY OSD | 1 = OLED+O
 TVout TV;
 
 void setup() {
-  digitalWrite(RST_pin, HIGH); // pull reset pin high
+  //digitalWrite(RST_pin, HIGH); // pull reset pin high
 
   // assign default color value
   if ( u8g.getMode() == U8G_MODE_R3G3B2 ) {
@@ -101,7 +102,7 @@ void setup() {
   pinMode(ButtonUp,     INPUT_PULLUP); //Button left
   pinMode(ButtonDown,   INPUT_PULLUP); //Button right
   pinMode(BUZZ,         OUTPUT); //Buzzer
-  pinMode(RST_pin,      OUTPUT); // NEW reset
+  //pinMode(RST_pin,      OUTPUT); // NEW reset
 
 #ifdef RSSI_mod
   pinMode(RSSI_pin, INPUT);
@@ -147,10 +148,10 @@ void setup() {
   display_setting = 1; //just for testing 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED
 
 
-  if (fscontrollEEP == 0) { // change to "serialEEP == 1" later
+if (fscontrollEEP == 0) { // change to "serialEEP == 1" later
 #define serial
-#undef FS_pin2
-#undef FS_pin3
+//#undef FS_pin2
+//#undef FS_pin3
     Serial.begin(9600);
   }
 
@@ -304,7 +305,7 @@ byte buttoncheck()
 
 
 void fs_buttons() {
-#ifndef serial
+//#ifndef serial
   // FS Button mapping:
   //CH1: p1-LOW,  p2-LOW,   p3-LOW
   //CH2: p1-HIGH, p2-LOW,   p3-LOW
@@ -344,7 +345,7 @@ void fs_buttons() {
     FS_channel = 1;
     //BT_update = 1;
   }
-#endif
+//#endif
 }
 
 
@@ -387,7 +388,7 @@ void control() {
           TV.fill(BLACK);
           TV.delay(10);
         }
-        return;
+        //return;
       }
     }
 
@@ -1245,15 +1246,14 @@ void menu() {
 //CALIBRATION MENU ************************
 
 void calibration() {     // Calibration wizzard
-
+  clearOLED();
   byte exit = 0;
+  int calstep = 1;
+ 
   while (exit == 0) {
-
+  
     u8g.firstPage();
     do {
-
-      int calstep = 1;
-
       if (calstep == 1) {
         buttoncheck();
         channeltable();
@@ -1280,7 +1280,7 @@ void calibration() {     // Calibration wizzard
 
         if (display_setting >= 1) {
           u8g.setPrintPos(10, 10);
-          u8g.print("CALIBRATE");
+          u8g.print("CALIBRATE1");
         }
 
 
@@ -1317,6 +1317,12 @@ void calibration() {     // Calibration wizzard
           TV.select_font(font4x6);
           TV.print(51, (81 + voffset), "NEXT >");
         }
+
+       if (display_setting >= 1) {
+          u8g.setPrintPos(10, 10);
+          u8g.print("CALIBRATE2");
+        }
+        
         if (pressedbut == 1) {
 
           RSSImaxEEP = rssi_value / 2;
@@ -1324,7 +1330,7 @@ void calibration() {     // Calibration wizzard
 
           if (display_setting <= 1) {
             TV.clear_screen();
-          }
+         }
           calstep = 3;
         }
       }
@@ -1340,6 +1346,12 @@ void calibration() {     // Calibration wizzard
           TV.select_font(font4x6);
           TV.print(51, (81 + voffset), "NEXT >");
         }
+
+          if (display_setting >= 1) {
+          u8g.setPrintPos(10, 10);
+          u8g.print("CALIBRATE3");
+        }
+        
         if (pressedbut == 1) {
 
           RSSIminEEP = rssi_value / 2;
@@ -1351,7 +1363,7 @@ void calibration() {     // Calibration wizzard
           calstep = 4;
         }
       }
-      while (calstep == 4) {
+      else if (calstep == 4) {
         buttoncheck();
 
         RSSIminEEP = EEPROM.read(RSSIminADDR) * 2;
@@ -1369,6 +1381,13 @@ void calibration() {     // Calibration wizzard
           TV.select_font(font4x6);
           TV.print(51, (81 + voffset), "EXIT >");
         }
+
+       if (display_setting >= 1) {
+          u8g.setPrintPos(10, 10);
+          u8g.print("CALIBRATE4");
+        }
+
+        
         if (pressedbut == 1) {
 
           if (display_setting <= 1) {
@@ -1690,7 +1709,7 @@ void bandscan() {
         u8g.print("C8");
 
 
-        if (percentage1 > 0) {
+        if (percentage1 > 1) {
           u8g.drawBox(15, (51 - (rssibar_ch1)), 9, rssibar_ch1);
         }
         if (percentage1 <= 9) {
@@ -1702,7 +1721,7 @@ void bandscan() {
         u8g.print(percentage1);
 
 
-        if (percentage2 > 0) {
+        if (percentage2 > 1) {
           u8g.drawBox(28, (51 - (rssibar_ch2)), 9, rssibar_ch2);
         }
         if (percentage2 <= 9) {
@@ -1714,7 +1733,7 @@ void bandscan() {
         u8g.print(percentage2);
 
 
-        if (percentage3 > 0) {
+        if (percentage3 > 1) {
           u8g.drawBox(41, (51 - (rssibar_ch3)), 9, rssibar_ch3);
         }
         if (percentage3 <= 9) {
@@ -1726,7 +1745,7 @@ void bandscan() {
         u8g.print(percentage3);
 
 
-        if (percentage4 > 0) {
+        if (percentage4 > 1) {
           u8g.drawBox(54, (51 - (rssibar_ch4)), 9, rssibar_ch4);
         }
         if (percentage4 <= 9) {
@@ -1738,7 +1757,7 @@ void bandscan() {
         u8g.print(percentage4);
 
 
-        if (percentage5 > 0) {
+        if (percentage5 > 1) {
           u8g.drawBox(67, (51 - rssibar_ch5), 9, rssibar_ch5);
         }
         if (percentage5 <= 9) {
@@ -1750,7 +1769,7 @@ void bandscan() {
         u8g.print(percentage5);
 
 
-        if (percentage6 > 0) {
+        if (percentage6 > 1) {
           u8g.drawBox(80, (51 - (rssibar_ch6)), 9, rssibar_ch6);
         }
         if (percentage6 <= 9) {
@@ -1762,7 +1781,7 @@ void bandscan() {
         u8g.print(percentage6);
 
 
-        if (percentage7 > 0) {
+        if (percentage7 > 1) {
           u8g.drawBox(93, (51 - (rssibar_ch7)), 9, rssibar_ch7);
         }
         if (percentage7 <= 9) {
@@ -1774,7 +1793,7 @@ void bandscan() {
         u8g.print(percentage7);
 
 
-        if (percentage8 > 0) {
+        if (percentage8 > 1) {
           u8g.drawBox(106, (51 - (rssibar_ch8)), 9, rssibar_ch8);
         }
         if (percentage7 <= 9) {
@@ -1896,7 +1915,7 @@ void finder() {
 
         u8g.drawFrame(12, 32, 40, 88);
 
-        if (percentage > 0) {
+        if (percentage > 1) {
           u8g.drawBox(16, (116 - (percentage * 0.8)), 32, (percentage * 0.8));
         }
         u8g.drawFrame(16, 115, 32, 1);
