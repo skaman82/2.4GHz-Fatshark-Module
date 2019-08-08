@@ -14833,6 +14833,11 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <wire x1="182.88" y1="91.44" x2="187.96" y2="91.44" width="0.1524" layer="91"/>
 <label x="187.96" y="91.44" size="1.778" layer="95" xref="yes"/>
 </segment>
+<segment>
+<pinref part="U1" gate="A" pin="PB0"/>
+<wire x1="17.78" y1="50.8" x2="12.7" y2="50.8" width="0.1524" layer="91"/>
+<label x="12.7" y="50.8" size="1.778" layer="95" rot="R180" xref="yes"/>
+</segment>
 </net>
 <net name="DTR" class="0">
 <segment>

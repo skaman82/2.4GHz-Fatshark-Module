@@ -1,12 +1,14 @@
-
 // This Project is created by Albert Kravcov
 
 // TO DOS & FIXMEs:
 // • Finder Screen (OSD)
-// • Calibarte Screen (OLED)
-// • Display setting (OLED + OSD)
+// • Array for RSS values in calibration and Bandscan
+
+// STUFF FOR LATER
+// • Display setting (OLED + OSD) 
 // • Serial setting (OLED + OSD)
-// • reorder menu items
+// • Dockking compatibility???
+// • Reorder menu items
 
 
 #include <TVout.h>
@@ -1259,14 +1261,14 @@ void calibration() {     // Calibration wizzard
       if (calstep == 1) {
         buttoncheck();
         channeltable();
-
+        //uint32_t rssi_value = _readRSSI();
         if (display_setting <= 1) {
 
           TV.select_font(font4x6);
           TV.print(30, (0 + voffset), "RSSI CALIBRATION");
           TV.select_font(font6x8);
           TV.print(14, (30 + voffset), "1:Select channel");
-          uint32_t rssi_value = _readRSSI();
+          
           TV.print(21, (50 + voffset), "< ");
           TV.print(ACT_channel);
           TV.print(":");
@@ -1281,8 +1283,23 @@ void calibration() {     // Calibration wizzard
         }
 
         if (display_setting >= 1) {
-          u8g.setPrintPos(10, 10);
-          u8g.print("CALIBRATE1");
+          u8g.setPrintPos(30, 10);
+          u8g.print("RSS CALIBRATION");
+          u8g.setPrintPos(27, 26);
+          u8g.print("1:Select channel");
+          u8g.setPrintPos(33, 40);
+          u8g.print("< ");
+          
+          u8g.print(ACT_channel);
+          u8g.print(":");
+          u8g.print(freq);
+          
+          u8g.print(" MHz");
+          u8g.print(" >");
+      
+          u8g.setPrintPos(55, 55);
+          u8g.print("NEXT >");
+          u8g.drawFrame(49,46,40,12);
         }
 
 
@@ -1320,9 +1337,17 @@ void calibration() {     // Calibration wizzard
           TV.print(51, (81 + voffset), "NEXT >");
         }
 
-       if (display_setting >= 1) {
-          u8g.setPrintPos(10, 10);
-          u8g.print("CALIBRATE2");
+
+        if (display_setting >= 1) {
+          u8g.setPrintPos(30, 10);
+          u8g.print("RSS CALIBRATION");
+          u8g.setPrintPos(20, 26);
+          u8g.print("2:Remove antenna and");
+          u8g.setPrintPos(25, 36);
+          u8g.print("switch off the VTX");     
+          u8g.setPrintPos(55, 55);
+          u8g.print("NEXT >");
+          u8g.drawFrame(49,46,40,12);
         }
         
         if (pressedbut == 1) {
@@ -1349,9 +1374,16 @@ void calibration() {     // Calibration wizzard
           TV.print(51, (81 + voffset), "NEXT >");
         }
 
-          if (display_setting >= 1) {
-          u8g.setPrintPos(10, 10);
-          u8g.print("CALIBRATE3");
+        if (display_setting >= 1) {
+          u8g.setPrintPos(30, 10);
+          u8g.print("RSS CALIBRATION");
+          u8g.setPrintPos(18, 26);
+          u8g.print("3:Put on the antenna");
+          u8g.setPrintPos(16, 36);
+          u8g.print("and switch on the VTX");      
+          u8g.setPrintPos(55, 55);
+          u8g.print("NEXT >");
+          u8g.drawFrame(49,46,40,12);
         }
         
         if (pressedbut == 1) {
@@ -1384,9 +1416,21 @@ void calibration() {     // Calibration wizzard
           TV.print(51, (81 + voffset), "EXIT >");
         }
 
-       if (display_setting >= 1) {
-          u8g.setPrintPos(10, 10);
-          u8g.print("CALIBRATE4");
+        if (display_setting >= 1) {
+          u8g.setPrintPos(30, 10);
+          u8g.print("RSS CALIBRATION");
+          u8g.setPrintPos(20, 26);
+          u8g.print("4:Calibration done!");
+
+          u8g.setPrintPos(30, 38);
+          u8g.print("Max:");
+          u8g.print(RSSIminEEP);
+          u8g.print(" Min:");
+          u8g.print(RSSImaxEEP);
+          
+          u8g.setPrintPos(55, 55);
+          u8g.print("EXIT >");
+          u8g.drawFrame(49,46,40,12);
         }
 
         
