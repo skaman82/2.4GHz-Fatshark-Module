@@ -44,7 +44,7 @@ int RSSIminEEP;     // RSSI calibration
 int serialEEP;     // TODO serial communication
 int max; //= 365; //0% RSSI
 int min; // = 338; //100% RSSI
-
+int findermode = 0;
 int osd_mode = 0;
 int menuactive = 0;
 int BT_channel = 1;
@@ -152,7 +152,7 @@ if (fscontrollEEP == 0) { // change to "serialEEP == 1" later
 #define serial
 //#undef FS_pin2
 //#undef FS_pin3
-    Serial.begin(9600);
+    //Serial.begin(9600);
   }
 
   clearOLED();
@@ -171,7 +171,7 @@ if (fscontrollEEP == 0) { // change to "serialEEP == 1" later
     TV.begin(_PAL, 128, 96); //original 128x96px, 160x120max (146x120)
 #endif
 #ifdef NTSC_FORMAT
-    TV.begin(_NTSC, 120, 90);
+    TV.begin(_NTSC, 128, 90);
 #endif
     TV.delay_frame(1);
     display.output_delay = 55; //move the whole screen vertically
@@ -711,7 +711,9 @@ void osd() {
     if (display_setting <= 1) {
       digitalWrite(OSD_ctr1, HIGH);
       digitalWrite(OSD_ctr2, LOW);
-      digitalWrite(LED_pin, HIGH);
+      if (findermode == 0) {
+        digitalWrite(LED_pin, HIGH);
+      }
     }
   }
 
@@ -831,7 +833,7 @@ void loop() {
       TV.println((percentage - 0), 0);
 
       if ((percentage < 100) && (percentage >= 10)) {
-        TV.draw_rect(88, (41 + voffset), 4, 4, BLACK, BLACK); //cover the first RSSI number
+        TV.draw_rect(86, (41 + voffset), 4, 4, BLACK, BLACK); //cover the first RSSI number
       }
 
       else if (percentage < 10) {
@@ -944,11 +946,11 @@ uint16_t _readRSSI() {
   rssiupdate++;
   volatile uint32_t sum = 0;
   sum = analogRead(RSSI_pin);
-  delay(2);
+  //delay(2);
   sum += analogRead(RSSI_pin);
-  delay(2);
+  //delay(2);
   sum += analogRead(RSSI_pin);
-  delay(2);
+  //delay(2);
   sum += analogRead(RSSI_pin);
   return sum / 4;
 
@@ -1868,6 +1870,9 @@ void finder() {
   byte exit = 0;
   clearOLED();
   int buzzertimer = 0;
+  findermode = 1;
+
+  
   while (exit == 0) {
     u8g.firstPage();
 
@@ -1875,7 +1880,7 @@ void finder() {
       osd();
       buttoncheck();
       channeltable();
-
+      digitalWrite(LED_pin, LOW);
       menuactive = 1;
       osd_mode = 1;
 
@@ -1943,10 +1948,13 @@ void finder() {
       if (buzzertimer > delaytime) {
         if (display_setting <= 1) {
           TV.tone(800, 100);
+          
         }
         else {
           tone(BUZZ, 800, 100);
+          
         }
+        digitalWrite(LED_pin, HIGH);
         buzzertimer = 0;
       }
 
@@ -1957,6 +1965,7 @@ void finder() {
           TV.clear_screen();
         }
         fixoled();
+        findermode = 0;
         exit = 1;
         return;
       }
@@ -2010,7 +2019,7 @@ void reboot_modal() {
       if (pressedbut == 1) {
 
         //restart
-        digitalWrite(RST_pin, LOW); // pull reset pin to low for reset
+        //digitalWrite(RST_pin, LOW); // pull reset pin to low for reset
 
         //following code doesn't happen if the reset is done:
         menuactive = 0; //for debugging only
