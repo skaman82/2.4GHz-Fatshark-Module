@@ -20,7 +20,7 @@ Steps to upload new firmware
 1. Install Arduino IDE
 2. Install the MightyCore hardware package from here: https://github.com/MCUdude/MightyCore (just follow the instructions)
 3. Download the firmware and open the Code.INO file in Arduino
-4. Select the hardware settings as shown in the image
+4. Select the hardware settings in Arduino IDE as shown in the image below
 5. Connect the FTDI tool according to the plug pinout as shown in the picture and select the COM port in Arduino IDE
 6. If you have the rev 06 PCB open the JUMP1 jumper on the PCB to upload code (solder it together after your upload is done).
 7. Upload the code
