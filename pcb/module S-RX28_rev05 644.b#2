@@ -8,7 +8,7 @@
 </settings>
 <grid distance="50" unitdist="mil" unit="mil" style="lines" multiple="1" display="no" altdistance="5" altunitdist="mil" altunit="mil"/>
 <layers>
-<layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="1" name="Top" color="4" fill="1" visible="no" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
 <layer number="3" name="Route3" color="4" fill="3" visible="no" active="no"/>
 <layer number="4" name="Route4" color="1" fill="4" visible="no" active="no"/>
@@ -28,11 +28,11 @@
 <layer number="18" name="Vias" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
 <layer number="20" name="Dimension" color="24" fill="1" visible="yes" active="yes"/>
-<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="no" active="yes"/>
 <layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="yes"/>
 <layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
-<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="no" active="yes"/>
 <layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="27" name="tValues" color="7" fill="1" visible="no" active="yes"/>
 <layer number="28" name="bValues" color="7" fill="1" visible="no" active="yes"/>
@@ -46,9 +46,9 @@
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="yes"/>
 <layer number="37" name="tTest" color="7" fill="1" visible="no" active="yes"/>
 <layer number="38" name="bTest" color="7" fill="1" visible="no" active="yes"/>
-<layer number="39" name="tKeepout" color="4" fill="11" visible="yes" active="yes"/>
+<layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="yes"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="yes" active="yes"/>
-<layer number="41" name="tRestrict" color="4" fill="10" visible="yes" active="yes"/>
+<layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="yes"/>
 <layer number="42" name="bRestrict" color="1" fill="10" visible="yes" active="yes"/>
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="yes"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
@@ -58,7 +58,7 @@
 <layer number="48" name="Document" color="7" fill="1" visible="no" active="yes"/>
 <layer number="49" name="Reference" color="7" fill="1" visible="no" active="yes"/>
 <layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
-<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="no" active="yes"/>
 <layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="53" name="tGND_GNDA" color="7" fill="9" visible="no" active="no"/>
 <layer number="54" name="bGND_GNDA" color="1" fill="9" visible="no" active="no"/>
@@ -3048,7 +3048,7 @@ design rules under a new name.</description>
 <attribute name="NAME" x="-2.413" y="20.32" size="0.6096" layer="26" font="vector" ratio="20" rot="MR270" align="bottom-center"/>
 <attribute name="VALUE" x="-0.127" y="20.32" size="0.6096" layer="28" font="vector" ratio="20" rot="MR270" align="top-center"/>
 </element>
-<element name="JUMPER1" library="SparkFun-Jumpers" library_urn="urn:adsk.eagle:library:528" package="SMT-JUMPER_2_NC_PASTE_SILK" package3d_urn="urn:adsk.eagle:package:39282/1" value="JUMPER-SMT_2_NC_PASTE_SILK" x="2.54" y="31.75" smashed="yes">
+<element name="FLASHING" library="SparkFun-Jumpers" library_urn="urn:adsk.eagle:library:528" package="SMT-JUMPER_2_NC_PASTE_SILK" package3d_urn="urn:adsk.eagle:package:39282/1" value="JUMPER-SMT_2_NC_PASTE_SILK" x="2.54" y="31.75" smashed="yes">
 <attribute name="NAME" x="-1.016" y="31.496" size="0.6096" layer="25" font="vector" ratio="20" align="bottom-center"/>
 <attribute name="VALUE" x="2.54" y="30.607" size="0.6096" layer="27" font="vector" ratio="20" align="top-center"/>
 </element>
@@ -3116,7 +3116,7 @@ design rules under a new name.</description>
 <via x="7.62" y="11.43" extent="1-16" drill="0.35"/>
 <via x="10.16" y="6.35" extent="1-16" drill="0.35"/>
 <via x="-2.54" y="6.35" extent="1-16" drill="0.35"/>
-<via x="1.016" y="8.636" extent="1-16" drill="0.35"/>
+<via x="0" y="8.89" extent="1-16" drill="0.35"/>
 <via x="8.89" y="19.05" extent="1-16" drill="0.35"/>
 <via x="10.16" y="21.082" extent="1-16" drill="0.35"/>
 <via x="15.24" y="11.43" extent="1-16" drill="0.35"/>
@@ -3365,9 +3365,12 @@ design rules under a new name.</description>
 <wire x1="34.2" y1="16.42" x2="34.2" y2="16.6" width="0.3" layer="16"/>
 <wire x1="31.75" y1="12.7" x2="31.75" y2="13.97" width="0.2032" layer="16"/>
 <wire x1="31.75" y1="13.97" x2="34.2" y2="16.42" width="0.2032" layer="16"/>
-<wire x1="38.1" y1="16.51" x2="38.1" y2="15.9498" width="0.2032" layer="1"/>
-<wire x1="38.1" y1="15.9498" x2="37.9584125" y2="15.9498" width="0.2032" layer="1"/>
-<wire x1="37.9584125" y1="15.9498" x2="34.7086125" y2="12.7" width="0.2032" layer="1"/>
+<wire x1="38.1" y1="16.51" x2="38.1" y2="15.915071875" width="0.2032" layer="1"/>
+<wire x1="38.1" y1="15.915071875" x2="36.83" y2="14.645071875" width="0.2032" layer="1"/>
+<wire x1="36.83" y1="14.645071875" x2="36.83" y2="14.49795" width="0.2032" layer="1"/>
+<wire x1="35.74185" y1="13.4098" x2="35.4184125" y2="13.4098" width="0.2032" layer="1"/>
+<wire x1="35.4184125" y1="13.4098" x2="34.7086125" y2="12.7" width="0.2032" layer="1"/>
+<wire x1="36.83" y1="14.49795" x2="35.74185" y2="13.4098" width="0.2032" layer="1"/>
 </signal>
 <signal name="N$1">
 <contactref element="R1" pad="2"/>
@@ -3602,7 +3605,7 @@ design rules under a new name.</description>
 <wire x1="15.75354375" y1="29.2402" x2="14.9402" y2="29.2402" width="0.2" layer="1"/>
 <wire x1="14.9402" y1="29.2402" x2="11" y2="25.3" width="0.2" layer="1"/>
 <wire x1="16.4798" y1="31.50154375" x2="16.4798" y2="29.96645625" width="0.2" layer="1"/>
-<contactref element="JUMPER1" pad="1"/>
+<contactref element="FLASHING" pad="1"/>
 <wire x1="2.5046375" y1="30.815" x2="2.3289" y2="30.9907375" width="0.2" layer="1"/>
 <wire x1="3.86928125" y1="30.41748125" x2="3.4717625" y2="30.815" width="0.2" layer="1"/>
 <wire x1="2.3289" y1="30.9907375" x2="2.3289" y2="31.5547" width="0.2" layer="1"/>
@@ -3844,7 +3847,7 @@ design rules under a new name.</description>
 </signal>
 <signal name="RESPIN">
 <contactref element="U1" pad="40"/>
-<contactref element="JUMPER1" pad="2"/>
+<contactref element="FLASHING" pad="2"/>
 <wire x1="2.9464" y1="31.75" x2="8.89" y2="31.75" width="0.2" layer="1"/>
 <via x="8.89" y="31.75" extent="1-16" drill="0.35"/>
 <wire x1="8.89" y1="31.75" x2="12.7" y2="27.94" width="0.2" layer="16"/>

@@ -1,15 +1,17 @@
 // This Project is created by Albert Kravcov
 
-// TO DOS & FIXMEs:
-// • Finder Screen (OSD)
+// TO DOS OR FIXMEs for 1.0:
 // • Array for RSS values in calibration and Bandscan
 
-// STUFF FOR LATER
-// • Display setting (OLED + OSD) 
+// STUFF FOR LATER VERSIONS
+// • Autosearch
+// • Display setting (OLED + OSD)
 // • Serial setting (OLED + OSD)
 // • Dockking compatibility???
 // • Reorder menu items
 
+
+const char verId[7] = "v1.0"; //VERSION INFO
 
 #include <TVout.h>
 #include <font8x8.h>
@@ -68,6 +70,13 @@ int refresh = 0;
 int osd_timeout;
 int lock_timeout;
 byte display_setting; //NEW setting for display modes. 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED (will require a reboot)
+
+unsigned char x, y;
+unsigned char originx = 5;
+unsigned char originy = 70;
+unsigned char plotx = originx;
+unsigned char ploty = 40;
+
 
 
 TVout TV;
@@ -149,13 +158,13 @@ void setup() {
 
   display_setting = 1; //just for testing 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED
 
-
-if (fscontrollEEP == 0) { // change to "serialEEP == 1" later
-#define serial
-//#undef FS_pin2
-//#undef FS_pin3
+//TODO>
+  //if (fscontrollEEP == 0) { // change to "serialEEP == 1" later
+    //#define serial
+    //#undef FS_pin2
+    //#undef FS_pin3
     //Serial.begin(9600);
-  }
+  //}
 
   clearOLED();
 
@@ -179,7 +188,7 @@ if (fscontrollEEP == 0) { // change to "serialEEP == 1" later
     display.output_delay = 55; //move the whole screen vertically
 
     TV.clear_screen();
-    TV.bitmap(2, (20 + voffset), logo);
+    TV.bitmap(5, (20 + voffset), logo);
 
     osd_timeout = 100; //looptime setting for osd timeout
     lock_timeout = 300; //looptime setting for lockmode timeout
@@ -196,9 +205,10 @@ if (fscontrollEEP == 0) { // change to "serialEEP == 1" later
     digitalWrite(LED_pin, HIGH);
 
     TV.select_font(font6x8);
-    TV.print(28, (50 + voffset), "2G4 MODULE");
+    TV.print(15, (50 + voffset), "2G4 MODULE ");
+    TV.print(verId);
     TV.select_font(font4x6);
-    TV.print(27, (69 + voffset), "#RUININGTHEHOBBY");
+    TV.print(29, (69 + voffset), "#RUININGTHEHOBBY");
     TV.delay(3000);
     TV.tone(500, 200);
     TV.clear_screen();
@@ -236,8 +246,9 @@ void showlogo()
     // splashscreen goes here
     u8g.drawBitmapP(10, 20, 14, 18, logo_OLED);
     u8g.setFont(u8g_font_5x7r);
-    u8g.setPrintPos(23, 55);
-    u8g.print("#RUININGTHEHOBBY");
+    u8g.setPrintPos(31, 55);
+    u8g.print("2G4 MODULE ");
+    u8g.print(verId);
   }
   while (u8g.nextPage());
 }
@@ -307,7 +318,7 @@ byte buttoncheck()
 
 
 void fs_buttons() {
-//#ifndef serial
+  //#ifndef serial
   // FS Button mapping:
   //CH1: p1-LOW,  p2-LOW,   p3-LOW
   //CH2: p1-HIGH, p2-LOW,   p3-LOW
@@ -347,7 +358,7 @@ void fs_buttons() {
     FS_channel = 1;
     //BT_update = 1;
   }
-//#endif
+  //#endif
 }
 
 
@@ -1253,9 +1264,9 @@ void calibration() {     // Calibration wizzard
   clearOLED();
   byte exit = 0;
   int calstep = 1;
- 
+
   while (exit == 0) {
-  
+
     u8g.firstPage();
     do {
       if (calstep == 1) {
@@ -1267,18 +1278,18 @@ void calibration() {     // Calibration wizzard
           TV.select_font(font4x6);
           TV.print(30, (0 + voffset), "RSSI CALIBRATION");
           TV.select_font(font6x8);
-          TV.print(14, (30 + voffset), "1:Select channel");
-          
-          TV.print(21, (50 + voffset), "< ");
+          TV.print(14, (20 + voffset), "1:Select channel");
+
+          TV.print(21, (40 + voffset), "< ");
           TV.print(ACT_channel);
           TV.print(":");
           TV.print(freq);
           TV.print(" MHz");
           TV.print(" >");
 
-          TV.draw_rect(38, (75 + voffset), 48, 16, WHITE);
+          TV.draw_rect(38, (65 + voffset), 48, 16, WHITE);
           TV.select_font(font4x6);
-          TV.print(51, (81 + voffset), "NEXT >");
+          TV.print(51, (71 + voffset), "NEXT >");
 
         }
 
@@ -1289,17 +1300,17 @@ void calibration() {     // Calibration wizzard
           u8g.print("1:Select channel");
           u8g.setPrintPos(33, 40);
           u8g.print("< ");
-          
+
           u8g.print(ACT_channel);
           u8g.print(":");
           u8g.print(freq);
-          
+
           u8g.print(" MHz");
           u8g.print(" >");
-      
+
           u8g.setPrintPos(55, 55);
           u8g.print("NEXT >");
-          u8g.drawFrame(49,46,40,12);
+          u8g.drawFrame(49, 46, 40, 12);
         }
 
 
@@ -1331,10 +1342,10 @@ void calibration() {     // Calibration wizzard
         if (display_setting <= 1) {
           TV.print(30, (0 + voffset), "RSSI CALIBRATION");
           TV.select_font(font6x8);
-          TV.print(0, (30 + voffset), "2:Remove antenna and switch off the VTX");
-          TV.draw_rect(38, (75 + voffset), 48, 16, WHITE);
+          TV.print(0, (20 + voffset), "2:Remove antenna and switch off the VTX");
+          TV.draw_rect(38, (65 + voffset), 48, 16, WHITE);
           TV.select_font(font4x6);
-          TV.print(51, (81 + voffset), "NEXT >");
+          TV.print(51, (71 + voffset), "NEXT >");
         }
 
 
@@ -1344,12 +1355,12 @@ void calibration() {     // Calibration wizzard
           u8g.setPrintPos(20, 26);
           u8g.print("2:Remove antenna and");
           u8g.setPrintPos(25, 36);
-          u8g.print("switch off the VTX");     
+          u8g.print("switch off the VTX");
           u8g.setPrintPos(55, 55);
           u8g.print("NEXT >");
-          u8g.drawFrame(49,46,40,12);
+          u8g.drawFrame(49, 46, 40, 12);
         }
-        
+
         if (pressedbut == 1) {
 
           RSSImaxEEP = rssi_value / 2;
@@ -1357,7 +1368,7 @@ void calibration() {     // Calibration wizzard
 
           if (display_setting <= 1) {
             TV.clear_screen();
-         }
+          }
           calstep = 3;
         }
       }
@@ -1368,10 +1379,10 @@ void calibration() {     // Calibration wizzard
         if (display_setting <= 1) {
           TV.print(30, (0 + voffset), "RSSI CALIBRATION");
           TV.select_font(font6x8);
-          TV.print(0, (30 + voffset), "3:Put on the antenna and switch on the VTX");
-          TV.draw_rect(38, (75 + voffset), 48, 16, WHITE);
+          TV.print(0, (20 + voffset), "3:Put on the antenna and switch on the VTX");
+          TV.draw_rect(38, (65 + voffset), 48, 16, WHITE);
           TV.select_font(font4x6);
-          TV.print(51, (81 + voffset), "NEXT >");
+          TV.print(51, (71 + voffset), "NEXT >");
         }
 
         if (display_setting >= 1) {
@@ -1380,12 +1391,12 @@ void calibration() {     // Calibration wizzard
           u8g.setPrintPos(18, 26);
           u8g.print("3:Put on the antenna");
           u8g.setPrintPos(16, 36);
-          u8g.print("and switch on the VTX");      
+          u8g.print("and switch on the VTX");
           u8g.setPrintPos(55, 55);
           u8g.print("NEXT >");
-          u8g.drawFrame(49,46,40,12);
+          u8g.drawFrame(49, 46, 40, 12);
         }
-        
+
         if (pressedbut == 1) {
 
           RSSIminEEP = rssi_value / 2;
@@ -1406,14 +1417,14 @@ void calibration() {     // Calibration wizzard
         if (display_setting <= 1) {
           TV.print(30, (0 + voffset), "RSSI CALIBRATION");
           TV.select_font(font6x8);
-          TV.print(8, (30 + voffset), "4:Calibration done!");
-          TV.print(30, (50 + voffset), "Saved Max:");
+          TV.print(8, (20 + voffset), "4:Calibration done!");
+          TV.print(30, (40 + voffset), "Saved Max:");
           TV.print(RSSIminEEP);
-          TV.print(30, (60 + voffset), "Saved Min:");
+          TV.print(30, (50 + voffset), "Saved Min:");
           TV.print(RSSImaxEEP);
-          TV.draw_rect(38, (75 + voffset), 48, 16, WHITE);
+          TV.draw_rect(38, (65 + voffset), 48, 16, WHITE);
           TV.select_font(font4x6);
-          TV.print(51, (81 + voffset), "EXIT >");
+          TV.print(51, (71 + voffset), "EXIT >");
         }
 
         if (display_setting >= 1) {
@@ -1427,13 +1438,13 @@ void calibration() {     // Calibration wizzard
           u8g.print(RSSIminEEP);
           u8g.print(" Min:");
           u8g.print(RSSImaxEEP);
-          
+
           u8g.setPrintPos(55, 55);
           u8g.print("EXIT >");
-          u8g.drawFrame(49,46,40,12);
+          u8g.drawFrame(49, 46, 40, 12);
         }
 
-        
+
         if (pressedbut == 1) {
 
           if (display_setting <= 1) {
@@ -1498,7 +1509,7 @@ void bandscan() {
           percentage1 = 0;
         }
         if (display_setting <= 1) {
-          TV.draw_rect(0, (13 + voffset), 14, 67, BLACK, BLACK);
+          TV.draw_rect(0, (13 + voffset), 14, 56, BLACK, BLACK);
           TV.draw_rect(0, ((70 - (percentage1 * 0.46)) + voffset), 10, (percentage1 * 0.46), WHITE, WHITE);
           TV.print(0, (75 + voffset), "CH1");
           if ((percentage1 < 100) && (percentage1 >= 10)) {
@@ -1527,7 +1538,7 @@ void bandscan() {
           percentage2 = 0;
         }
         if (display_setting <= 1) {
-          TV.draw_rect(16, (13 + voffset), 14, 67, BLACK, BLACK);
+          TV.draw_rect(16, (13 + voffset), 14, 56, BLACK, BLACK);
           TV.draw_rect(16, ((70 - (percentage2 * 0.46)) + voffset), 10, (percentage2 * 0.46), WHITE, WHITE);
           TV.print(16, (75 + voffset), "CH2");
           if ((percentage2 < 100) && (percentage2 >= 10)) {
@@ -1556,7 +1567,7 @@ void bandscan() {
         }
 
         if (display_setting <= 1) {
-          TV.draw_rect(32, (13 + voffset), 14, 67, BLACK, BLACK);
+          TV.draw_rect(32, (13 + voffset), 14, 56, BLACK, BLACK);
           TV.draw_rect(32, ((70 - (percentage3 * 0.46)) + voffset), 10, (percentage3 * 0.46), WHITE, WHITE);
           TV.print(32, (75 + voffset), "CH3");
           if ((percentage3 < 100) && (percentage3 >= 10)) {
@@ -1584,7 +1595,7 @@ void bandscan() {
           percentage4 = 0;
         }
         if (display_setting <= 1) {
-          TV.draw_rect(48, (13 + voffset), 14, 67, BLACK, BLACK);
+          TV.draw_rect(48, (13 + voffset), 14, 56, BLACK, BLACK);
           TV.draw_rect(48, ((70 - (percentage4 * 0.46)) + voffset), 10, (percentage4 * 0.46), WHITE, WHITE);
           TV.print(48, (75 + voffset), "CH4");
           if ((percentage4 < 100) && (percentage4 >= 10)) {
@@ -1612,7 +1623,7 @@ void bandscan() {
           percentage5 = 0;
         }
         if (display_setting <= 1) {
-          TV.draw_rect(64, (13 + voffset), 14, 67, BLACK, BLACK);
+          TV.draw_rect(64, (13 + voffset), 14, 56, BLACK, BLACK);
           TV.draw_rect(64, ((70 - (percentage5 * 0.46)) + voffset), 10, (percentage5 * 0.46), WHITE, WHITE);
           TV.print(64, (75 + voffset), "CH5");
           if ((percentage5 < 100) && (percentage5 >= 10)) {
@@ -1642,7 +1653,7 @@ void bandscan() {
         }
 
         if (display_setting <= 1) {
-          TV.draw_rect(80, (13 + voffset), 14, 67, BLACK, BLACK);
+          TV.draw_rect(80, (13 + voffset), 14, 56, BLACK, BLACK);
           TV.draw_rect(80, ((70 - (percentage6 * 0.46)) + voffset), 10, (percentage6 * 0.46), WHITE, WHITE);
           TV.print(80, (75 + voffset), "CH6");
           if ((percentage6 < 100) && (percentage6 >= 10)) {
@@ -1671,7 +1682,7 @@ void bandscan() {
           percentage7 = 0;
         }
         if (display_setting <= 1) {
-          TV.draw_rect(96, (13 + voffset), 14, 67, BLACK, BLACK);
+          TV.draw_rect(96, (13 + voffset), 14, 56, BLACK, BLACK);
           TV.draw_rect(96, ((70 - (percentage7 * 0.46)) + voffset), 10, (percentage7 * 0.46), WHITE, WHITE);
           TV.print(96, (75 + voffset), "CH7");
           if ((percentage7 < 100) && (percentage7 >= 10)) {
@@ -1700,7 +1711,7 @@ void bandscan() {
           percentage8 = 0;
         }
         if (display_setting <= 1) {
-          TV.draw_rect(112, (13 + voffset), 14, 67, BLACK, BLACK);
+          TV.draw_rect(112, (13 + voffset), 14, 56, BLACK, BLACK);
           TV.draw_rect(112, ((70 - (percentage8 * 0.46)) + voffset), 10, (percentage8 * 0.46), WHITE, WHITE);
           TV.print(112, (75 + voffset), "CH8");
           if ((percentage8 < 100) && (percentage8 >= 10)) {
@@ -1715,10 +1726,6 @@ void bandscan() {
         }
         ACT_channel = 1;
       }
-
-
-
-
 
 
       if (display_setting >= 1) {
@@ -1849,11 +1856,7 @@ void bandscan() {
           u8g.setPrintPos(106, (48 - rssibar_ch8));
         }
         u8g.print(percentage8);
-
       }
-
-
-
 
 
       if (pressedbut == 1) {
@@ -1870,6 +1873,9 @@ void bandscan() {
   }
 }
 
+
+
+//BUTTON LOCKING FUNCTION ************************
 
 void runlocktimer() {
   buttoncheck();
@@ -1909,6 +1915,8 @@ void runlocktimer() {
 
 
 
+//FINDER MODE ************************
+
 void finder() {
   u8g.setRot270();
   byte exit = 0;
@@ -1916,7 +1924,7 @@ void finder() {
   int buzzertimer = 0;
   findermode = 1;
 
-  
+
   while (exit == 0) {
     u8g.firstPage();
 
@@ -1950,9 +1958,32 @@ void finder() {
 
 
       if (display_setting <= 1) {
-        TV.print(50, (10 + voffset), "finder");
-        //TODO
+        TV.select_font(font4x6);
+        TV.print(45, (0 + voffset), "FIND MODE");
+        TV.select_font(font6x8);
+
+        drawGraph();
+
+
+        int newploty = 70 - (percentage * 0.5);
+        TV.draw_line(plotx - 1, ploty, plotx, newploty, 1);
+        ploty = newploty;
+
+        if (plotx++ > 120) {
+          TV.fill(0);
+          plotx = originx + 1;
+        }
+
+        TV.print(3, 85, "RSSI:");
+        TV.draw_rect(29, 84, 20,8, BLACK, BLACK);
+        TV.print(percentage);
+        TV.print(55, 85, "CH");
+        TV.print(ACT_channel);
+        TV.print(" ");
+        TV.print(freq);
+        TV.print("MHz");
       }
+
 
       if (display_setting >= 1) {
         u8g.setPrintPos(5, 20);
@@ -1974,7 +2005,7 @@ void finder() {
         }
         else {
           u8g.setPrintPos(24, 100);
-          }
+        }
 
         if (percentage > 26 ) {
           u8g.setColorIndex(0);
@@ -1984,7 +2015,6 @@ void finder() {
         else {
           u8g.print(percentage);
         }
-
       }
 
 
@@ -1992,11 +2022,11 @@ void finder() {
       if (buzzertimer > delaytime) {
         if (display_setting <= 1) {
           TV.tone(800, 100);
-          
+
         }
         else {
           tone(BUZZ, 800, 100);
-          
+
         }
         digitalWrite(LED_pin, HIGH);
         buzzertimer = 0;
@@ -2032,12 +2062,14 @@ void finder() {
         }
       }
 
-
     } while ( u8g.nextPage() );
   }
 }
 
 
+
+
+//REBOOT MODAL ************************
 
 void reboot_modal() {
   byte exit = 0;
@@ -2074,10 +2106,14 @@ void reboot_modal() {
         return;
       }
 
-
     } while ( u8g.nextPage() );
   }
 }
+
+
+
+
+//RESTORE OLED ORIENTATION ************************
 
 void fixoled() {
   u8g.undoRotation();
@@ -2086,6 +2122,26 @@ void fixoled() {
   do {
   } while ( u8g.nextPage() );
 }
+
+void drawGraph() {
+  TV.draw_line(originx, 20, originx, originy, 1);
+  TV.draw_line(originx, originy, 120, originy, 1);
+
+  for (byte y = originy; y > 20; y -= 4) {
+    TV.set_pixel(originx - 1, y, 1);
+    TV.set_pixel(originx - 2, y, 1);
+  }
+
+  for (byte x = originx; x < 120; x += 4) {
+    TV.set_pixel(x, originy + 1, 1);
+    TV.set_pixel(x, originy + 2, 1);
+  }
+}
+
+
+
+
+
 
 //STORING STUFF FOR LATER
 // u8g.drawBitmapP(5, 20, 7, 32, bitmap_dock);    //serial
