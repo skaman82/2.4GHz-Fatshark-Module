@@ -2,11 +2,13 @@
 RX28 based Fatshark RX module
 
 - 8 channels (2414, 2432, 2450, 2468, 2490, 2510, 2390, 2370 MHz)
-- OSD menus
-- OLED screen
+- RSSI display
 - Fatshark button control
 - Bandscan
 - Finder mode
+- RSSI calibration
+- OSD menus
+- OLED screen
 
 # OPERATION
 …
