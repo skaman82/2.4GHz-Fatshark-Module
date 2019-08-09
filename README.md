@@ -13,7 +13,7 @@ RX28 based Fatshark RX module
 Tested with following VTX models:
 • TBS Unify 2G4
 • Lawmate
-• Cheap low power chinese transmitter modules (no compatibility issues unlike the latest 2.4 module on the market)
+• Cheap low power chinese transmitter modules (no audio compatibility issues unlike the latest RX 2.4 module on the market)
 
 
 # OPERATION
