@@ -13,7 +13,7 @@ RX28 based Fatshark RX module
 Tested with following VTX models:
 • TBS Unify 2G4
 • Lawmate
-• Cheap low power chinese transmitter modules (no audio compatibility issues unlike the latest RX 2.4 module on the market)
+• Cheap low power chinese transmitter modules </br>(no audio compatibility issues unlike the latest RX 2.4 module on the market)
 
 
 # OPERATION
@@ -31,7 +31,7 @@ Steps to upload new firmware
 5. Select the hardware settings in Arduino IDE as shown in the image below
 6. Connect the FTDI tool according to the plug pinout as shown in the picture and select the COM port in Arduino IDE
 7. If you have the rev 06 PCB open the JUMP1 jumper on the PCB to upload code (solder it together after your upload is done).
-8. Upload the code
+8. Upload the code </br>
 YOU ARE DONE :)
 
 <img src="https://raw.githubusercontent.com/skaman82/2.4GHz-Fatshark-Module/master/img/PCB.png"/>
