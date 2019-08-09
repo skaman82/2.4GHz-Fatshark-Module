@@ -3011,12 +3011,12 @@ design rules under a new name.</description>
 <attribute name="SF_SKU" value="COM-10063" x="32.766" y="19.431" size="1.778" layer="27" rot="R315" display="off"/>
 <attribute name="VALUE" x="32.945603125" y="14.940875" size="0.6096" layer="27" font="vector" ratio="20" align="top-center"/>
 </element>
-<element name="BUZZ+" library="testpad" library_urn="urn:adsk.eagle:library:385" package="TP17SQ" package3d_urn="urn:adsk.eagle:package:27977/1" value="TPTP17SQ" x="5.08" y="23.876" smashed="yes">
+<element name="B+" library="testpad" library_urn="urn:adsk.eagle:library:385" package="TP17SQ" package3d_urn="urn:adsk.eagle:package:27977/1" value="TPTP17SQ" x="5.08" y="23.876" smashed="yes">
 <attribute name="NAME" x="4.1801" y="23.0261" size="0.7112" layer="25" font="vector" ratio="20" rot="R90"/>
 <attribute name="TP_SIGNAL_NAME" value="" x="5.08" y="23.876" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="4.318" y="22.987" size="0.0254" layer="27"/>
 </element>
-<element name="BUZZ-" library="testpad" library_urn="urn:adsk.eagle:library:385" package="TP17SQ" package3d_urn="urn:adsk.eagle:package:27977/1" value="TPTP17SQ" x="5.08" y="27.178" smashed="yes">
+<element name="BZ-" library="testpad" library_urn="urn:adsk.eagle:library:385" package="TP17SQ" package3d_urn="urn:adsk.eagle:package:27977/1" value="TPTP17SQ" x="5.08" y="27.178" smashed="yes">
 <attribute name="NAME" x="4.1801" y="26.3281" size="0.7112" layer="25" font="vector" ratio="20" rot="R90"/>
 <attribute name="TP_SIGNAL_NAME" value="" x="5.08" y="27.178" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="4.318" y="26.289" size="0.0254" layer="27"/>
@@ -3123,7 +3123,7 @@ design rules under a new name.</description>
 <contactref element="U$1" pad="P$2"/>
 <contactref element="U$1" pad="P$4"/>
 <contactref element="S2" pad="GND"/>
-<contactref element="BUZZ-" pad="TP"/>
+<contactref element="BZ-" pad="TP"/>
 <contactref element="GND•5V•SCL•SDA" pad="1"/>
 <contactref element="FTDI" pad="2"/>
 <contactref element="C6" pad="1"/>
@@ -3865,7 +3865,7 @@ design rules under a new name.</description>
 </signal>
 <signal name="N$2">
 <contactref element="BUZZ" pad="1"/>
-<contactref element="BUZZ+" pad="TP"/>
+<contactref element="B+" pad="TP"/>
 <wire x1="0.1" y1="20.8" x2="-1.2" y2="20.8" width="0.2" layer="16"/>
 <wire x1="4.7" y1="25.4" x2="0.1" y2="20.8" width="0.2" layer="16"/>
 <wire x1="4.7" y1="24.2" x2="4.7" y2="25.4" width="0.2" layer="1"/>

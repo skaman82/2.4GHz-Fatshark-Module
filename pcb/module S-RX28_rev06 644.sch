@@ -14107,7 +14107,7 @@ FIDUCIAL</description>
 <part name="C2" library="SparkFun-Passives" deviceset="CAP_POL" device="7343" value="470uf"/>
 <part name="P+8" library="SparkFun" deviceset="3.3V" device="" value="VCC"/>
 <part name="GND16" library="supply1" deviceset="GND" device=""/>
-<part name="R6" library="resistor" library_urn="urn:adsk.eagle:library:348" deviceset="R-EU_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/2" value="10R"/>
+<part name="R6" library="resistor" library_urn="urn:adsk.eagle:library:348" deviceset="R-EU_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/2" value="0R"/>
 <part name="GND7" library="supply1" deviceset="GND" device=""/>
 <part name="P+2" library="SparkFun" deviceset="3.3V" device="" value="VCC"/>
 <part name="U2" library="ts5a3359" deviceset="TS5A3359" device=""/>

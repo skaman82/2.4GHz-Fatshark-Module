@@ -14332,11 +14332,11 @@ FIDUCIAL</description>
 <attribute name="VALUE" x="93.98" y="-35.56" size="1.778" layer="96"/>
 </instance>
 <instance part="BUZZ+" gate="G$1" x="142.24" y="73.66" smashed="yes" rot="R180">
-<attribute name="NAME" x="143.51" y="72.39" size="1.778" layer="95" rot="R180"/>
+<attribute name="NAME" x="146.05" y="72.39" size="1.778" layer="95" rot="R180"/>
 <attribute name="TP_SIGNAL_NAME" x="140.97" y="74.93" size="1.778" layer="97" rot="R180"/>
 </instance>
 <instance part="BUZZ-" gate="G$1" x="142.24" y="63.5" smashed="yes">
-<attribute name="NAME" x="140.97" y="64.77" size="1.778" layer="95"/>
+<attribute name="NAME" x="138.43" y="64.77" size="1.778" layer="95"/>
 <attribute name="TP_SIGNAL_NAME" x="143.51" y="62.23" size="1.778" layer="97"/>
 </instance>
 <instance part="GND6" gate="1" x="142.24" y="53.34" smashed="yes">

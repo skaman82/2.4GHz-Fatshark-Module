@@ -23,17 +23,17 @@
 <layer number="13" name="Route13" color="4" fill="5" visible="no" active="no"/>
 <layer number="14" name="Route14" color="1" fill="6" visible="no" active="no"/>
 <layer number="15" name="Route15" color="4" fill="6" visible="no" active="no"/>
-<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="no" active="yes"/>
 <layer number="17" name="Pads" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="18" name="Vias" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
 <layer number="20" name="Dimension" color="24" fill="1" visible="yes" active="yes"/>
 <layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="no" active="yes"/>
 <layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
-<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="yes"/>
 <layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="no" active="yes"/>
 <layer number="27" name="tValues" color="7" fill="1" visible="no" active="yes"/>
 <layer number="28" name="bValues" color="7" fill="1" visible="no" active="yes"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
@@ -47,9 +47,9 @@
 <layer number="37" name="tTest" color="7" fill="1" visible="no" active="yes"/>
 <layer number="38" name="bTest" color="7" fill="1" visible="no" active="yes"/>
 <layer number="39" name="tKeepout" color="4" fill="11" visible="yes" active="yes"/>
-<layer number="40" name="bKeepout" color="1" fill="11" visible="yes" active="yes"/>
+<layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="yes"/>
 <layer number="41" name="tRestrict" color="4" fill="10" visible="yes" active="yes"/>
-<layer number="42" name="bRestrict" color="1" fill="10" visible="yes" active="yes"/>
+<layer number="42" name="bRestrict" color="1" fill="10" visible="no" active="yes"/>
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="yes"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
 <layer number="45" name="Holes" color="7" fill="1" visible="no" active="yes"/>
@@ -59,7 +59,7 @@
 <layer number="49" name="Reference" color="7" fill="1" visible="no" active="yes"/>
 <layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
 <layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="no" active="yes"/>
 <layer number="53" name="tGND_GNDA" color="7" fill="9" visible="no" active="no"/>
 <layer number="54" name="bGND_GNDA" color="1" fill="9" visible="no" active="no"/>
 <layer number="56" name="wert" color="7" fill="1" visible="no" active="no"/>
@@ -183,7 +183,7 @@
 <wire x1="39.37" y1="33.02" x2="39.37" y2="5.08" width="0.1524" layer="20"/>
 <wire x1="39.37" y1="5.08" x2="-3.81" y2="5.08" width="0.1524" layer="20"/>
 <text x="23.368" y="6.35" size="0.7112" layer="21" font="vector" ratio="10" rot="R180">• GND | GND | 5V | TX | RX | DTR</text>
-<text x="31.496" y="31.496" size="2.794" layer="25" font="vector" ratio="10" rot="R270">2G4</text>
+<text x="31.242" y="31.496" size="2.794" layer="25" font="vector" ratio="10" rot="R270">2G4</text>
 <text x="22.86" y="13.462" size="2.032" layer="26" ratio="20" rot="MR0">S-RX28</text>
 <wire x1="34.29" y1="33.02" x2="1.27" y2="33.02" width="0.1524" layer="26"/>
 <wire x1="1.27" y1="33.02" x2="1.27" y2="30.48" width="0.1524" layer="26"/>
@@ -208,7 +208,7 @@
 <text x="-1.778" y="19.431" size="0.889" layer="25" font="vector" ratio="10" rot="R90" align="bottom-center">OSD</text>
 <wire x1="1.27" y1="17.272" x2="-2.54" y2="17.272" width="0.2" layer="25"/>
 <wire x1="1.27" y1="12.954" x2="-2.54" y2="12.954" width="0.2" layer="25"/>
-<text x="36.068" y="25.146" size="1.2192" layer="25" font="vector" ratio="10" rot="R90">MODULE</text>
+<text x="35.814" y="25.146" size="1.2192" layer="25" font="vector" ratio="10" rot="R90">MODULE</text>
 <wire x1="1.27" y1="21.59" x2="-2.54" y2="21.59" width="0.2" layer="25"/>
 <rectangle x1="4.318" y1="26.416" x2="5.842" y2="27.94" layer="31"/>
 <rectangle x1="4.318" y1="23.114" x2="5.842" y2="24.638" layer="31"/>

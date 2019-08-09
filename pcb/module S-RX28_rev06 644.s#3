@@ -14394,11 +14394,9 @@ FIDUCIAL</description>
 </instance>
 <instance part="BUZZ" gate="G$1" x="142.24" y="83.82" smashed="yes" rot="R90">
 <attribute name="NAME" x="139.7" y="81.28" size="1.778" layer="95" font="vector" rot="R90"/>
-<attribute name="VALUE" x="144.78" y="81.28" size="1.778" layer="96" font="vector" rot="R90" align="top-left"/>
 </instance>
 <instance part="JUMP1" gate="G$1" x="154.94" y="83.82" smashed="yes" rot="R90">
 <attribute name="NAME" x="152.4" y="81.28" size="1.778" layer="95" font="vector" rot="R90"/>
-<attribute name="VALUE" x="157.48" y="81.28" size="1.778" layer="96" font="vector" rot="R90" align="top-left"/>
 </instance>
 <instance part="U$3" gate="G$1" x="-20.32" y="-10.16" smashed="yes"/>
 <instance part="U$4" gate="G$1" x="-20.32" y="-15.24" smashed="yes"/>
