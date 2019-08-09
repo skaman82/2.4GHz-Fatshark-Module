@@ -14,7 +14,7 @@ RX28 based Fatshark RX module
 …
 
 # UPDATING THE FIRMWARE
-You will need a FTDI to USB adapter to upload the module firmware. You may need to install the FTDI driver for it.
+You will need a FTDI to USB adapter to upload the module firmware. You may need to install the FTDI driver for it. Set the FTDI to 5V.
 
 Steps to upload new firmware
 1. Install Arduino IDE
