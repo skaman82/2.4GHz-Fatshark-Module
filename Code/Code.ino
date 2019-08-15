@@ -537,7 +537,7 @@ void control() {
       if (display_setting <= 1) {
         TV.clear_screen();
       }
-      reboot_modal();
+      //reboot_modal();
     }
   }
 }
@@ -1418,9 +1418,9 @@ void calibration() {     // Calibration wizzard
           TV.print(30, (0 + voffset), "RSSI CALIBRATION");
           TV.select_font(font6x8);
           TV.print(8, (20 + voffset), "4:Calibration done!");
-          TV.print(30, (40 + voffset), "Saved Max:");
+          TV.print(30, (40 + voffset), "Saved MIN:");
           TV.print(RSSIminEEP);
-          TV.print(30, (50 + voffset), "Saved Min:");
+          TV.print(30, (50 + voffset), "Saved MAX:");
           TV.print(RSSImaxEEP);
           TV.draw_rect(38, (65 + voffset), 48, 16, WHITE);
           TV.select_font(font4x6);
@@ -1434,9 +1434,9 @@ void calibration() {     // Calibration wizzard
           u8g.print("4:Calibration done!");
 
           u8g.setPrintPos(30, 38);
-          u8g.print("Max:");
+          u8g.print("MIN:");
           u8g.print(RSSIminEEP);
-          u8g.print(" Min:");
+          u8g.print(" MAX:");
           u8g.print(RSSImaxEEP);
 
           u8g.setPrintPos(55, 55);
