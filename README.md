@@ -10,10 +10,12 @@ RX28 based Fatshark RX module
 - OSD menus
 - OLED screen
 
-Tested with following VTX models:
-• TBS Unify 2G4
-• Lawmate
-• Cheap low power chinese transmitter modules </br>(no audio compatibility issues unlike the latest RX 2.4 module on the market)
+Tested with following VTX models:</br>
+• TBS Unify 2G4</br>
+• Lawmate 2.4</br>
+• FuriousFPV 2.4 VTX</br>
+• Cheap low power chinese transmitter modules </br>
+(no audio compatibility issues unlike the latest RX 2.4 module on the market)
 
 
 # OPERATION
