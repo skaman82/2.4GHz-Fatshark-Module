@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/skaman82/2.4GHz-Fatshark-Module/master/img/img.jpg"/>
+
 # 2.4GHz-Fatshark-Module
 RX28 based Fatshark RX module
 
