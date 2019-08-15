@@ -25,7 +25,7 @@ By pressing the CENTER button you can bring up the MENU. With UP/DOWN you can sw
 </br>
 <b>GOGGLE CONTROL:</b> Enables fatshark button control.</br>
 </br>
-<b>BANDSCAN: Scans all channels an displays the RSSI values in a graph.</br>
+<b>BANDSCAN:</b> Scans all channels an displays the RSSI values in a graph.</br>
 </br>
 <b>LOCK MODE:</b> If activated (lock icon in the home screen) the module will lock up after approx. 10 seconds. All controls are disabled to prevent chanel changes on acidental button press. You can temorarerly UNLOCK the module by pressing the CENTER button for 3-5 seconds (the lock icon will open). After unlocking the module will return to locked state after approx. 10 seconds.</br>
 </br>
