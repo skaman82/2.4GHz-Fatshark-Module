@@ -19,7 +19,22 @@ Tested with following VTX models:</br>
 
 
 # OPERATION
-…
+<b>HOME SCREEN:</b> You can change the channels by pressing the UP/DOWN keys - it works also with the google buttons (if the feature is active). If using the joystick you have to press UP/down once to bring the OSD up - then you can change the channel. After no button press is registered the OSD will automatically disappear. </br>
+</br>
+By pressing the CENTER button you can bring up the MENU. With UP/DOWN you can switch between different menu items. Select EXIT to return to the home screen.</br>
+</br>
+<b>GOGGLE CONTROL:</b> Enables fatshark button control.</br>
+</br>
+<b>BANDSCAN: Scans all channels an displays the RSSI values in a graph.</br>
+</br>
+<b>LOCK MODE:</b> If activated (lock icon in the home screen) the module will lock up after approx. 10 seconds. All controls are disabled to prevent chanel changes on acidental button press. You can temorarerly UNLOCK the module by pressing the CENTER button for 3-5 seconds (the lock icon will open). After unlocking the module will return to locked state after approx. 10 seconds.</br>
+</br>
+<b>FIND MODE:</b>Will show the RSSI value in a BAR (oled) or a plot (OSD). Depending on the RSSI value the beeper will beep more often and the OSD LED will blink as well indicating the direction. You can change the channel in the FIND MODE - so be sure you have the correct one. Use a directional antenna to find your model with this function.</br>
+</br>
+<b>CALIBRATION:</b> You have to run calibration to have the correct RSSI values. Just follow the instructions in the wizzard.</br>
+
+
+
 
 
 # UPDATING THE FIRMWARE
