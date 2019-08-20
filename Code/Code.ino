@@ -1,16 +1,5 @@
 // This Project is created by Albert Kravcov
 
-// TO DOS OR FIXMEs for 1.0:
-// • Array for RSS values in calibration and Bandscan
-
-// STUFF FOR LATER VERSIONS
-// • Autosearch
-// • Display setting (OLED + OSD)
-// • Serial setting (OLED + OSD)
-// • Dockking compatibility???
-// • Reorder menu items
-
-
 const char verId[7] = "v1.0"; //VERSION INFO
 
 #include <TVout.h>
@@ -19,10 +8,8 @@ const char verId[7] = "v1.0"; //VERSION INFO
 #include <font4x6.h>
 #include "hardware.h"
 #include "logo.h"
-
 #include <Wire.h>
 #include "U8glib.h"
-
 #include <EEPROM.h>
 
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_NO_ACK | U8G_I2C_OPT_FAST); // Fast I2C / TWI
@@ -191,12 +178,9 @@ void setup() {
   display_setting = 1; //just for testing 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED
 
 //TODO>
-  //if (fscontrollEEP == 0) { // change to "serialEEP == 1" later
-    //#define serial
-    //#undef FS_pin2
-    //#undef FS_pin3
-    //Serial.begin(9600);
-  //}
+  if (fscontrollEEP == 0) { // change to "serialEEP == 1" later
+    Serial.begin(9600);
+  }
 
   clearOLED();
 
@@ -1696,6 +1680,13 @@ void drawGraph() {
 
 
 
+
+// STUFF FOR LATER VERSIONS
+// • Autosearch
+// • Display setting (OLED + OSD)
+// • Serial setting (OLED + OSD)
+// • Dockking compatibility???
+// • Reorder menu items
 
 
 //STORING STUFF FOR LATER
