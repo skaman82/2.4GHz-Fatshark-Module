@@ -1311,6 +1311,7 @@ void bandscan() {
   clearOLED();
 
   int chan_rssi[8];
+  memset(chan_rssi, 0, 8*sizeof(int));
 
   byte exit = 0;
   while (exit == 0) {
@@ -1327,9 +1328,6 @@ void bandscan() {
         TV.print(35, (0 + voffset), "BAND SCANNER");
         TV.draw_line(0, (70 + voffset), 123, (70 + voffset), WHITE);
       }
-
-      if (ACT_channel < 1 && ACT_channel > 8)
-        ACT_channel = 1;
 
       {
           int idx = ACT_channel - 1;
