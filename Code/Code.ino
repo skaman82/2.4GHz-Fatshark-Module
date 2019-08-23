@@ -98,6 +98,7 @@ channel_t sm186R_chan_table[8]= {
 };
 
 
+
 TVout TV;
 
 void setup() {
@@ -534,7 +535,7 @@ void control() {
       if (display_setting <= 1) {
         TV.clear_screen();
       }
-      //reboot_modal();
+      autosearch();
     }
   }
 }
@@ -696,8 +697,8 @@ void loop() {
     }
 
     if (fscontrollEEP == 0) {
-      Serial.println(percentage, 0);
-      Serial.println(ACT_channel);
+      //Serial.println(percentage, 0);
+      //Serial.println(ACT_channel);
     }
 
     if (display_setting <= 1) {
@@ -1374,6 +1375,7 @@ void bandscan() {
 
         for (unsigned int idx = 0; idx < 8; idx++) {
             int rssi = chan_rssi[idx];
+ 
             int rssibar = round(rssi * 0.3);
 
             int x = 15 + idx*13;
@@ -1651,6 +1653,169 @@ void reboot_modal() {
 
 
 
+//AUTOSEARCH MODAL ************************
+
+void autosearch() {
+  byte exit = 0;
+    
+  ACT_channel = 1;
+
+    double values[8];
+    int maxIndex = 0;
+    int minIndex = 0;
+    
+    byte rssireadin = 0;
+
+    double rssi_value1 = 0;
+    double rssi_value2 = 0;
+    double rssi_value3 = 0;
+    double rssi_value4 = 0;
+    double rssi_value5 = 0;
+    double rssi_value6 = 0;
+    double rssi_value7 = 0;
+    double rssi_value8 = 0;
+    
+  clearOLED();
+
+  while (exit == 0) {
+
+    u8g.firstPage();
+    do {
+      osd();
+      buttoncheck();
+      channeltable();
+      //menuactive = 1;
+      osd_mode = 1;
+
+      if (display_setting <= 1) {
+        TV.print(10, (10 + voffset), "Autosearch...");
+      }
+      if (display_setting >= 1) {
+        u8g.setPrintPos(10, 10);
+        u8g.print("Autosearch...");
+      }
+
+if (rssireadin < 10) {
+if (ACT_channel == 1) {
+ rssi_value1 = _readRSSI();
+ values[0] = rssi_value1;
+ Serial.print("1: "); Serial.println(values[0]);
+  ACT_channel = 2;
+}
+
+else if (ACT_channel == 2) {
+rssi_value2 = _readRSSI();
+values[1] = rssi_value2;
+Serial.print("2: "); Serial.println(values[1]);
+ACT_channel = 3;
+}
+
+else if (ACT_channel == 3) {
+rssi_value3 = _readRSSI();
+values[2] = rssi_value3;
+Serial.print("3: "); Serial.println(values[2]);
+ACT_channel = 4;
+}
+
+else if (ACT_channel == 4) {
+ rssi_value4 = _readRSSI();
+ values[3] = rssi_value4;
+Serial.print("4: "); Serial.println(values[3]);
+ACT_channel = 5;
+}
+
+else if (ACT_channel == 5) {
+ rssi_value5 = _readRSSI();
+ values[4] = rssi_value5;
+Serial.print("5: "); Serial.println(values[4]);
+ACT_channel = 6;
+}
+
+else if (ACT_channel == 6) {
+
+ rssi_value6 = _readRSSI();
+ values[5] = rssi_value6;
+ Serial.print("6: "); Serial.println(values[5]);
+ACT_channel = 7;
+}
+
+else if (ACT_channel == 7) {
+ rssi_value7 = _readRSSI();
+ values[6] = rssi_value7;
+Serial.print("7: "); Serial.println(values[6]);
+ACT_channel = 8;
+}
+
+else if (ACT_channel == 8) {
+ rssi_value8 = _readRSSI();
+ values[7] = rssi_value8;
+ Serial.print("8: "); Serial.println(values[7]);
+
+rssireadin = rssireadin+1;
+ACT_channel = 1;
+}
+
+}
+
+  if (rssireadin == 10) {
+
+double rssi_max = values[0];
+double rssi_min = values[0];
+ 
+
+
+for (int i = 1; i < 8; i++) {
+    if (values[i] > rssi_max) {
+      maxIndex = i;
+      rssi_max = values[i]; //determine max value in the array
+      }
+     if (values[i] < rssi_min) {
+      rssi_min = values[i]; //determine min value in the array
+      minIndex = i;
+      }
+    }
+
+      
+      Serial.print("minIndex: ");
+      Serial.println(minIndex+1);
+      Serial.print("maxIndex: ");
+      Serial.println(maxIndex+1); 
+      Serial.print("rssi_max: ");
+      Serial.println(rssi_max); 
+      Serial.print("rssi_min: ");
+      Serial.println(rssi_min);
+
+      rssireadin = 10;
+  }
+
+
+  if (rssireadin == 10) {
+if (display_setting >= 1) {
+        u8g.setPrintPos(10, 30);
+        u8g.print("Best CH: ");
+        u8g.print(minIndex+1);
+      }
+  }
+
+      if (pressedbut == 1) {
+        menuactive = 0; //for debugging only
+        
+        if (display_setting <= 1) {
+          TV.clear_screen();
+        }
+        
+         ACT_channel = minIndex+1;
+
+        exit = 1;
+        //return;
+      }
+        
+
+    } while ( u8g.nextPage() );
+  }
+}
+
+
 
 //RESTORE OLED ORIENTATION ************************
 
@@ -1676,7 +1841,6 @@ void drawGraph() {
     TV.set_pixel(x, originy + 2, 1);
   }
 }
-
 
 
 
