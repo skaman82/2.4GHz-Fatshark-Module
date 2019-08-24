@@ -68,33 +68,33 @@ const unsigned char *chan_bitmaps[8] = { bitmap_one, bitmap_two, bitmap_three, b
 const unsigned char *chan_bitmaps_osd[8] = { bitmap_one_OSD, bitmap_two_OSD, bitmap_three_OSD, bitmap_four_OSD, bitmap_five_OSD, bitmap_six_OSD, bitmap_seven_OSD, bitmap_eight_OSD };
 
 typedef struct {
-    int freq;
-    int bx;
-    int ch1;
-    int ch2;
-    int ch3;
+  int freq;
+  int bx;
+  int ch1;
+  int ch2;
+  int ch3;
 } channel_t;
 
 channel_t rx28_chan_table[8] = {
-    { 2414, LOW, LOW, HIGH, HIGH },
-    { 2432, LOW, HIGH, LOW, HIGH },
-    { 2450, LOW, HIGH, HIGH, LOW },
-    { 2468, LOW, HIGH, HIGH, HIGH },
-    { 2490, HIGH, LOW, HIGH, HIGH },
-    { 2510, HIGH, HIGH, LOW, HIGH },
-    { 2390, HIGH, HIGH, HIGH, LOW },
-    { 2370, HIGH, HIGH, HIGH, HIGH }
+  { 2414, LOW, LOW, HIGH, HIGH },
+  { 2432, LOW, HIGH, LOW, HIGH },
+  { 2450, LOW, HIGH, HIGH, LOW },
+  { 2468, LOW, HIGH, HIGH, HIGH },
+  { 2490, HIGH, LOW, HIGH, HIGH },
+  { 2510, HIGH, HIGH, LOW, HIGH },
+  { 2390, HIGH, HIGH, HIGH, LOW },
+  { 2370, HIGH, HIGH, HIGH, HIGH }
 };
 
-channel_t sm186R_chan_table[8]= {
-    { 2414, LOW, LOW, LOW, 0 },
-    { 2432, LOW, HIGH, LOW, 0 },
-    { 2450, LOW, LOW, HIGH, 0 },
-    { 2468, LOW, HIGH, HIGH, 0 },
-    { 2490, HIGH, LOW, LOW, 0 },
-    { 2510, HIGH, HIGH, LOW, 0 },
-    { 2390, HIGH, LOW, HIGH, 0 },
-    { 2370, HIGH, HIGH, HIGH, 0 }
+channel_t sm186R_chan_table[8] = {
+  { 2414, LOW, LOW, LOW, 0 },
+  { 2432, LOW, HIGH, LOW, 0 },
+  { 2450, LOW, LOW, HIGH, 0 },
+  { 2468, LOW, HIGH, HIGH, 0 },
+  { 2490, HIGH, LOW, LOW, 0 },
+  { 2510, HIGH, HIGH, LOW, 0 },
+  { 2390, HIGH, LOW, HIGH, 0 },
+  { 2370, HIGH, HIGH, HIGH, 0 }
 };
 
 
@@ -178,7 +178,7 @@ void setup() {
 
   display_setting = 1; //just for testing 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED
 
-//TODO>
+  //TODO>
   if (fscontrollEEP == 0) { // change to "serialEEP == 1" later
     Serial.begin(9600);
   }
@@ -347,14 +347,14 @@ void fs_buttons() {
 
   int chan = 0;
 
-  if(digitalRead(FS_pin1) == HIGH)
+  if (digitalRead(FS_pin1) == HIGH)
     chan = 1;
 
-  if(digitalRead(FS_pin2) == HIGH)
-    chan |= 1<<1;
+  if (digitalRead(FS_pin2) == HIGH)
+    chan |= 1 << 1;
 
-  if(digitalRead(FS_pin3) == HIGH)
-    chan |= 1<<2;
+  if (digitalRead(FS_pin3) == HIGH)
+    chan |= 1 << 2;
 
   FS_channel = chan + 1;
 }
@@ -577,9 +577,9 @@ void channeltable() {
     ACT_channel = 1;
 
 #ifdef RX28 //RX28 receiver channel settings
-  channel_t ch = rx28_chan_table[ACT_channel-1];
+  channel_t ch = rx28_chan_table[ACT_channel - 1];
 #elif SM186R //SM186R receiver channel settings
-  channel_t ch = sm186R_chan_table[ACT_channel-1];
+  channel_t ch = sm186R_chan_table[ACT_channel - 1];
 #endif
 
   freq = ch.freq;
@@ -683,7 +683,7 @@ void loop() {
       TV.println(95, (22 + voffset), "MHz");
 
       if (ACT_channel >= 1 && ACT_channel <= 8)
-        TV.bitmap(18, (20 + voffset), chan_bitmaps_osd[ACT_channel-1]);
+        TV.bitmap(18, (20 + voffset), chan_bitmaps_osd[ACT_channel - 1]);
     }
 
 #ifdef RSSI_mod
@@ -778,7 +778,7 @@ void loop() {
 #endif
 
       if (ACT_channel >= 1 && ACT_channel <= 8)
-        u8g.drawBitmapP(12, 12, 4, 41, chan_bitmaps[ACT_channel-1]);
+        u8g.drawBitmapP(12, 12, 4, 41, chan_bitmaps[ACT_channel - 1]);
 
       if ((lockmodeEEP == 1) && (lockmode == 1)) {
         u8g.drawBitmapP(109, 32, 2, 8, bitmap_lock);     //mini lock icon
@@ -1311,7 +1311,7 @@ void bandscan() {
   clearOLED();
 
   int chan_rssi[8];
-  memset(chan_rssi, 0, 8*sizeof(int));
+  memset(chan_rssi, 0, 8 * sizeof(int));
 
   byte exit = 0;
   while (exit == 0) {
@@ -1330,41 +1330,41 @@ void bandscan() {
       }
 
       {
-          int idx = ACT_channel - 1;
+        int idx = ACT_channel - 1;
 
-          int rssi = map(_readRSSI(), max, min, 0, 100);
+        int rssi = map(_readRSSI(), max, min, 0, 100);
 
-          if (rssi > 100) {
-              rssi = 100;
-          }
-          if (rssi < 0) {
-              rssi = 0;
-          }
+        if (rssi > 100) {
+          rssi = 100;
+        }
+        if (rssi < 0) {
+          rssi = 0;
+        }
 
-          chan_rssi[idx] = rssi;
+        chan_rssi[idx] = rssi;
 
-      if (display_setting <= 1) {
+        if (display_setting <= 1) {
           int x = 16 * idx;
           char chan_label[10];
-          sprintf(chan_label, "CH%d", idx-1);
+          sprintf(chan_label, "CH%d", idx - 1);
 
           TV.draw_rect(x, (13 + voffset), 14, 56, BLACK, BLACK);
           TV.draw_rect(x, ((70 - (rssi * 0.46)) + voffset), 10, (rssi * 0.46), WHITE, WHITE);
           TV.print(x, (75 + voffset), chan_label);
           if ((rssi < 100) && (rssi >= 10)) {
-              TV.print(x+2, ((63 - (rssi * 0.46)) + voffset), rssi);
+            TV.print(x + 2, ((63 - (rssi * 0.46)) + voffset), rssi);
           }
           else if (rssi < 10) {
-              TV.print(x+4, ((63 - (rssi * 0.46)) + voffset), rssi);
+            TV.print(x + 4, ((63 - (rssi * 0.46)) + voffset), rssi);
           }
           else {
-              TV.print(x, ((63 - (rssi * 0.46)) + voffset), rssi);
+            TV.print(x, ((63 - (rssi * 0.46)) + voffset), rssi);
           }
-      }
+        }
       }
 
       if (++ACT_channel > 8)
-          ACT_channel = 1;
+        ACT_channel = 1;
 
       if (display_setting >= 1) {
         u8g.setPrintPos(35, 10);
@@ -1372,28 +1372,28 @@ void bandscan() {
         u8g.drawHLine(15, 50, 100);
 
         for (unsigned int idx = 0; idx < 8; idx++) {
-            int rssi = chan_rssi[idx];
- 
-            int rssibar = round(rssi * 0.3);
+          int rssi = chan_rssi[idx];
 
-            int x = 15 + idx*13;
+          int rssibar = round(rssi * 0.3);
 
-            char chan_label[10];
-            sprintf(chan_label, "C%d", idx+1);
+          int x = 15 + idx * 13;
 
-            u8g.setPrintPos(x, 59);
-            u8g.print(chan_label);
+          char chan_label[10];
+          sprintf(chan_label, "C%d", idx + 1);
 
-            if (rssi > 1) {
-                u8g.drawBox(x, (51 - (rssibar)), 9, rssibar);
-            }
-            if (rssi <= 9) {
-                u8g.setPrintPos(x+2, (48 - rssibar));
-            }
-            else {
-                u8g.setPrintPos(x, (48 - rssibar));
-            }
-            u8g.print(rssi);
+          u8g.setPrintPos(x, 59);
+          u8g.print(chan_label);
+
+          if (rssi > 1) {
+            u8g.drawBox(x, (51 - (rssibar)), 9, rssibar);
+          }
+          if (rssi <= 9) {
+            u8g.setPrintPos(x + 2, (48 - rssibar));
+          }
+          else {
+            u8g.setPrintPos(x, (48 - rssibar));
+          }
+          u8g.print(rssi);
         }
       }
 
@@ -1514,7 +1514,7 @@ void finder() {
         }
 
         TV.print(3, 85, "RSSI:");
-        TV.draw_rect(29, 84, 20,8, BLACK, BLACK);
+        TV.draw_rect(29, 84, 20, 8, BLACK, BLACK);
         TV.print(percentage);
         TV.print(55, 85, "CH");
         TV.print(ACT_channel);
@@ -1655,24 +1655,24 @@ void reboot_modal() {
 
 void autosearch() {
   byte exit = 0;
-    
+
   ACT_channel = 1;
 
-    double values[8];
-    int maxIndex = 0;
-    int minIndex = 0;
-    
-    byte rssireadin = 0;
+  double values[8];
+  int maxIndex = 0;
+  int minIndex = 0;
 
-    double rssi_value1 = 0;
-    double rssi_value2 = 0;
-    double rssi_value3 = 0;
-    double rssi_value4 = 0;
-    double rssi_value5 = 0;
-    double rssi_value6 = 0;
-    double rssi_value7 = 0;
-    double rssi_value8 = 0;
-    
+  byte rssireadin = 0;
+
+  double rssi_value1 = 0;
+  double rssi_value2 = 0;
+  double rssi_value3 = 0;
+  double rssi_value4 = 0;
+  double rssi_value5 = 0;
+  double rssi_value6 = 0;
+  double rssi_value7 = 0;
+  double rssi_value8 = 0;
+
   clearOLED();
 
   while (exit == 0) {
@@ -1682,7 +1682,6 @@ void autosearch() {
       osd();
       buttoncheck();
       channeltable();
-      //menuactive = 1;
       osd_mode = 1;
 
       if (display_setting <= 1) {
@@ -1693,121 +1692,128 @@ void autosearch() {
         u8g.print("Autosearch...");
       }
 
-if (rssireadin < 10) {
-if (ACT_channel == 1) {
- rssi_value1 = _readRSSI();
- values[0] = rssi_value1;
- Serial.print("1: "); Serial.println(values[0]);
-  ACT_channel = 2;
-}
+      //Fill up the array with RSSi values for each channel - repeated 10 times for accuracy
 
-else if (ACT_channel == 2) {
-rssi_value2 = _readRSSI();
-values[1] = rssi_value2;
-Serial.print("2: "); Serial.println(values[1]);
-ACT_channel = 3;
-}
+      if (rssireadin < 10) {
 
-else if (ACT_channel == 3) {
-rssi_value3 = _readRSSI();
-values[2] = rssi_value3;
-Serial.print("3: "); Serial.println(values[2]);
-ACT_channel = 4;
-}
+        if (ACT_channel == 1) {
+          rssi_value1 = _readRSSI();
+          values[0] = rssi_value1;
+          //Serial.print("1: "); Serial.println(values[0]);
+          ACT_channel = 2;
+        }
 
-else if (ACT_channel == 4) {
- rssi_value4 = _readRSSI();
- values[3] = rssi_value4;
-Serial.print("4: "); Serial.println(values[3]);
-ACT_channel = 5;
-}
+        else if (ACT_channel == 2) {
+          rssi_value2 = _readRSSI();
+          values[1] = rssi_value2;
+          //Serial.print("2: "); Serial.println(values[1]);
+          ACT_channel = 3;
+        }
 
-else if (ACT_channel == 5) {
- rssi_value5 = _readRSSI();
- values[4] = rssi_value5;
-Serial.print("5: "); Serial.println(values[4]);
-ACT_channel = 6;
-}
+        else if (ACT_channel == 3) {
+          rssi_value3 = _readRSSI();
+          values[2] = rssi_value3;
+          //Serial.print("3: "); Serial.println(values[2]);
+          ACT_channel = 4;
+        }
 
-else if (ACT_channel == 6) {
+        else if (ACT_channel == 4) {
+          rssi_value4 = _readRSSI();
+          values[3] = rssi_value4;
+          //Serial.print("4: "); Serial.println(values[3]);
+          ACT_channel = 5;
+        }
 
- rssi_value6 = _readRSSI();
- values[5] = rssi_value6;
- Serial.print("6: "); Serial.println(values[5]);
-ACT_channel = 7;
-}
+        else if (ACT_channel == 5) {
+          rssi_value5 = _readRSSI();
+          values[4] = rssi_value5;
+          //Serial.print("5: "); Serial.println(values[4]);
+          ACT_channel = 6;
+        }
 
-else if (ACT_channel == 7) {
- rssi_value7 = _readRSSI();
- values[6] = rssi_value7;
-Serial.print("7: "); Serial.println(values[6]);
-ACT_channel = 8;
-}
+        else if (ACT_channel == 6) {
 
-else if (ACT_channel == 8) {
- rssi_value8 = _readRSSI();
- values[7] = rssi_value8;
- Serial.print("8: "); Serial.println(values[7]);
+          rssi_value6 = _readRSSI();
+          values[5] = rssi_value6;
+          //Serial.print("6: "); Serial.println(values[5]);
+          ACT_channel = 7;
+        }
 
-rssireadin = rssireadin+1;
-ACT_channel = 1;
-}
+        else if (ACT_channel == 7) {
+          rssi_value7 = _readRSSI();
+          values[6] = rssi_value7;
+          //Serial.print("7: "); Serial.println(values[6]);
+          ACT_channel = 8;
+        }
 
-}
-
-  if (rssireadin == 10) {
-
-double rssi_max = values[0];
-double rssi_min = values[0];
- 
-
-
-for (int i = 1; i < 8; i++) {
-    if (values[i] > rssi_max) {
-      maxIndex = i;
-      rssi_max = values[i]; //determine max value in the array
+        else if (ACT_channel == 8) {
+          rssi_value8 = _readRSSI();
+          values[7] = rssi_value8;
+          //Serial.print("8: "); Serial.println(values[7]);
+          
+          rssireadin = rssireadin + 1;
+          ACT_channel = 1;
+        }
       }
-     if (values[i] < rssi_min) {
-      rssi_min = values[i]; //determine min value in the array
-      minIndex = i;
+
+     //Getting the max/min values and the position in the array
+     
+     if (rssireadin == 10) {
+        
+        double rssi_max = values[0];
+        double rssi_min = values[0];
+
+        for (int i = 1; i < 8; i++) {
+          if (values[i] > rssi_max) {
+            maxIndex = i;
+            rssi_max = values[i]; //determine max value in the array
+          }
+          if (values[i] < rssi_min) {
+            rssi_min = values[i]; //determine min value in the array
+            minIndex = i;
+          }
+        }
+
+        //Serial.print("minIndex: ");
+        //Serial.println(minIndex+1);
+        //Serial.print("maxIndex: ");
+        //Serial.println(maxIndex+1);
+        //Serial.print("rssi_max: ");
+        //Serial.println(rssi_max);
+        //Serial.print("rssi_min: ");
+        //Serial.println(rssi_min);
+
+        rssireadin = 11;
+
       }
-    }
 
-      
-      Serial.print("minIndex: ");
-      Serial.println(minIndex+1);
-      Serial.print("maxIndex: ");
-      Serial.println(maxIndex+1); 
-      Serial.print("rssi_max: ");
-      Serial.println(rssi_max); 
-      Serial.print("rssi_min: ");
-      Serial.println(rssi_min);
+      //print out the results
+      if (rssireadin >= 11) {
 
-      rssireadin = 10;
-  }
+        if (display_setting >= 1) {
+          u8g.setPrintPos(10, 30);
+          u8g.print("Best CH: ");
+          u8g.print(minIndex + 1);
+        }
 
-
-  if (rssireadin == 10) {
-if (display_setting >= 1) {
-        u8g.setPrintPos(10, 30);
-        u8g.print("Best CH: ");
-        u8g.print(minIndex+1);
+        rssireadin = rssireadin + 1;
       }
-  }
 
-      if (pressedbut == 1) {
-        menuactive = 0; //for debugging only
+      //go back and switch to the best channel
+      if (rssireadin >= 50)  {
         
         if (display_setting <= 1) {
           TV.clear_screen();
         }
         
-         ACT_channel = minIndex+1;
+        menuactive = 0; //for debugging only
+        ACT_channel = minIndex + 1;
+        BT_channel = minIndex + 1;
+        rssireadin = 0;
 
         exit = 1;
-        //return;
+        return;
       }
-        
 
     } while ( u8g.nextPage() );
   }
@@ -1824,6 +1830,9 @@ void fixoled() {
   do {
   } while ( u8g.nextPage() );
 }
+
+
+//FINDER OSD PLOT ************************
 
 void drawGraph() {
   TV.draw_line(originx, 20, originx, originy, 1);
@@ -1844,7 +1853,6 @@ void drawGraph() {
 
 
 // STUFF FOR LATER VERSIONS
-// • Autosearch
 // • Display setting (OLED + OSD)
 // • Serial setting (OLED + OSD)
 // • Dockking compatibility???
