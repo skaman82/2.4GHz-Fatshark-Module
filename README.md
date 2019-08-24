@@ -33,6 +33,8 @@ By pressing the CENTER button you can bring up the <b>MENU</b>. With UP/DOWN you
 </br>
 <b>FIND MODE:</b>Will show the RSSI value in a BAR (oled) or a plot (OSD). Depending on the RSSI value the beeper will beep more often and the OSD LED will blink as well indicating the direction. You can change the channel in the FIND MODE - so be sure you have the correct one. Use a directional antenna to find your model with this function.</br>
 </br>
+<b>AUTOSEARCH:</b> Press the CENTER button for 2 seconds to call the autosearch function. Autosearch will find the strongest channel and switch to it automatically.</br>
+</br>
 <b>CALIBRATION:</b> You have to run calibration to have the correct RSSI values. Just follow the instructions in the wizzard.</br>
 
 
