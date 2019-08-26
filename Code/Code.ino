@@ -671,9 +671,7 @@ void loop() {
       percentage = 0;
     }
 
-    if (fscontrollEEP == 0) {
-
-
+    if (serial_setting == 1) {
       //PLACEHOLDER FOR SERIAL CODE
       Serial.println(percentage, 0);
       Serial.println(ACT_channel);
