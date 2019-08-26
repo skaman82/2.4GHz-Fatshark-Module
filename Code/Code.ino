@@ -1,12 +1,11 @@
-// This Project is created by Albert Kravcov
-//
-//
-//
-//
-//
-//
-//
-//
+// This Project is created by Albert Kravcov under GNU GPLv3 License
+// 
+//  The code uses some libraries created by others:
+//  TV-OUT (VE) Library by 2017 nootropicdesign (MIT license)
+//  U8glib
+//  The U8glib code (http://code.google.com/p/u8glib/) is licensed under the terms of 
+//  the new-bsd license (two-clause bsd license).
+
 
 const char verId[7] = "v1.0"; //VERSION INFO
 

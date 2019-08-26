@@ -8,9 +8,7 @@
 //************V3 Hardware*******************
   #define CH1_pin      A3
   #define CH2_pin      A2
-#ifdef RX28
   #define CH3_pin      A1
-#endif
   #define BX_pin       A4 
   #define RSSI_pin     A0
   #define FS_pin1      2
