@@ -20,6 +20,7 @@ const char verId[7] = "v1.0"; //VERSION INFO
 #include "U8glib.h"
 #include <EEPROM.h>
 
+//DISPLAY TYPE SELECTION
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_NO_ACK | U8G_I2C_OPT_FAST); // Fast I2C / TWI
 //U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_FAST);  // Dev 0, Fast I2C / TWI
 
@@ -65,6 +66,8 @@ int refresh = 0;
 int osd_timeout;
 int lock_timeout;
 byte display_setting; //NEW setting for display modes. 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED (will require a reboot)
+byte serial_setting;
+
 
 unsigned char x, y;
 unsigned char originx = 5;
@@ -94,22 +97,11 @@ channel_t rx28_chan_table[8] = {
   { 2370, HIGH, HIGH, HIGH, HIGH }
 };
 
-channel_t sm186R_chan_table[8] = {
-  { 2414, LOW, LOW, LOW, 0 },
-  { 2432, LOW, HIGH, LOW, 0 },
-  { 2450, LOW, LOW, HIGH, 0 },
-  { 2468, LOW, HIGH, HIGH, 0 },
-  { 2490, HIGH, LOW, LOW, 0 },
-  { 2510, HIGH, HIGH, LOW, 0 },
-  { 2390, HIGH, LOW, HIGH, 0 },
-  { 2370, HIGH, HIGH, HIGH, 0 }
-};
-
-
 
 TVout TV;
 
 void setup() {
+  // TODO
   //digitalWrite(RST_pin, HIGH); // pull reset pin high
 
   // assign default color value
@@ -131,7 +123,8 @@ void setup() {
   pinMode(OSD_ctr2,     OUTPUT); //ctrl2
   pinMode(CH1_pin,      OUTPUT); //module c1
   pinMode(CH2_pin,      OUTPUT); //module c2
-  pinMode(BX_pin,       OUTPUT); //module BX
+  pinMode(CH3_pin,      OUTPUT); //module c3
+  pinMode(BX_pin,       OUTPUT); //module BX (connect to ch3 on RX2189)
   pinMode(FS_pin1,      INPUT); //google c1
   pinMode(FS_pin2,      INPUT); //google c2
   pinMode(FS_pin3,      INPUT); //google c3
@@ -145,10 +138,6 @@ void setup() {
 
 #ifdef RSSI_mod
   pinMode(RSSI_pin, INPUT);
-#endif
-
-#ifndef SM186R
-  pinMode(CH3_pin,      OUTPUT); //module c3
 #endif
 
   channelvalueEEP = EEPROM.read(chanADDR);
@@ -184,11 +173,19 @@ void setup() {
     display_setting = 1; //setting the  default state of no valid value
   }
 
+  if (serialEEP > 2)
+  {
+    serial_setting = 0; //setting the  default state of no valid value
+  }
+
   //TODO>
   display_setting = 1; //just for testing 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED
 
+  serial_setting = 0;
+
   //TODO>
-  if (fscontrollEEP == 0) { // change to "serialEEP == 1" later
+  if (serial_setting == 1) {
+    fscontrollEEP = 0; //disable FS button control
     Serial.begin(9600);
   }
 
@@ -270,9 +267,9 @@ void showlogo()
   do
   {
     // splashscreen goes here
-    u8g.drawBitmapP(10, 20, 14, 18, logo_OLED);
+    u8g.drawBitmapP(10, 10, 14, 18, logo_OLED);
     u8g.setFont(u8g_font_5x7r);
-    u8g.setPrintPos(31, 55);
+    u8g.setPrintPos(31, 45);
     u8g.print("2G4 MODULE ");
     u8g.print(verId);
   }
@@ -587,18 +584,15 @@ void channeltable() {
 
 #ifdef RX28 //RX28 receiver channel settings
   channel_t ch = rx28_chan_table[ACT_channel - 1];
-#elif SM186R //SM186R receiver channel settings
-  channel_t ch = sm186R_chan_table[ACT_channel - 1];
 #endif
+
 
   freq = ch.freq;
   digitalWrite(BX_pin, ch.bx); //BX
   digitalWrite(CH1_pin, ch.ch1); //1
   digitalWrite(CH2_pin, ch.ch2); //2
-
-#ifdef RX28
   digitalWrite(CH3_pin, ch.ch3); //3
-#endif
+
 }
 
 void callOSD() {
@@ -656,33 +650,6 @@ void loop() {
     runlocktimer();
     osd();
 
-
-#ifdef debug
-    //Debug OSD output
-
-    osd_mode = 1;
-    uint32_t rssi_value = _readRSSI();
-    float percentage = map(rssi_value, max, min, 0, 100);
-
-    if (percentage > 100) {
-      percentage = 100;
-    }
-    if (percentage < 0) {
-      percentage = 0;
-    }
-
-    int p1_value = digitalRead(FS_pin1);
-    int p2_value = digitalRead(FS_pin2);
-    int p3_value = digitalRead(FS_pin3);
-
-    if (display_setting <= 1) {
-      //do OSD stuff
-    }
-
-#endif
-
-#ifndef debug
-
     if (display_setting <= 1) {
       //Main OSD code
 
@@ -706,8 +673,11 @@ void loop() {
     }
 
     if (fscontrollEEP == 0) {
-      //Serial.println(percentage, 0);
-      //Serial.println(ACT_channel);
+
+
+      //PLACEHOLDER FOR SERIAL CODE
+      Serial.println(percentage, 0);
+      Serial.println(ACT_channel);
     }
 
     if (display_setting <= 1) {
@@ -730,9 +700,7 @@ void loop() {
 
 #endif
 
-#endif
 
-#ifndef debug
     if (display_setting <= 1) {
       if ((menuactive != 1) && (osd_mode == 1)) {
         //NEW OSD TIMER
@@ -754,7 +722,6 @@ void loop() {
         }
       }
     }
-#endif
 
     if (display_setting >= 1) {
       u8g.setFont(u8g_font_profont22r);
@@ -768,9 +735,6 @@ void loop() {
       u8g.setPrintPos(50, 40);
       u8g.print("RSSI:");
       u8g.print(percentage, 0);
-
-      //rssibar = 100;
-
       u8g.drawBox(53, 48, (percentage * 0.60), 3); //
       u8g.drawFrame(50, 45, 66, 9);
       //u8g.setColorIndex(0);
@@ -809,16 +773,11 @@ uint16_t _readRSSI() {
   rssiupdate++;
   volatile uint32_t sum = 0;
   sum = analogRead(RSSI_pin);
-  //delay(2);
   sum += analogRead(RSSI_pin);
-  //delay(2);
   sum += analogRead(RSSI_pin);
-  //delay(2);
   sum += analogRead(RSSI_pin);
   return sum / 4;
-
 }
-
 
 
 //MAIN MENU ************************
@@ -846,11 +805,17 @@ void menu() {
           TV.select_font(font6x8);
           TV.bitmap(35, (25 + voffset), bitmap_nkizw_OSD); //goggle
           TV.print(15, (70 + voffset), "Goggle control:");
-          if (fscontrollEEP == 1) {
-            TV.print("ON");
+          if (serial_setting == 0) {
+            if (fscontrollEEP == 1) {
+
+              TV.print("ON");
+            }
+            else {
+              TV.print("OFF");
+            }
           }
           else {
-            TV.print("OFF");
+            TV.print("--");
           }
         }
 
@@ -858,26 +823,33 @@ void menu() {
         u8g.setFont(u8g_font_5x7r);
         u8g.setPrintPos(23, 55);
         u8g.print("GOGGLE CONTROL:");
-        if (fscontrollEEP == 1) {
-          u8g.print("ON");
-        }
-        else {
-          u8g.print("OFF");
-        }
-
-        if (pressedbut == 1) {
-
+        if (serial_setting == 0) {
           if (fscontrollEEP == 1) {
-            fscontrollEEP = 0;
-            EEPROM.write(fscontrollADDR, fscontrollEEP);
+            u8g.print("ON");
           }
           else {
-            fscontrollEEP = 1;
-            EEPROM.write(fscontrollADDR, fscontrollEEP);
+            u8g.print("OFF");
           }
+        }
+        else {
+          u8g.print("--");
+        }
 
-          if (display_setting <= 1) {
-            TV.clear_screen();
+        if (serial_setting == 0) {
+          if (pressedbut == 1) {
+
+            if (fscontrollEEP == 1) {
+              fscontrollEEP = 0;
+              EEPROM.write(fscontrollADDR, fscontrollEEP);
+            }
+            else {
+              fscontrollEEP = 1;
+              EEPROM.write(fscontrollADDR, fscontrollEEP);
+            }
+
+            if (display_setting <= 1) {
+              TV.clear_screen();
+            }
           }
         }
         if (pressedbut == 2) {
@@ -1115,7 +1087,6 @@ void calibration() {     // Calibration wizzard
   byte exit = 0;
   int calstep = 1;
 
-
   ACT_channel = 1;
 
   double values[8];
@@ -1143,10 +1114,12 @@ void calibration() {     // Calibration wizzard
 
       double rssi_max;
       double rssi_min;
+      byte progress;
 
       if (calstep == 1) {
 
         if (display_setting <= 1) {
+          TV.select_font(font4x6);
           TV.print(30, (0 + voffset), "RSSI CALIBRATION");
           TV.select_font(font6x8);
           TV.print(0, (20 + voffset), "1:Remove antenna and switch off the VTX");
@@ -1168,24 +1141,41 @@ void calibration() {     // Calibration wizzard
         }
 
         if (pressedbut == 1) {
+
+          if (display_setting <= 1) {
+            TV.clear_screen();
+          }
+
           calstep = 2;
         }
       }
 
       else if (calstep == 2) {
 
-        if (display_setting <= 1) {
-          TV.print(30, (0 + voffset), "RSSI CALIBRATION");
-          TV.select_font(font6x8);
-          TV.print(0, (20 + voffset), "calibrating");
+
+        if (progress >= 100) {
+        }
+        else {
+          progress++;
         }
 
+        if (display_setting <= 1) {
+          TV.select_font(font4x6);
+          TV.print(30, (0 + voffset), "RSSI CALIBRATION");
+          TV.draw_rect(13, 33, 104, 8, WHITE, BLACK);
+          if (progress <= 100) {
+            TV.draw_rect(15, 35, progress, 4, WHITE, WHITE);
+          }
+        }
         if (display_setting >= 1) {
           u8g.setPrintPos(30, 10);
           u8g.print("RSS CALIBRATION");
-          u8g.setPrintPos(20, 26);
-          u8g.print("calibrating");
+          u8g.drawFrame(13, 28, 104, 8);
+          if (progress <= 100) {
+            u8g.drawBox(15, 30, progress, 4);
+          }
         }
+
 
 
         //Fill up the array with RSSi values for each channel - repeated 10 times for accuracy
@@ -1195,35 +1185,35 @@ void calibration() {     // Calibration wizzard
           if (ACT_channel == 1) {
             rssi_value1 = _readRSSI();
             values[0] = rssi_value1;
-            Serial.print("1: "); Serial.println(values[0]);
+            //Serial.print("1: "); Serial.println(values[0]);
             ACT_channel = 2;
           }
 
           else if (ACT_channel == 2) {
             rssi_value2 = _readRSSI();
             values[1] = rssi_value2;
-            Serial.print("2: "); Serial.println(values[1]);
+            //Serial.print("2: "); Serial.println(values[1]);
             ACT_channel = 3;
           }
 
           else if (ACT_channel == 3) {
             rssi_value3 = _readRSSI();
             values[2] = rssi_value3;
-            Serial.print("3: "); Serial.println(values[2]);
+            //Serial.print("3: "); Serial.println(values[2]);
             ACT_channel = 4;
           }
 
           else if (ACT_channel == 4) {
             rssi_value4 = _readRSSI();
             values[3] = rssi_value4;
-            Serial.print("4: "); Serial.println(values[3]);
+            //Serial.print("4: "); Serial.println(values[3]);
             ACT_channel = 5;
           }
 
           else if (ACT_channel == 5) {
             rssi_value5 = _readRSSI();
             values[4] = rssi_value5;
-            Serial.print("5: "); Serial.println(values[4]);
+            //Serial.print("5: "); Serial.println(values[4]);
             ACT_channel = 6;
           }
 
@@ -1231,21 +1221,21 @@ void calibration() {     // Calibration wizzard
 
             rssi_value6 = _readRSSI();
             values[5] = rssi_value6;
-            Serial.print("6: "); Serial.println(values[5]);
+            //Serial.print("6: "); Serial.println(values[5]);
             ACT_channel = 7;
           }
 
           else if (ACT_channel == 7) {
             rssi_value7 = _readRSSI();
             values[6] = rssi_value7;
-            Serial.print("7: "); Serial.println(values[6]);
+            //Serial.print("7: "); Serial.println(values[6]);
             ACT_channel = 8;
           }
 
           else if (ACT_channel == 8) {
             rssi_value8 = _readRSSI();
             values[7] = rssi_value8;
-            Serial.print("8: "); Serial.println(values[7]);
+            //Serial.print("8: "); Serial.println(values[7]);
 
             rssireadin = rssireadin + 1;
             ACT_channel = 1;
@@ -1272,8 +1262,8 @@ void calibration() {     // Calibration wizzard
         //print out the results
         if (rssireadin >= 11) {
 
-          Serial.print("rssi_max: ");
-          Serial.println(rssi_max);
+          //Serial.print("rssi_max: ");
+          //Serial.println(rssi_max);
 
           rssireadin = rssireadin + 1;
         }
@@ -1283,11 +1273,12 @@ void calibration() {     // Calibration wizzard
           RSSImaxEEP = rssi_max / 2;
 
           EEPROM.write(RSSImaxADDR, RSSImaxEEP);
-          Serial.print("rssi_max saved! ");
+          //Serial.print("rssi_max saved! ");
 
           if (display_setting <= 1) {
             TV.clear_screen();
           }
+          progress = 0;
           calstep = 3;
         }
       }
@@ -1295,6 +1286,7 @@ void calibration() {     // Calibration wizzard
       else if (calstep == 3) {
 
         if (display_setting <= 1) {
+          TV.select_font(font4x6);
           TV.print(30, (0 + voffset), "RSSI CALIBRATION");
           TV.select_font(font6x8);
           TV.print(0, (20 + voffset), "2:Put on the antenna and switch on the VTX");
@@ -1324,8 +1316,8 @@ void calibration() {     // Calibration wizzard
 
           calstep = 4;
 
-          Serial.print("readin: "); Serial.println(rssireadin);
-          Serial.print("step: "); Serial.println(calstep);
+          //Serial.print("readin: "); Serial.println(rssireadin);
+          //Serial.print("step: "); Serial.println(calstep);
         }
       }
 
@@ -1335,18 +1327,27 @@ void calibration() {     // Calibration wizzard
 
         channeltable();
 
-        if (display_setting <= 1) {
-          TV.print(30, (0 + voffset), "RSSI CALIBRATION");
-          TV.select_font(font6x8);
-          TV.print(0, (20 + voffset), "calibrating");
+        if (progress >= 100) {
+        }
+        else {
+          progress++;
         }
 
-
+        if (display_setting <= 1) {
+          TV.select_font(font4x6);
+          TV.print(30, (0 + voffset), "RSSI CALIBRATION");
+          TV.draw_rect(13, 33, 104, 8, WHITE, BLACK);
+          if (progress <= 100) {
+            TV.draw_rect(15, 35, progress, 4, WHITE, WHITE);
+          }
+        }
         if (display_setting >= 1) {
           u8g.setPrintPos(30, 10);
           u8g.print("RSS CALIBRATION");
-          u8g.setPrintPos(20, 26);
-          u8g.print("calibrating");
+          u8g.drawFrame(13, 28, 104, 8);
+          if (progress <= 100) {
+            u8g.drawBox(15, 30, progress, 4);
+          }
         }
 
 
@@ -1357,35 +1358,35 @@ void calibration() {     // Calibration wizzard
           if (ACT_channel == 1) {
             rssi_value1 = _readRSSI();
             values[0] = rssi_value1;
-            Serial.print("1: "); Serial.println(values[0]);
+            //Serial.print("1: "); Serial.println(values[0]);
             ACT_channel = 2;
           }
 
           else if (ACT_channel == 2) {
             rssi_value2 = _readRSSI();
             values[1] = rssi_value2;
-            Serial.print("2: "); Serial.println(values[1]);
+            //Serial.print("2: "); Serial.println(values[1]);
             ACT_channel = 3;
           }
 
           else if (ACT_channel == 3) {
             rssi_value3 = _readRSSI();
             values[2] = rssi_value3;
-            Serial.print("3: "); Serial.println(values[2]);
+            //Serial.print("3: "); Serial.println(values[2]);
             ACT_channel = 4;
           }
 
           else if (ACT_channel == 4) {
             rssi_value4 = _readRSSI();
             values[3] = rssi_value4;
-            Serial.print("4: "); Serial.println(values[3]);
+            //Serial.print("4: "); Serial.println(values[3]);
             ACT_channel = 5;
           }
 
           else if (ACT_channel == 5) {
             rssi_value5 = _readRSSI();
             values[4] = rssi_value5;
-            Serial.print("5: "); Serial.println(values[4]);
+            //Serial.print("5: "); Serial.println(values[4]);
             ACT_channel = 6;
           }
 
@@ -1393,21 +1394,21 @@ void calibration() {     // Calibration wizzard
 
             rssi_value6 = _readRSSI();
             values[5] = rssi_value6;
-            Serial.print("6: "); Serial.println(values[5]);
+            //Serial.print("6: "); Serial.println(values[5]);
             ACT_channel = 7;
           }
 
           else if (ACT_channel == 7) {
             rssi_value7 = _readRSSI();
             values[6] = rssi_value7;
-            Serial.print("7: "); Serial.println(values[6]);
+            //Serial.print("7: "); Serial.println(values[6]);
             ACT_channel = 8;
           }
 
           else if (ACT_channel == 8) {
             rssi_value8 = _readRSSI();
             values[7] = rssi_value8;
-            Serial.print("8: "); Serial.println(values[7]);
+            //Serial.print("8: "); Serial.println(values[7]);
 
             rssireadin = rssireadin + 1;
             ACT_channel = 1;
@@ -1434,8 +1435,8 @@ void calibration() {     // Calibration wizzard
         //print out the results
         if (rssireadin >= 11) {
 
-          Serial.print("rssi_min: ");
-          Serial.println(rssi_min);
+          //Serial.print("rssi_min: ");
+          //Serial.println(rssi_min);
 
           rssireadin = rssireadin + 1;
         }
@@ -1445,11 +1446,12 @@ void calibration() {     // Calibration wizzard
           RSSIminEEP = rssi_min / 2;
 
           EEPROM.write(RSSIminADDR, RSSIminEEP);
-          Serial.print("rssi_min saved! ");
+          //Serial.print("rssi_min saved! ");
 
           if (display_setting <= 1) {
             TV.clear_screen();
           }
+          progress = 0;
           calstep = 5;
         }
 
@@ -1464,6 +1466,7 @@ void calibration() {     // Calibration wizzard
         RSSImaxEEP = EEPROM.read(RSSImaxADDR) * 2;
 
         if (display_setting <= 1) {
+          TV.select_font(font4x6);
           TV.print(30, (0 + voffset), "RSSI CALIBRATION");
           TV.select_font(font6x8);
           TV.print(8, (20 + voffset), "3:Calibration done!");
@@ -1554,7 +1557,7 @@ void bandscan() {
         if (display_setting <= 1) {
           int x = 16 * idx;
           char chan_label[10];
-          sprintf(chan_label, "CH%d", idx - 1);
+          sprintf(chan_label, "CH%d", idx + 1);
 
           TV.draw_rect(x, (13 + voffset), 14, 56, BLACK, BLACK);
           TV.draw_rect(x, ((70 - (rssi * 0.46)) + voffset), 10, (rssi * 0.46), WHITE, WHITE);
@@ -1882,6 +1885,8 @@ void autosearch() {
   double rssi_value8 = 0;
 
   clearOLED();
+  byte progress = 0;
+
 
   while (exit == 0) {
 
@@ -1892,12 +1897,28 @@ void autosearch() {
       channeltable();
       osd_mode = 1;
 
+      if (progress >= 100) {
+        //progress = 0;
+      }
+      else {
+        progress++;
+      }
+
       if (display_setting <= 1) {
-        TV.print(10, (10 + voffset), "Autosearch...");
+        TV.select_font(font4x6);
+        TV.print(45, (0 + voffset), "AUTOSEARCH");
+        TV.draw_rect(13, 33, 104, 8, WHITE, BLACK);
+        if (progress <= 100) {
+          TV.draw_rect(15, 35, progress, 4, WHITE, WHITE);
+        }
       }
       if (display_setting >= 1) {
-        u8g.setPrintPos(10, 10);
-        u8g.print("Autosearch...");
+        u8g.setPrintPos(40, 10);
+        u8g.print("AUTOSEARCH");
+        u8g.drawFrame(13, 28, 104, 8);
+        if (progress <= 100) {
+          u8g.drawBox(15, 30, progress, 4);
+        }
       }
 
       //Fill up the array with RSSi values for each channel - repeated 10 times for accuracy
@@ -1989,8 +2010,14 @@ void autosearch() {
       //print out the results
       if (rssireadin >= 11) {
 
+        if (display_setting <= 1) {
+          TV.select_font(font6x8);
+          TV.print(35, (45 + voffset), "Best CH: ");
+          TV.print(minIndex + 1);
+        }
+
         if (display_setting >= 1) {
-          u8g.setPrintPos(10, 30);
+          u8g.setPrintPos(35, 50);
           u8g.print("Best CH: ");
           u8g.print(minIndex + 1);
         }
@@ -2005,10 +2032,20 @@ void autosearch() {
           TV.clear_screen();
         }
 
-        menuactive = 0; //for debugging only
-        ACT_channel = minIndex + 1;
+        menuactive = 0;
+        BT_update = 1;
         BT_channel = minIndex + 1;
+
+        rx_update();
+
         rssireadin = 0;
+
+        if (display_setting <= 1) {
+          TV.tone(600, 400);
+        }
+        else {
+          tone(BUZZ, 600, 400);
+        }
 
         exit = 1;
         return;
@@ -2047,15 +2084,6 @@ void drawGraph() {
     TV.set_pixel(x, originy + 2, 1);
   }
 }
-
-
-
-
-// STUFF FOR LATER VERSIONS
-// • Display setting (OLED + OSD)
-// • Serial setting (OLED + OSD)
-// • Dockking compatibility???
-// • Reorder menu items
 
 
 //STORING STUFF FOR LATER
