@@ -1,6 +1,8 @@
 <img src="https://raw.githubusercontent.com/skaman82/2.4GHz-Fatshark-Module/master/img/img.jpg"/>
 
 # 2.4GHz-Fatshark-Module
+I created this module to fly my 2.4 wings casually without the need to set up the bulky 2.4 ground station. The range is absolutely plenty - up to 8km with just a pair of CPL Singularity antennas, even more with a patch. This is not meant to be a replacement for a good ground station for real LR flights.
+
 RX28 based Fatshark RX module
 
 - 8 channels (2414, 2432, 2450, 2468, 2490, 2510, 2390, 2370 MHz)
