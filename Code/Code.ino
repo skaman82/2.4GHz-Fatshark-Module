@@ -697,7 +697,7 @@ void loop() {
       //set the values to be transmitted
       trueDdata.rssi1 = percentage;
       trueDdata.rssi_max = percentage;
-      trueDdata.band_channel = 0x80 | (ACT_channel & 0x07);
+      trueDdata.band_channel = 0x80 | ((ACT_channel-1) & 0x07);
 
       //calculate checksum
       uint16_t crc_calc = crc16_ccitt(&trueDdata.preamble1, sizeof(trueDdata_tx_s) - 2);
