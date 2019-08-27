@@ -1,9 +1,9 @@
 // This Project is created by Albert Kravcov under GNU GPLv3 License
-// 
+//
 //  The code uses some libraries created by others:
 //  TV-OUT (VE) Library by 2017 nootropicdesign (MIT license)
 //  U8glib
-//  The U8glib code (http://code.google.com/p/u8glib/) is licensed under the terms of 
+//  The U8glib code (http://code.google.com/p/u8glib/) is licensed under the terms of
 //  the new-bsd license (two-clause bsd license).
 
 
@@ -18,6 +18,7 @@ const char verId[7] = "v1.0"; //VERSION INFO
 #include <Wire.h>
 #include "U8glib.h"
 #include <EEPROM.h>
+#include "crc16.h"
 
 //DISPLAY TYPE SELECTION
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_DEV_0 | U8G_I2C_OPT_NO_ACK | U8G_I2C_OPT_FAST); // Fast I2C / TWI
@@ -96,6 +97,24 @@ channel_t rx28_chan_table[8] = {
   { 2370, HIGH, HIGH, HIGH, HIGH }
 };
 
+typedef __attribute__((__packed__)) struct trueDdata_tx_t
+{
+  const uint8_t preamble1 = 0xFD;
+  const uint8_t preamble2 = 0x07;
+  uint8_t unknown1;
+  uint8_t unknown2;
+  uint8_t unknown3;
+  uint8_t unknown4;
+  uint8_t unknown5;
+  uint8_t band_channel;
+  uint8_t unknown6;
+  uint8_t rssi_max;
+  uint8_t rssi1;
+  uint8_t rssi2;
+  uint8_t unknown7;
+  uint8_t crc_h;
+  uint8_t crc_l;
+}trueDdata_tx_s;
 
 TVout TV;
 
@@ -672,9 +691,25 @@ void loop() {
     }
 
     if (serial_setting == 1) {
+      //static, so no need to initialize, all values are 0 by default
+      static trueDdata_tx_s trueDdata;
+
+      //set the values to be transmitted
+      trueDdata.rssi1 = percentage;
+      trueDdata.rssi_max = percentage;
+      trueDdata.band_channel = 0x80 | (ACT_channel & 0x07);
+
+      //calculate checksum
+      uint16_t crc_calc = crc16_ccitt(&trueDdata.preamble1, sizeof(trueDdata_tx_s) - 2);
+      trueDdata.crc_l = (uint8_t)crc_calc;
+      trueDdata.crc_h = (uint8_t)(crc_calc >> 8);
+      
+      //send data on serial port
+      Serial.write(&trueDdata.preamble1, sizeof(trueDdata_tx_s));
+
       //PLACEHOLDER FOR SERIAL CODE
-      Serial.println(percentage, 0);
-      Serial.println(ACT_channel);
+      //Serial.println(percentage, 0);
+      //Serial.println(ACT_channel);
     }
 
     if (display_setting <= 1) {
