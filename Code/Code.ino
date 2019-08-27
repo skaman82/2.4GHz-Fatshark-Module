@@ -199,7 +199,7 @@ void setup() {
   //TODO>
   display_setting = 1; //just for testing 0 = ONLY OSD | 1 = OLED+OSD | 2 = ONLY OLED
 
-  serial_setting = 0;
+  serial_setting = 1;
 
   //TODO>
   if (serial_setting == 1) {
