@@ -22,7 +22,7 @@ Tested with following VTX models:</br>
 • Cheap low power chinese transmitter modules </br>
 (no audio compatibility issues unlike the latest RX 2.4 module on the market)
 
-See the Wiki for build instructions! > https://github.com/skaman82/2.4GHz-Fatshark-Module/wiki
+See the Wiki for <b>build instructions!</b> > https://github.com/skaman82/2.4GHz-Fatshark-Module/wiki
 
 # OPERATION
 <b>HOME SCREEN:</b> You can change the channels by pressing the UP/DOWN keys - it works also with the google buttons (if the feature is active). If using the joystick you have to press UP/DOWN once to bring the OSD up - then you can change the channel. After no button press is registered the OSD will automatically disappear. </br>
